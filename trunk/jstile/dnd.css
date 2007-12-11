@@ -1,0 +1,20 @@
+h1 {
+    font-size: 2em;
+    color: #4B4545;
+    text-align: center;
+}
+
+.tile
+{
+    background: white;
+    cursor: move;
+    font-size: 25px;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid black;
+    text-align: center;
+}
+.hoverclass
+{
+    background: #88ff88;
+}

@@ -1,0 +1,12 @@
+tilescript の実験
+
+goal: 0 から 9 までの DnD 出来るタイルを表示する。
+
+使用ライブラリ
+http://script.aculo.us/dist/scriptaculous-js-1.7.1_beta3.tar.gz
+
+参考
+- http://www.openspc2.org/JavaScript/Ajax/ref/script.aculo.us/ver1.7.1b3/index.html
+
+- http://diaspar.jp/node/43
+- http://wiki.script.aculo.us/scriptaculous/show/Draggable
