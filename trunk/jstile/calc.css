@@ -1,0 +1,32 @@
+h1 {
+    font-size: 2em;
+    color: #4B4545;
+    text-align: center;
+}
+
+.answer
+{
+    font-size: 30px;
+    margin: 2px;
+    padding: 10px;
+    background:#f0f0f0;
+}
+
+
+.tile
+{
+    cursor: move;
+    font-size: 25px;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #888888;
+    text-align: center;
+//    background:#d0f0d0;
+    background:#ffffff;
+}
+
+
+.hoverclass
+{
+    background: #e8c0a0;
+}
