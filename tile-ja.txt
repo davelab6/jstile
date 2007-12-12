@@ -10,3 +10,4 @@ http://script.aculo.us/dist/scriptaculous-js-1.7.1_beta3.tar.gz
 
 - http://diaspar.jp/node/43
 - http://wiki.script.aculo.us/scriptaculous/show/Draggable
+- http://developer.mozilla.org/ja/docs/Gecko_DOM_Reference
