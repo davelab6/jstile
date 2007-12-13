@@ -55,7 +55,7 @@ Array.prototype.makeTile = function() {
   span.appendChild(argTile1);
   span.appendChild(symbolTile);
   span.appendChild(argTile2);
-  span.children = [symbolTile, argTile1, argTile2];
+  span.nodes = [symbolTile, argTile1, argTile2];
   span.draggable = new Draggable(span, { ghosting: false, revert: true });
   Droppables.add(span, { onDrop: acceptDrop, accept: "tile", hoverclass: "hoverclass"});
   span.tileString = function () { return "(" + argTile1.tileString() + span.value[0] + argTile2.tileString() + ")"; }
@@ -74,13 +74,13 @@ Array.prototype.dup = function() {
 function acceptDrop(element, droppableElement) {
   var newNode = element.value.dup().makeTile();
   var parent = droppableElement.parentNode;
-  if (parent.children != undefined) {
-    if (parent.children[1] == droppableElement) {
-      parent.children[1] = newNode;
+  if (parent.nodes != undefined) {
+    if (parent.nodes[1] == droppableElement) {
+      parent.nodes[1] = newNode;
       parent.value[1] = newNode.value;
     }
-    if (parent.children[2] == droppableElement) {
-      parent.children[2] = newNode;
+    if (parent.nodes[2] == droppableElement) {
+      parent.nodes[2] = newNode;
       parent.value[2] = newNode.value;
     }
   }
@@ -92,11 +92,11 @@ function acceptDrop(element, droppableElement) {
 
 /* adjust the tile's padding based on the depth */
 function adjustPadding (tile) {
-  if (tile.children == undefined) {
+  if (tile.nodes == undefined) {
     return 2;
   }
   var max = 0;
-  tile.children.each(function (value, index) {
+  tile.nodes.each(function (value, index) {
     var padding = adjustPadding(value);
     if (max < padding) {
       max = padding;
@@ -107,7 +107,7 @@ function adjustPadding (tile) {
 }
 
 function findTop(tile) {
-  if (tile.parentNode.children == undefined) {
+  if (tile.parentNode.nodes == undefined) {
     return tile;
   }
   return findTop(tile.parentNode);
@@ -116,9 +116,9 @@ function findTop(tile) {
 // ---------- Evaluation ----------
 
 function updateAnswer() {
-  query = $("query").getElementsByTagName("span")[0].value;
-  if (query != undefined) {
-    $("answer").innerHTML = query.getAnswer();
+  var q = $("query").getElementsByTagName("span")[0].value;
+  if (q != undefined) {
+    $("answer").innerHTML = q.getAnswer();
   }
 }
 
@@ -162,14 +162,14 @@ function test() {
   // Replace to a complex tile
   before = ["+", 3, 4].makeTile();
   after =["-", 5, 6].makeTile();
-  target = before.children[1];
+  target = before.nodes[1];
   p = document.createElement("p");
   p.appendChild(before);
   document.body.appendChild(p);
   acceptDrop(after, target);
   if (p.firstChild.value[1][0] != "-") alert("Failed: " + p.firstChild.value);
-  if (p.firstChild.children[1].value[0] != "-") {
-    alert("Failed: " + p.firstChild.children[1].value);
+  if (p.firstChild.nodes[1].value[0] != "-") {
+    alert("Failed: " + p.firstChild.nodes[1].value);
   }
   document.body.appendChild(document.createTextNode("ok"))
 }
