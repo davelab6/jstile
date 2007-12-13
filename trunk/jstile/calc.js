@@ -25,10 +25,16 @@ function addTiles() {
   p2.appendChild(minus);
   adjustPadding(p2.firstChild);
 
+  var p3 = document.createElement("p");
+  var multi = ["*", 1, 2].makeTile();
+  p3.appendChild(multi);
+  adjustPadding(p3.firstChild);
+
   Droppables.remove(plus);
   Droppables.remove(minus);
   document.body.appendChild(p1);
   document.body.appendChild(p2);
+  document.body.appendChild(p3);
 }
 
 // ---------- Tiles ----------
@@ -128,6 +134,8 @@ Array.prototype.getAnswer = function () {
     return this[1].getAnswer() + this[2].getAnswer();
   } else if (this[0] == "-") {
     return this[1].getAnswer() - this[2].getAnswer();
+  } else if (this[0] == "*") {
+    return this[1].getAnswer() * this[2].getAnswer();
   }
 }
 
