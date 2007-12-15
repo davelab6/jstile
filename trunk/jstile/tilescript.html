@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>A Calculator in Tile</title>
+    <link href="tilescript.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="scriptaculous/prototype.js"></script>
+    <script type="text/javascript" src="scriptaculous/scriptaculous.js?load=effects,dragdrop"></script>
+    <script type="text/javascript" src="tilescript.js"></script>
+
+    <script src="ometa-js/lib.js"></script>
+    <script src="ometa-js/ometa-base.js"></script>
+    <script src="ometa-js/parser.js"></script>
+    <script src="ometa-js/squeak-parser.js"></script>
+    <script src="ometa-js/squeak-lib.js"></script>
+    <script src="ometa-js/ometa-parser.js"></script>
+
+    <script>
+
+function autoexec() {
+  Array.prototype.topLevelMakeTile = function() {
+    var r = this.makeTile()
+    adjustPadding(r)
+    return r
+  }
+  eval(OMetaParser.matchAllwith(document.getElementById("omsparser").value, "grammar").squish().join(''))
+  OMetaSqueakParser.translate = function(s) { return this.matchAllwith(s, "iTranslate") }
+  OMetaSqueakParser.eval      = function(s) { return eval(this.translate(s)) }
+  OMetaSqueakParser.eval(document.getElementById("mdsparser").value)
+  OMetaSqueakParser.eval(document.getElementById("jsparser").value)
+}
+
+    </script>
+</head>
+<body>
+
+<textarea id=omsparser style="display: none">
+ometa OMetaSqueakParser : Parser {
+  topLevelExpr  ::= <foreign OMetaParser  #grammar>
+                  | <foreign SqueakParser #expr>.
+  topLevelExprs ::= <listOf #topLevelExpr '.'>:r (<token '.'> | <empty>) <spaces> <end> => [r delimWith: '; '].
+  iTranslate    ::= <topLevelExprs>:r                                                   => [r squish join: ''].
+}
+</textarea>
+
+<textarea id=mdsparser style="display: none">
+ometa MDefSqueakParser : SqueakParser {
+  unaryMsgPat       ::= <identifier>:m                        => [{{$'. m. $'}. {}}].
+  binaryMsgPat      ::= <binary>:m  <identifier>:a            => [{m squish join: ''. {a}}].
+  keywordMsgPatPart ::= <keyword>:k <identifier>:a            => [{k. a}].                    
+  keywordMsgPat     ::= <keywordMsgPatPart>+:parts                                            
+                          ![parts collect: [:p | p at: 0]]:ks                                 
+                          ![parts collect: [:p | p at: 1]]:as                                
+                          ![ks squish join: '']:ks            => [{{$'. ks escape. $'}. as}]. 
+  msgPat            ::= <keywordMsgPat>                                                        
+                      | <binaryMsgPat>                                                         
+                      | <unaryMsgPat>.                                                         
+  methodDef         ::= <identifier>:cls <msgPat>:nameAndArgs <block false>:body              
+                          => [cls,, '.prototype[',, (nameAndArgs at: 0),, '] = ',,           
+                              'function(',, ((nameAndArgs at: 1) delimWith: ', '),, ') { ',,  
+                                'var $elf = this; ',,                                         
+                                'try { (',, body,, ')() } ',,                                 
+                                'catch (_r) { ',,                                             
+                                  'if (_r instanceof Return) return _r.value;',,               
+                                  'else throw _r } return this }'].                            
+}.                                                                                             
+ometa NewSqueakParser {                                                                        
+   expr ::= <foreign MDefSqueakParser #methodDef>                                              
+          | <foreign MDefSqueakParser #expr>.                                                  
+}.                                                                                             
+SqueakParser := NewSqueakParser.
+</textarea>
+
+<textarea id=jsparser style="display: none">
+ometa JSParser : Parser {
+  nameFirst    ::= <letter>        | '$'.
+  nameRest     ::= <letterOrDigit> | '$'.
+  iName        ::= <firstAndRest #nameFirst #nameRest>:r                                           => [r join: ''].
+  name         ::= <iName>:n ?[(self isKeyword: n) not]                                            => [{#name. n}].
+  keyword      ::= <iName>:k ?[self isKeyword: k]                                                  => [{k. k}].
+  number       ::= <digit>+:ds                                                                     => [{#number. parseInt value: (ds join: '')}].
+  escapeChar   ::= '\\' <char>:c                                                                   => ['\\', c].
+  str          ::= "'" (<escapeChar> | ~"'" <char>)*:cs "'"                                        => [{#string. cs join: ''}]
+                 | '"' (<escapeChar> | ~'"' <char>)*:cs '"'                                        => [{#string. cs join: ''}].
+  special      ::= ( "("   | ")"   | "{"   | "}"   | "["  | "]"  | "," | ";"  | "?" | ":"
+                   | "!==" | "!="  | "===" | "=="  | "="  | ">=" | ">" | "<=" | "<" | "++"
+                   | "+="  | "+"   | "--"  | "-="  | "-"  | "*=" | "*" | "/=" | "/" | "%="
+                   | "%"   | "&&=" | "&&"  | "||=" | "||" | "."  | "!"                    ):s      => [{s. s}].
+  tok          ::= <spaces> (<name> | <keyword> | <number> | <str> | <special>).
+  toks         ::= <token>*:ts <spaces> <end>                                                      => [ts].
+  token :tt    ::= <tok>:t ?[(t at: 0) = tt]                                                       => [t at: 1].
+  spacesNoNl   ::= (~'\n' <space>)*.
+
+  expr         ::= <orExpr>:e ( <token '?'>   <expr>:t <token ':'> <expr>:f                        => [{#condExpr. e. t. f}]
+                              | <token '='>   <expr>:rhs                                           => [{#set.  e. rhs}]
+                              | <token '+='>  <expr>:rhs                                           => [{#mset. e. #+.    rhs}]
+                              | <token '-='>  <expr>:rhs                                           => [{#mset. e. #-.    rhs}]
+                              | <token '*='>  <expr>:rhs                                           => [{#mset. e. #*.    rhs}]
+                              | <token '/='>  <expr>:rhs                                           => [{#mset. e. #/.    rhs}]
+                              | <token '%='>  <expr>:rhs                                           => [{#mset. e. #%.    rhs}]
+                              | <token '&&='> <expr>:rhs                                           => [{#mset. e. #&&.   rhs}]
+                              | <token '||='> <expr>:rhs                                           => [{#mset. e. #'||'. rhs}]
+                              | <empty>                                                            => [e]
+                              ).
+  orExpr       ::= <orExpr>:x <token '||'> <andExpr>:y                                             => [{#'||'. x. y}]
+                 | <andExpr>.
+  andExpr      ::= <andExpr>:x <token '&&'> <eqExpr>:y                                             => [{#&&. x. y}]
+                 | <eqExpr>.
+  eqExpr       ::= <eqExpr>:x ( <token '=='>  <relExpr>:y                                          => [{#==.  x. y}]
+                              | <token '!='>  <relExpr>:y                                          => [{#!=.  x. y}]
+                              | <token '==='> <relExpr>:y                                          => [{#===. x. y}]
+                              | <token '!=='> <relExpr>:y                                          => [{#!==. x. y}]
+                              )
+                 | <relExpr>.
+  relExpr      ::= <relExpr>:x ( <token '>'>          <addExpr>:y                                  => [{#>.  x. y}]
+                               | <token '>='>         <addExpr>:y                                  => [{#>=. x. y}]
+                               | <token '<'>          <addExpr>:y                                  => [{#<.  x. y}]
+                               | <token '<='>         <addExpr>:y                                  => [{#>=. x. y}]
+                               | <token 'instanceof'> <addExpr>:y                                  => [{#instanceof. x. y}]
+                               )
+                 | <addExpr>.
+  addExpr      ::= <addExpr>:x <token '+'> <mulExpr>:y                                             => [{#+. x. y}]
+                 | <addExpr>:x <token '-'> <mulExpr>:y                                             => [{#-. x. y}]
+                 | <mulExpr>.
+  mulExpr      ::= <mulExpr>:x <token '*'> <mulExpr>:y                                             => [{#*. x. y}]
+                 | <mulExpr>:x <token '/'> <mulExpr>:y                                             => [{#/. x. y}]
+                 | <mulExpr>:x <token '%'> <mulExpr>:y                                             => [{#%. x. y}]
+                 | <unary>.
+  unary        ::= <token '-'>  <postfix>:p                                                        => [{#-. 0. p}]
+                 | <token '+'>  <postfix>:p                                                        => [p]
+                 | <token '++'> <postfix>:p                                                        => [{#preIncr. p}]
+                 | <token '--'> <postfix>:p                                                        => [{#preDecr. p}]
+                 | <token '!'>  <postfix>:p                                                        => [{#not. p}]
+                 | <postfix>.
+  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postIncr. p}]
+                                | <spacesNoNl> <token '--'>                                        => [{#postDecr. p}]
+                                | <empty>                                                          => [p]
+                                ).
+  primExpr     ::= <primExpr>:p
+                     ( <token '['> <expr>:i <token ']'>                                            => [{#get.  i. p}]
+                     | <token '.'> <token 'name'>:m <token '('> <listOf #expr ','>:as <token ')'>  => [{#send. m. p} concat: as]
+                     | <token '.'> <token 'name'>:f                                                => [{#get.  f. p}]
+                     | <token '('> <listOf #expr ','>:as <token ')'>                               => [{#call. p} concat: as]
+                     )
+                 | <primExprHd>.
+  primExprHd   ::= <token '('> <expr>:e <token ')'>                                                => [e]
+                 | <token 'this'>                                                                  => [{#this}]
+                 | <token 'name'>:n                                                                => [{#get. n}]
+                 | <token 'number'>:n                                                              => [{#number. n}]
+                 | <token 'string'>:s                                                              => [{#string. s}]
+                 | <token 'function'> <funcRest>
+                 | <token 'new'> <token 'name'>:n <token '('> <listOf #expr ','>:as <token ')'>    => [{#new. n} concat: as]
+                 | <token '['> <listOf #expr ','>:es <token ']'>                                   => [{#arr} concat: es]
+                 | <json>.
+  json         ::= <token '{'> <listOf #jsonBinding ','>:bs <token '}'>                            => [{#json} concat: bs].
+  jsonBinding  ::= <jsonPropName>:n <token ':'> <expr>:v                                           => [{#binding. n. v}].
+  jsonPropName ::= <token 'name'> | <token 'number'> | <token 'string'>.
+  formal       ::= <spaces> <token 'name'>.
+  funcRest     ::= <token '('> <listOf #formal ','>:fs <token ')'>
+                     <token '{'> <srcElems>:body <token '}'>                                       => [{#func. {#formals} concat: fs. body}].
+  sc           ::= <spacesNoNl> ('\n' | &'}' | <end>)
+                 | <token ';'>.
+  binding      ::= <token 'name'>:n ( <token '='> <expr>
+                                    | <empty> => [{#get. 'undefined'}] ):v                         => [{#var. n. v}].
+  block        ::= <token '{'> <srcElems>:ss <token '}'>                                           => [ss].
+  stmt         ::= <block>
+                 | <token 'var'> <listOf #binding ','>:bs <sc>                                     => [{#begin} concat: bs]
+                 | <token 'if'> <token '('> <expr>:c <token ')'> <stmt>:t
+                     ( <token 'else'> <stmt>
+                     | <empty> => [{#get. 'undefined'}] ):f                                        => [{#if. c. t. f}]
+                 | <token 'while'> <token '('> <expr>:c <token ')'> <stmt>:s                       => [{#while.   c. s}]
+                 | <token 'do'> <stmt>:s <token 'while'> <token '('> <expr>:c <token ')'> <sc>     => [{#doWhile. s. c}]
+                 | <token 'for'> <token '('> ( <token 'var'> <binding>
+                                             | <expr>
+                                             | <empty> => [{#get. 'undefined'}] ):i
+                                 <token ';'> ( <expr>
+                                             | <empty> => [{#get. 'true'}]      ):c
+                                 <token ';'> ( <expr>
+                                             | <empty> => [{#get. 'undefined'}] ):u
+                                 <token ')'>
+                       <stmt>:s                                                                    => [{#for. i. c. u. s}]
+                 | <token 'for'> <token '('> ( <token 'var'> <token 'name'>:n
+                                                            => [{#var. n. {#get. 'undefined'}}]
+                                            | <expr>                                            ):v
+                                <token 'in'> <expr>:e
+                                <token ')'>
+                       <stmt>:s                                                                    => [{#forIn. v. e. s}]
+                 | <token 'switch'> <token '('> <expr>:e <token ')'> <token '{'>
+                     ( <token 'case'> <expr>:c <token ':'> <srcElems>:cs => [{#case. c. cs}]
+                     | <token 'default'> <token ':'> <srcElems>:cs       => [{#default. cs}] )*:cs
+                     <token '}'>                                                                   => [{#switch. e} concat: cs]
+                 | <token 'break'> <sc>                                                            => [{#break}]
+                 | <token 'continue'> <sc>                                                         => [{#continue}]
+                 | <token 'throw'> <spacesNoNl> <expr>:e <sc>                                      => [{#throw. e}]
+                 | <token 'try'> <block>:t
+                     <token 'catch'> <token '('> <token 'name'>:e <token ')'> <block>:c
+                     ( <token 'finally'> <block>
+                     | <empty> => [{#get. 'undefined'}] ):f                                        => [{#try. t. e. c. f}]
+                 | <token 'return'> ( <expr>
+                                    | <empty> => [{#get. 'undefined'}] ):e <sc>                    => [{#return. e}]
+                 | <expr>:e <sc>                                                                   => [e].
+  srcElem      ::= <token 'function'> <token 'name'>:n <funcRest>:f                                => [{#var. n. f}]
+                 | <stmt>.
+  srcElems     ::= <srcElem>*:ss                                                                   => [{#begin} concat: ss].
+}.
+
+JSParser at: #keywords put: Object new.
+keywords := #(break case catch continue default delete do else finally for function if
+              in instanceof new return switch this throw try typeof var void while with).
+keywords do: [:k |
+  (JSParser at: #keywords) at: k put: true
+].
+JSParser isKeyword: k [^ (self at: #keywords) hasOwnProperty: k].
+</textarea>
+
+  <form>
+    <input type=text size=80 name=input value="2 + 3">
+    <input type=button
+           value="make tile"
+           onClick="p = document.createElement('p'); p.appendChild(JSParser.matchAllwith(input.value, 'srcElem').topLevelMakeTile()); document.body.appendChild(p)">
+  </form>
+  <h1>A Calculator in Tile</h1>
+  <p>Drop a tile to the expression. <a href="javascript:test();">Unit test</a></p>
+  <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
+  <p class="answer" id="query">
+  <span class="tile" id="queryPlace">drop here</span> = <span id="answer">answer</span>
+  </p>
+
+</body>
+</html>
