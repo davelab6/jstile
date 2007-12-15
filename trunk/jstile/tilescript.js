@@ -1,12 +1,3 @@
-/*
-TODO:
-----
-
-{#switch. e}
-{#case. c. cs}
-{#default. cs}
-*/
-
 // ---------- Initialization ----------
 
 window.onload = function() {
@@ -295,6 +286,32 @@ Array.prototype.makeCodes["binding"] = function() { return this[1].printString()
 Array.prototype.makeTiles["binding"] = function(span) {
   span.appendChild(document.createTextNode(this[1] + ": "))
   span.appendChild(this.makeTile(2))
+}
+
+Array.prototype.makeCodes["switch"] = function() {
+  return "switch (" + this[1].makeCode() + ") {" + this.clone().splice(2).map(function(c) { return c.makeCode() }).join("; ") + "}"
+}
+Array.prototype.makeTiles["switch"] = function(span) {
+  span.appendChild(document.createTextNode("switch ("))
+  span.appendChild(this.makeTile(1))
+  span.appendChild(document.createTextNode(") { "))
+  for (var idx = 2; idx < this.length; idx++)
+    span.appendChild(this.makeTile(idx))
+  span.appendChild(document.createTextNode(" }"))
+}
+
+Array.prototype.makeCodes["case"] = function() { return "case " + this[1].makeCode() + ": " + this[2].makeCode() }
+Array.prototype.makeTiles["case"] = function(span) {
+  span.appendChild(document.createTextNode("case "))
+  span.appendChild(this.makeTile(1))
+  span.appendChild(document.createTextNode(": "))
+  span.appendChild(this.makeTile(2))
+}
+
+Array.prototype.makeCodes["default"] = function() { return "default: " + this[1].makeCode() }
+Array.prototype.makeTiles["default"] = function(span) {
+  span.appendChild(document.createTextNode("default: "))
+  span.appendChild(this.makeTile(1))
 }
 
 function acceptDrop(element, target) {
