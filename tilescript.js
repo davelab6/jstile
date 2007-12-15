@@ -3,12 +3,7 @@ TODO:
 ----
 
 {#json}
-{#while.   c. s}
-{#doWhile. s. c}
-{#for. i. c. u. s}
-{#forIn. v. e. s}
 {#switch. e}
-{#try. t. e. c. f}
 */
 
 // ---------- Initialization ----------
@@ -123,7 +118,6 @@ Array.prototype.makeTiles["postOp"] = function(span) {
 }
 
 Array.prototype.makeCodes["return"] = function() { return "return " + this[1].makeCode() }
-Array.prototype.makeCodes["throw"]  = function() { return "throw "  + this[1].makeCode() }
 
 Array.prototype.makeCodes["if"] = function() { return "if (" + this[1].makeCode() + ")  " + this[2].makeCode() + "\n" +
                                                       "else  " + this[3].makeCode() }
@@ -143,6 +137,43 @@ Array.prototype.makeTiles["condExpr"] = function(span) {
   span.appendChild(document.createTextNode(" ? "))
   span.appendChild(this.makeTile(2))
   span.appendChild(document.createTextNode(" : "))
+  span.appendChild(this.makeTile(3))
+}
+
+Array.prototype.makeCodes["while"] = function() { return "while (" + this[1].makeCode() + ") " + this[2].makeCode() }
+Array.prototype.makeTiles["while"] = function(span) {
+  span.appendChild(document.createTextNode("while ("))
+  span.appendChild(this.makeTile(1))
+  span.appendChild(document.createTextNode(") "))
+  span.appendChild(this.makeTile(2))
+}
+
+Array.prototype.makeCodes["doWhile"] = function() { return "do {" + this[1].makeCode() + "} while (" + this[2].makeCode() + ")" }
+Array.prototype.makeTiles["doWhile"] = function(span) {
+  span.appendChild(document.createTextNode("do "))
+  span.appendChild(this.makeTile(1))
+  span.appendChild(document.createTextNode(" while ("))
+  span.appendChild(this.makeTile(2))
+  span.appendChild(document.createTextNode(")"))
+}
+
+Array.prototype.makeCodes["for"] = function() { return "for (" + this[1].makeCode() + "; " +
+                                                                 this[2].makeCode() + "; " +
+                                                                 this[3].makeCode() + ") " + this[4].makeCode() }
+Array.prototype.makeTiles["for"] = function(span) {
+  span.appendChild(document.createTextNode("for ("))
+  span.appendChild(this.makeTile(1)); span.appendChild(document.createTextNode("; "))
+  span.appendChild(this.makeTile(2)); span.appendChild(document.createTextNode("; "))
+  span.appendChild(this.makeTile(3)); span.appendChild(document.createTextNode(") "))
+  span.appendChild(this.makeTile(4))
+}
+
+Array.prototype.makeCodes["forIn"] = function() { return "for (" + this[1].makeCode() + " in " +
+                                                                   this[2].makeCode() + ") " + this[3].makeCode() }
+Array.prototype.makeTiles["forIn"] = function(span) {
+  span.appendChild(document.createTextNode("for ("))
+  span.appendChild(this.makeTile(1)); span.appendChild(document.createTextNode(" in "))
+  span.appendChild(this.makeTile(2)); span.appendChild(document.createTextNode(") "))
   span.appendChild(this.makeTile(3))
 }
 
@@ -228,6 +259,22 @@ Array.prototype.makeCodes["var"] = function() {
 Array.prototype.makeTiles["var"] = function(span) {
   span.appendChild(document.createTextNode("var " + this[1] + " = "))
   span.appendChild(this.makeTile(2))
+}
+
+Array.prototype.makeCodes["throw"]  = function() { return "throw "  + this[1].makeCode() }
+
+Array.prototype.makeCodes["try"] = function() {
+  return "try {" + this[1].makeCode() + "} " +
+         "catch (" + this[2] + ") { " + this[3].makeCode() + " } " +
+         "finally { " + this[4].makeCode() + "}"
+}
+Array.prototype.makeTiles["try"] = function(span) {
+  span.appendChild(document.createTextNode("try "))
+  span.appendChild(this.makeTile(1))
+  span.appendChild(document.createTextNode(" catch (" + this[2] + ") "))
+  span.appendChild(this.makeTile(3))
+  span.appendChild(document.createTextNode(" finally "))
+  span.appendChild(this.makeTile(4))
 }
 
 function acceptDrop(element, target) {
