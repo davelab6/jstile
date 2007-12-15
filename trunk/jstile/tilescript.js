@@ -2,8 +2,9 @@
 TODO:
 ----
 
-{#json}
 {#switch. e}
+{#case. c. cs}
+{#default. cs}
 */
 
 // ---------- Initialization ----------
@@ -275,6 +276,25 @@ Array.prototype.makeTiles["try"] = function(span) {
   span.appendChild(this.makeTile(3))
   span.appendChild(document.createTextNode(" finally "))
   span.appendChild(this.makeTile(4))
+}
+
+Array.prototype.makeCodes["json"] = function() {
+  return "({" + this.clone().splice(1).map(function(b) { return b.makeCode() }).join(", ") + "})"
+}
+Array.prototype.makeTiles["json"] = function(span) {
+  span.appendChild(document.createTextNode("{"))
+  for (var idx = 1; idx < this.length; idx++) {
+    if (idx > 1)
+      span.appendChild(document.createTextNode(", "))
+    span.appendChild(this.makeTile(idx))
+  }
+  span.appendChild(document.createTextNode("}"))
+}
+
+Array.prototype.makeCodes["binding"] = function() { return this[1].printString() + ": " + this[2].makeCode() }
+Array.prototype.makeTiles["binding"] = function(span) {
+  span.appendChild(document.createTextNode(this[1] + ": "))
+  span.appendChild(this.makeTile(2))
 }
 
 function acceptDrop(element, target) {
