@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>A Calculator in Tile</title>
+    <title>TileScript</tile>
     <link href="tilescript.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="scriptaculous/prototype.js"></script>
     <script type="text/javascript" src="scriptaculous/scriptaculous.js?load=effects,dragdrop"></script>
@@ -126,14 +126,14 @@ ometa JSParser : Parser {
                  | <mulExpr>:x <token '/'> <mulExpr>:y                                             => [{#binop. #/. x. y}]
                  | <mulExpr>:x <token '%'> <mulExpr>:y                                             => [{#binop. #%. x. y}]
                  | <unary>.
-  unary        ::= <token '-'>  <postfix>:p                                                        => [{#binop. #-. {#number. 0}. p}]
+  unary        ::= <token '-'>  <postfix>:p                                                        => [{#unop.  #-.   p}]
                  | <token '+'>  <postfix>:p                                                        => [p]
-                 | <token '++'> <postfix>:p                                                        => [{#preOp. #+. p}]
-                 | <token '--'> <postfix>:p                                                        => [{#preOp. #-. p}]
-                 | <token '!'>  <postfix>:p                                                        => [{#not. p}]
+                 | <token '++'> <postfix>:p                                                        => [{#preOp. #++.  p}]
+                 | <token '--'> <postfix>:p                                                        => [{#preOp. #--.  p}]
+                 | <token '!'>  <postfix>:p                                                        => [{#unop.  #!.   p}]
                  | <postfix>.
-  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postOp. #+. p}]
-                                | <spacesNoNl> <token '--'>                                        => [{#postOp. #-. p}]
+  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postOp. #++. p}]
+                                | <spacesNoNl> <token '--'>                                        => [{#postOp. #--. p}]
                                 | <empty>                                                          => [p]
                                 ).
   primExpr     ::= <primExpr>:p
@@ -219,7 +219,7 @@ JSParser isKeyword: k [^ (self at: #keywords) hasOwnProperty: k].
            value="make tile"
            onClick="p = document.createElement('p'); p.appendChild(JSParser.matchAllwith(input.value, 'srcElem').topLevelMakeTile()); document.body.appendChild(p)">
   </form>
-  <h1>A Calculator in Tile</h1>
+  <h1>TileScript</h1>
   <p>Drop a tile to the expression. <a href="javascript:test();">Unit test</a></p>
   <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
   <p class="answer" id="query">
@@ -228,3 +228,4 @@ JSParser isKeyword: k [^ (self at: #keywords) hasOwnProperty: k].
 
 </body>
 </html>
+
