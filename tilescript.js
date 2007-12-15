@@ -2,17 +2,12 @@
 TODO:
 ----
 
-{#new. n}
-{#arr}
 {#json}
-{#begin}
-{#if. c. t. f}
 {#while.   c. s}
 {#doWhile. s. c}
 {#for. i. c. u. s}
 {#forIn. v. e. s}
 {#switch. e}
-{#throw. e}
 {#try. t. e. c. f}
 */
 
@@ -75,6 +70,19 @@ Array.prototype.makeTiles["number"] = function(span) { span.innerHTML = "" + spa
 Array.prototype.makeCodes["string"] = function()     { return this[1].printString() }
 Array.prototype.makeTiles["string"] = function(span) { span.innerHTML = "<i>" + span.value[1] + "</i>"; }
 
+Array.prototype.makeCodes["arr"] = function() {
+  return "[" + this.clone().splice(1).map(function(x) { return x.makeCode() }).join(", ") + "]"
+}
+Array.prototype.makeTiles["arr"] = function(span) {
+  span.appendChild(document.createTextNode("["))
+  for (var idx = 1; idx < this.length; idx++) {
+    if (idx > 1)
+      span.appendChild(document.createTextNode(", "))
+    span.appendChild(this.makeTile(idx))
+  }
+  span.appendChild(document.createTextNode("]"))
+}
+
 Array.prototype.makeCodes["unop"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["unop"] = function(span) {
   span.appendChild(document.createTextNode(this[1]))
@@ -115,6 +123,7 @@ Array.prototype.makeTiles["postOp"] = function(span) {
 }
 
 Array.prototype.makeCodes["return"] = function() { return "return " + this[1].makeCode() }
+Array.prototype.makeCodes["throw"]  = function() { return "throw "  + this[1].makeCode() }
 
 Array.prototype.makeCodes["if"] = function() { return "if (" + this[1].makeCode() + ")  " + this[2].makeCode() + "\n" +
                                                       "else  " + this[3].makeCode() }
@@ -138,10 +147,7 @@ Array.prototype.makeTiles["condExpr"] = function(span) {
 }
 
 Array.prototype.makeCodes["begin"] = function() {
-  var r = "{"
-  for (var idx = 1; idx < this.length; idx++)
-    r += this[idx].makeCode() + "; "
-  return r
+  return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
 }
 Array.prototype.makeTiles["begin"] = function(span) {
   span.appendChild(document.createTextNode("{ "))
@@ -160,9 +166,6 @@ Array.prototype.makeTiles["func"] = function(span) {
   span.appendChild(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["begin"] = function() {
-  return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
-}
 
 Array.prototype.makeCodes["get"] = function() {
   return this.length == 3 ?  this[2].makeCode() + "[" + this[1].makeCode() + "]" : this[1]
@@ -202,6 +205,19 @@ Array.prototype.makeTiles["send"] = function(span) {
     span.appendChild(this.makeTile(idx))
     if (idx != this.length - 1)
       span.appendChild(document.createTextNode(", "))
+  }
+  span.appendChild(document.createTextNode(")"))
+}
+
+Array.prototype.makeCodes["new"] = function() {
+  return "new " + this[1] + "(" + this.clone().splice(2).map(function(x) { return x.makeCode() }).join(", ") + ")"
+}
+Array.prototype.makeTiles["new"] = function(span) {
+  span.appendChild(document.createTextNode("new " + this[1] + "("))
+  for (var idx = 2; idx < this.length; idx++) {
+    if (idx > 2)
+      span.appendChild(document.createTextNode(", "))
+    span.appendChild(this.makeTile(idx))
   }
   span.appendChild(document.createTextNode(")"))
 }
