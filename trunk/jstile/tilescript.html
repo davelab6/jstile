@@ -102,44 +102,44 @@ ometa JSParser : Parser {
                               | <token '||='> <expr>:rhs                                           => [{#mset. e. #'||'. rhs}]
                               | <empty>                                                            => [e]
                               ).
-  orExpr       ::= <orExpr>:x <token '||'> <andExpr>:y                                             => [{#'||'. x. y}]
+  orExpr       ::= <orExpr>:x <token '||'> <andExpr>:y                                             => [{#binop. #'||'. x. y}]
                  | <andExpr>.
-  andExpr      ::= <andExpr>:x <token '&&'> <eqExpr>:y                                             => [{#&&. x. y}]
+  andExpr      ::= <andExpr>:x <token '&&'> <eqExpr>:y                                             => [{#binop. #&&. x. y}]
                  | <eqExpr>.
-  eqExpr       ::= <eqExpr>:x ( <token '=='>  <relExpr>:y                                          => [{#==.  x. y}]
-                              | <token '!='>  <relExpr>:y                                          => [{#!=.  x. y}]
-                              | <token '==='> <relExpr>:y                                          => [{#===. x. y}]
-                              | <token '!=='> <relExpr>:y                                          => [{#!==. x. y}]
+  eqExpr       ::= <eqExpr>:x ( <token '=='>  <relExpr>:y                                          => [{#binop. #==.  x. y}]
+                              | <token '!='>  <relExpr>:y                                          => [{#binop. #!=.  x. y}]
+                              | <token '==='> <relExpr>:y                                          => [{#binop. #===. x. y}]
+                              | <token '!=='> <relExpr>:y                                          => [{#binop. #!==. x. y}]
                               )
                  | <relExpr>.
-  relExpr      ::= <relExpr>:x ( <token '>'>          <addExpr>:y                                  => [{#>.  x. y}]
-                               | <token '>='>         <addExpr>:y                                  => [{#>=. x. y}]
-                               | <token '<'>          <addExpr>:y                                  => [{#<.  x. y}]
-                               | <token '<='>         <addExpr>:y                                  => [{#>=. x. y}]
-                               | <token 'instanceof'> <addExpr>:y                                  => [{#instanceof. x. y}]
+  relExpr      ::= <relExpr>:x ( <token '>'>          <addExpr>:y                                  => [{#binop. #>.  x. y}]
+                               | <token '>='>         <addExpr>:y                                  => [{#binop. #>=. x. y}]
+                               | <token '<'>          <addExpr>:y                                  => [{#binop. #<.  x. y}]
+                               | <token '<='>         <addExpr>:y                                  => [{#binop. #>=. x. y}]
+                               | <token 'instanceof'> <addExpr>:y                                  => [{#binop. #instanceof. x. y}]
                                )
                  | <addExpr>.
-  addExpr      ::= <addExpr>:x <token '+'> <mulExpr>:y                                             => [{#+. x. y}]
-                 | <addExpr>:x <token '-'> <mulExpr>:y                                             => [{#-. x. y}]
+  addExpr      ::= <addExpr>:x <token '+'> <mulExpr>:y                                             => [{#binop. #+. x. y}]
+                 | <addExpr>:x <token '-'> <mulExpr>:y                                             => [{#binop. #-. x. y}]
                  | <mulExpr>.
-  mulExpr      ::= <mulExpr>:x <token '*'> <mulExpr>:y                                             => [{#*. x. y}]
-                 | <mulExpr>:x <token '/'> <mulExpr>:y                                             => [{#/. x. y}]
-                 | <mulExpr>:x <token '%'> <mulExpr>:y                                             => [{#%. x. y}]
+  mulExpr      ::= <mulExpr>:x <token '*'> <mulExpr>:y                                             => [{#binop. #*. x. y}]
+                 | <mulExpr>:x <token '/'> <mulExpr>:y                                             => [{#binop. #/. x. y}]
+                 | <mulExpr>:x <token '%'> <mulExpr>:y                                             => [{#binop. #%. x. y}]
                  | <unary>.
-  unary        ::= <token '-'>  <postfix>:p                                                        => [{#-. 0. p}]
+  unary        ::= <token '-'>  <postfix>:p                                                        => [{#binop. #-. {#number. 0}. p}]
                  | <token '+'>  <postfix>:p                                                        => [p]
-                 | <token '++'> <postfix>:p                                                        => [{#preIncr. p}]
-                 | <token '--'> <postfix>:p                                                        => [{#preDecr. p}]
+                 | <token '++'> <postfix>:p                                                        => [{#preOp. #+. p}]
+                 | <token '--'> <postfix>:p                                                        => [{#preOp. #-. p}]
                  | <token '!'>  <postfix>:p                                                        => [{#not. p}]
                  | <postfix>.
-  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postIncr. p}]
-                                | <spacesNoNl> <token '--'>                                        => [{#postDecr. p}]
+  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postOp. #+. p}]
+                                | <spacesNoNl> <token '--'>                                        => [{#postOp. #-. p}]
                                 | <empty>                                                          => [p]
                                 ).
   primExpr     ::= <primExpr>:p
                      ( <token '['> <expr>:i <token ']'>                                            => [{#get.  i. p}]
                      | <token '.'> <token 'name'>:m <token '('> <listOf #expr ','>:as <token ')'>  => [{#send. m. p} concat: as]
-                     | <token '.'> <token 'name'>:f                                                => [{#get.  f. p}]
+                     | <token '.'> <token 'name'>:f                                                => [{#get.  {#string. f}. p}]
                      | <token '('> <listOf #expr ','>:as <token ')'>                               => [{#call. p} concat: as]
                      )
                  | <primExprHd>.
@@ -223,7 +223,7 @@ JSParser isKeyword: k [^ (self at: #keywords) hasOwnProperty: k].
   <p>Drop a tile to the expression. <a href="javascript:test();">Unit test</a></p>
   <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
   <p class="answer" id="query">
-  <span class="tile" id="queryPlace">drop here</span> = <span id="answer">answer</span>
+  <span class="tile" id="queryPlace">drop here</span> = <span id="tree">tree</span> = <span id="code">code</span> = <span id="answer">answer</span>
   </p>
 
 </body>
