@@ -51,6 +51,33 @@ function makeSpan() {
   return span;
 }
 
+Array.prototype.makeCode = function() {
+  return this.makeCodes[this[0]] == undefined ? this.printString() : this.makeCodes[this[0]].apply(this)
+}
+Array.prototype.makeCodes = new Object()
+Array.prototype.makeCodes["number"] = function() { return "" + this[1] }
+Array.prototype.makeCodes["string"] = function() { return this[1].printString() }
+Array.prototype.makeCodes["binop"]  = function() { return "(" + this[2].makeCode() + this[1] + this[3].makeCode() + ")" }
+Array.prototype.makeCodes["return"] = function() { return "return " + this[1].makeCode() }
+Array.prototype.makeCodes["func"] = function() {
+  return "(function(" + this[1].clone().splice(1).join(", ") + ") " + this[2].makeCode() + ")"
+}
+Array.prototype.makeCodes["begin"] = function() {
+  return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
+}
+Array.prototype.makeCodes["get"] = function() {
+  return this.length == 3 ?  this[2].makeCode() + "[" + this[1].makeCode() + "]" : this[1]
+}
+Array.prototype.makeCodes["call"] = function() {
+  return this[1].makeCode() + "(" + this.clone().splice(2).map(function(a) { return a.makeCode() }).join(", ") + ")"
+}
+Array.prototype.makeCodes["send"] = function() {
+  return this[2].makeCode() + "." + this[1] + "(" + this.clone().splice(3).map(function(a) { return a.makeCode() }).join(", ") + ")"
+}
+Array.prototype.makeCodes["var"] = function() {
+  return "var " + this[1] + " = " + this[2].makeCode()
+}
+
 Array.prototype.makeTile = function() {
   var span = makeSpan()
   span.value = this
@@ -74,15 +101,54 @@ Array.prototype.makeTiles = new Object()
 Array.prototype.makeTiles["number"] = function(arr, span) {
   span.innerHTML = "" + span.value[1]
 }
-Array.prototype.makeTiles["get"] = Array.prototype.makeTiles["number"]
 Array.prototype.makeTiles["string"] = function(arr, span) {
   span.innerHTML = "<i>" + span.value[1] + "</i>";
 }
 Array.prototype.makeTiles["func"] = function(arr, span) {
-  span.appendChild(document.createTextNode("function(" + arr[1].splice(1).join(", ") + ")"))
+  span.appendChild(document.createTextNode("function(" + arr[1].clone().splice(1).join(", ") + ")"))
   var body = arr[2].makeTile()
   span.appendChild(body)
   span.nodes = [body]
+}
+Array.prototype.makeTiles["binop"] = function(arr, span) {
+  var x = arr[2].makeTile(), op = document.createTextNode(arr[1]), y = arr[3].makeTile()
+  span.nodes = [x, op, y]
+  span.nodes.map(function(n) { span.appendChild(n) })
+}
+Array.prototype.makeTiles["get"] = function(arr, span) {
+  if (arr.length == 3) {
+    var prop = arr[1].makeTile(), recv = arr[2].makeTile(), open = document.createTextNode("["), close = document.createTextNode("]")
+    span.nodes = [recv, open, prop, close]
+  }
+  else {
+    span.nodes = [document.createTextNode(arr[1])]
+  }
+  span.nodes.map(function(n) { span.appendChild(n) })
+}
+Array.prototype.makeTiles["call"] = function(arr, span) {
+  span.nodes = [arr[1].makeTile()]
+  span.nodes.push(document.createTextNode("("))
+  for (var idx = 2; idx < arr.length; idx++) {
+    span.nodes.push(arr[idx].makeTile())
+    if (idx != arr.length - 1)
+      span.nodes.push(document.createTextNode(", "))
+  }
+  span.nodes.push(document.createTextNode(")"))
+  span.nodes.map(function(n) { span.appendChild(n) })
+}
+Array.prototype.makeTiles["send"] = function(arr, span) {
+  span.nodes = [arr[2].makeTile(), document.createTextNode(arr[1] + ".(")]
+  for (var idx = 3; idx < arr.length; idx++) {
+    span.nodes.push(arr[idx].makeTile())
+    if (idx != arr.length - 1)
+      span.nodes.push(document.createTextNode(", "))
+  }
+  span.nodes.push(document.createTextNode(")"))
+  span.nodes.map(function(n) { span.appendChild(n) })
+}
+Array.prototype.makeTiles["var"] = function(arr, span) {
+  span.nodes = [document.createTextNode("var "), document.createTextNode(arr[1]), document.createTextNode(" = "), arr[2].makeTile()]
+  span.nodes.map(function(n) { span.appendChild(n) })
 }
 
 Array.prototype.dup = function() {
@@ -135,61 +201,14 @@ function findTop(tile) {
 
 function updateAnswer() {
   var q = $("query").getElementsByTagName("span")[0].value;
+  //alert(q.printString())
   if (q != undefined) {
-    $("answer").innerHTML = q.printString();
+    $("tree").innerHTML   = q.printString();
+    $("code").innerHTML   = q.makeCode();
+    $("answer").innerHTML = "ERROR"
+    $("answer").innerHTML = q.eval()
   }
 }
 
-Number.prototype.getAnswer = function () { return this };
-Array.prototype.getAnswer = function () {
-  if (this[0] == "+") {
-    return this[1].getAnswer() + this[2].getAnswer();
-  } else if (this[0] == "-") {
-    return this[1].getAnswer() - this[2].getAnswer();
-  } else if (this[0] == "*") {
-    return this[1].getAnswer() * this[2].getAnswer();
-  }
-}
+Array.prototype.eval = function() { return eval(this.makeCode()) }
 
-// ---------- Tests ----------
-
-function test() {
-  // Clone
-  if (["-", 2, 3].dup()[0] != "-") {
-    alert("Failed: [\"-\", 2, 3].dup()[0] != " +  ["-", 2, 3].dup()[0]);
-  }
-    
-  // Simple replace
-  before = (3).makeTile();
-  after = (4).makeTile();
-  p = document.createElement("p");
-  p.appendChild(before);
-  document.body.appendChild(p);
-  acceptDrop(after, before);
-  if (p.firstChild.value != 4) alert("Failed: " + p.firstChild.value);
-  document.body.appendChild(document.createTextNode("ok"))
-
-  // Replace to an expression
-  before = (3).makeTile();
-  after = ["+", 3, 4].makeTile();
-  p = document.createElement("p");
-  p.appendChild(before);
-  document.body.appendChild(p);
-  acceptDrop(after, before);
-  if (p.firstChild.value[0] != "+") alert("Failed: " + p.firstChild.value);
-  document.body.appendChild(document.createTextNode("ok"))
-
-  // Replace to a complex tile
-  before = ["+", 3, 4].makeTile();
-  after =["-", 5, 6].makeTile();
-  target = before.nodes[1];
-  p = document.createElement("p");
-  p.appendChild(before);
-  document.body.appendChild(p);
-  acceptDrop(after, target);
-  if (p.firstChild.value[1][0] != "-") alert("Failed: " + p.firstChild.value);
-  if (p.firstChild.nodes[1].value[0] != "-") {
-    alert("Failed: " + p.firstChild.nodes[1].value);
-  }
-  document.body.appendChild(document.createTextNode("ok"))
-}
