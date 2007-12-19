@@ -1,19 +1,28 @@
 // ---------- Initialization ----------
 
 window.onload = function(){
+  eval(OMetaParser.matchAllwith($("grammar").value, "grammar").squish().join(''))
   addTiles();
-
-  acceptDrop(["+", 3, 4].makeTile(), $("queryPlace"));
+  sourceChanged("3+4");
   updateAnswer();
+}
+
+/* Answer the position of query. */
+function queryPlace() {
+  return $("query").getElementsByTagName("span")[0];
+}
+
+function sourceChanged(source) {
+  var exp = Calc.matchAllwith(source, "expr");
+  acceptDrop(exp.makeTile(), queryPlace());
 }
 
 function addTiles() {
   for (var i = 0; i < 10; i++) {
     var span = (i).makeTile();
-    document.body.appendChild(span);
+    $("partsbin").appendChild(span);
     Droppables.remove(span);
   }
-  //  Droppables.add("queryPlace", { onDrop: acceptDrop, accept: "tile", hoverclass: "hoverclass"});
 
   var p1 = document.createElement("p");
   var plus = ["+", 3, 4].makeTile();
@@ -32,9 +41,9 @@ function addTiles() {
 
   Droppables.remove(plus);
   Droppables.remove(minus);
-  document.body.appendChild(p1);
-  document.body.appendChild(p2);
-  document.body.appendChild(p3);
+  $("partsbin").appendChild(p1);
+  $("partsbin").appendChild(p2);
+  $("partsbin").appendChild(p3);
 }
 
 // ---------- Tiles ----------
@@ -47,7 +56,6 @@ Number.prototype.makeTile = function() {
   span.className = "tile";
   span.draggable = new Draggable(span, { ghosting: false, revert: true });
   Droppables.add(span, { onDrop: acceptDrop, accept: "tile", hoverclass: "hoverclass"});
-  span.tileString = function () { return "[" + v + "]"; };
   return span;
 }
 
@@ -64,7 +72,6 @@ Array.prototype.makeTile = function() {
   span.nodes = [symbolTile, argTile1, argTile2];
   span.draggable = new Draggable(span, { ghosting: false, revert: true });
   Droppables.add(span, { onDrop: acceptDrop, accept: "tile", hoverclass: "hoverclass"});
-  span.tileString = function () { return "(" + argTile1.tileString() + span.value[0] + argTile2.tileString() + ")"; }
   return span;
 }
 
@@ -122,21 +129,21 @@ function findTop(tile) {
 // ---------- Evaluation ----------
 
 function updateAnswer() {
-  var q = $("query").getElementsByTagName("span")[0].value;
+  var q = queryPlace().value;
   if (q != undefined) {
-    $("answer").innerHTML = q.getAnswer();
+    $("answer").innerHTML = eval(q.makeCode());
+    $("source").value = q.makeCode();
   }
 }
 
-Number.prototype.getAnswer = function () { return this };
-Array.prototype.getAnswer = function () {
-  if (this[0] == "+") {
-    return this[1].getAnswer() + this[2].getAnswer();
-  } else if (this[0] == "-") {
-    return this[1].getAnswer() - this[2].getAnswer();
-  } else if (this[0] == "*") {
-    return this[1].getAnswer() * this[2].getAnswer();
-  }
+Number.prototype.makeCode = function () {
+  return "" + this;
+}
+String.prototype.makeCode = function () {
+  return this;
+}
+Array.prototype.makeCode = function () {
+  return "(" + this[1].makeCode() + this[0] + this[2].makeCode() + ")";
 }
 
 // ---------- Tests ----------

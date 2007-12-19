@@ -1,6 +1,15 @@
 tilescript の実験
 
 goal: 0 から 9 までの DnD 出来るタイルを表示する。
+goal: OMeta で、テキストとタイルの切り替えが出来る状況を作成する。
+
+OMeta で簡単な電卓のパーサー
+
+1 -> 1
+1 + 1 -> ['+', 1, 1]
+
+
+
 
 使用ライブラリ
 http://script.aculo.us/dist/scriptaculous-js-1.7.1_beta3.tar.gz
@@ -11,3 +20,4 @@ http://script.aculo.us/dist/scriptaculous-js-1.7.1_beta3.tar.gz
 - http://diaspar.jp/node/43
 - http://wiki.script.aculo.us/scriptaculous/show/Draggable
 - http://developer.mozilla.org/ja/docs/Gecko_DOM_Reference
+- http://developer.mozilla.org/en/docs/DOM
