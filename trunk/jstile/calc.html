@@ -7,14 +7,44 @@
     <script type="text/javascript" src="scriptaculous/prototype.js"></script>
     <script type="text/javascript" src="scriptaculous/scriptaculous.js?load=effects,dragdrop"></script>
     <script type="text/javascript" src="calc.js"></script>
+    <script type="text/javascript" src="ometa-js/lib.js"></script>
+    <script type="text/javascript" src="ometa-js/ometa-base.js"></script>
+    <script type="text/javascript" src="ometa-js/parser.js"></script>
+    <script type="text/javascript" src="ometa-js/squeak-parser.js"></script>
+    <script type="text/javascript" src="ometa-js/squeak-lib.js"></script>
+    <script type="text/javascript" src="ometa-js/ometa-parser.js"></script>
+
 </head>
 <body>
+<textarea id="grammar" style="display: none" rows="0" cols="0">
+ometa Calc {
+  digit   ::= <char>:c ?[c isDigit]        => [c digitValue].
+  number  ::= <number>:n <digit>:d         => [n * 10 + d]
+            | <digit>.
+  priExpr ::= <number>
+            | "(" <expr>:e ")"             => [e].
+  mulExpr ::= <mulExpr>:x "*" <priExpr>:y  => [{'*'. x. y}]
+            | <mulExpr>:x "/" <priExpr>:y  => [{'/'. x. y}]
+            | <priExpr>.
+  addExpr ::= <addExpr>:x "+" <mulExpr>:y  => [{'+'. x. y}]
+            | <addExpr>:x "-" <mulExpr>:y  => [{'-'. x. y}]
+            | <mulExpr>.
+  expr    ::= <addExpr>.
+}.
+</textarea>
   <h1>A Calculator in Tile</h1>
-  <p>Drop a tile to the expression. <a href="javascript:test();">Unit test</a></p>
-  <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
+  <p>Drop a tile to the expression. 
+  <form action="" onsubmit="sourceChanged(this.source.value); return false;">
+    <input type="text" id="source" class="source"/>
+    <input type="submit"/>
+  </form>
   <p class="answer" id="query">
   <span class="tile" id="queryPlace">drop here</span> = <span id="answer">answer</span>
   </p>
+  <p id="partsbin"></p>
 
+  <hr/>
+  <p><a href="javascript:test();">Unit test</a></p>
+  <a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
 </body>
 </html>
