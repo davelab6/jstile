@@ -1,13 +1,74 @@
 // ---------- Initialization ----------
 
 window.onload = function() {
-  autoexec()
-  acceptDrop(["number", 0].makeTile(), $("queryPlace"));
-  updateAnswer();
+  autoexec();
+  addExpression();
 }
 
+// ---------- User Interface ----------
+
+function toggleVisible(element) {
+  var style = element.style
+  if (style.display == "none") {
+    style.display = "block"
+    return "hide"
+  }
+  else {
+    style.display = "none"
+    return "show"
+  }
+}
+
+function printIt(parent) {
+  var isSource = parent.getElementsByTagName("input")[0].checked;
+  var node = expressionNode(parent);
+  if (isSource) {
+    var tree = node.value.makeTree();
+  } else {
+    var tree = node.value;
+  }
+  var transcript = $("transcript");
+  transcript.value += "tree: " + tree.printString() + "\n";
+  transcript.value += "code: " + tree.makeCode() + "\n";
+  transcript.value += tree.eval() + "\n";
+}
+
+function toggleTile(parent) {
+  var isSource = parent.getElementsByTagName("input")[0].checked;
+  old = expressionNode(parent);
+  if (isSource) {
+    var input = document.createElement("input");
+    input.className = "tile";
+    input.value = old.value.makeCode();
+    parent.replaceChild(input, old);
+  } else {
+    var newNode = old.value.makeTree().makeTile();
+    adjustPadding(newNode);
+    parent.replaceChild(newNode, old)
+  }
+}
+
+function expressionNode(parent) {
+  return document.getElementsByClassName("tile", parent)[0];
+  return parent.lastChild;
+}
+
+function addExpression() {
+  var place = $("addExpression");
+  var p = document.createElement("p");
+  p.className = "expression";
+  p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
+<input type='checkbox' onchange='toggleTile(this.parentNode)'> \
+<input class='tile' id='queryPlace' value='3 + 4'/>";
+  place.parentNode.insertBefore(p, place);
+  toggleTile(p);
+}
 
 // ---------- Tiles ----------
+
+String.prototype.makeTree = function () {
+  return JSParser.matchAllwith(this, 'srcElem');
+}
 
 function makeSpan() {
   var span = document.createElement("span")
@@ -323,7 +384,6 @@ function acceptDrop(element, target) {
   }
   parent.replaceChild(elementCopy, target)
   adjustPadding(findTop(elementCopy))
-  updateAnswer()
 }
 
 /* adjust the tile's padding based on the depth */
@@ -343,16 +403,6 @@ function adjustPadding(tile) {
 function findTop(tile) { return tile.parentNode.className == "tile" ? findTop(tile.parentNode) : tile }
 
 // ---------- Evaluation ----------
-
-function updateAnswer() {
-  var q = $("query").getElementsByTagName("span")[0].value;
-  if (q != undefined) {
-    $("tree").innerHTML   = q.printString();
-    $("code").innerHTML   = q.makeCode();
-    $("answer").innerHTML = "ERROR"
-    $("answer").innerHTML = q.eval()
-  }
-}
 
 Array.prototype.eval = function() { return eval(this.makeCode()) }
 
