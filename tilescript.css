@@ -4,14 +4,30 @@ h1 {
     text-align: center;
 }
 
-.answer
+.expression
 {
     font-size: 30px;
     margin: 2px;
     padding: 10px;
-    background:#f0f0f0;
+    background:#E7FFE7;
+    border: 1px solid #84B584;
 }
 
+.toggle
+{
+    cursor: pointer;
+}
+
+input.tile
+{
+    cursor: text;
+    font-size: 25px;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #888888;
+    text-align: left;
+    background:#ffffff;
+}
 
 .tile
 {
