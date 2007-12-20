@@ -67,7 +67,7 @@ function addExpression() {
 // ---------- Tiles ----------
 
 String.prototype.makeTree = function () {
-  return JSParser.matchAllwith(this, 'srcElem');
+  return JSParser.parse(this);
 }
 
 function makeSpan() {
