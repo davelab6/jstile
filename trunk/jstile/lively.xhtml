@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html debug="true" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Minimal Lively Kernel</title>
+  </head>
+
+<body topmargin="0" leftmargin="0">
+  <!-- these scripts need the xhtml context -->
+  <script src="LivelyKernel-SourceCode-0.7/firebug/firebug.js"/>
+  <!-- script src="LivelyKernel-SourceCode-0.7/prototype.js"/ -->
+  <script type="text/javascript" src="scriptaculous/prototype.js"></script>
+  
+  <script src="LivelyKernel-SourceCode-0.7/fontinfo.js"/> 
+
+<div>  
+<svg id="canvas"
+     width="600" height="200" 
+     xmlns="http://www.w3.org/2000/svg" 
+     xmlns:lively="http://www.experimentalstuff.com/Lively"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     xmlns:D="DAV"
+     xml:space="preserve"
+     zoomAndPan="disable">
+
+<defs id="Defaults">
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/defaultconfig.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Core.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/svgtext-compat.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Text.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Network.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Widgets.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Storage.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Tools.js"/>
+<script type="text/ecmascript" xlink:href="LivelyKernel-SourceCode-0.7/Examples.js"/>
+</defs>
+
+</svg>
+</div>
+<script>
+function main() {
+  var world = WorldMorph(Canvas);
+  WorldMorph.setCurrent(world);
+  world.displayWorldOn(Canvas);
+
+  var widget = ClockMorph(pt(60, 60), 50);
+  world.addMorph(widget);
+  widget.startSteppingScripts();
+}
+main.delay(0.05);
+</script>
+
+</body>
+</html>
