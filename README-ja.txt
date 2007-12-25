@@ -2,11 +2,24 @@ tilescript の実験
 
 goal: Lively Kernel でロケットを表示し、js から操作する。
 
+Smalltalk-72 で出来る事をやる。
+
+
 todo: prototype 1.5.2 と scriptaculous の組み合わせを試す。
 
 goal: sort の図示
 goal: Active Essay
 goal: 音楽？
+
+r6621
+
+== prototype.js 1.5.2pre0 のダウンロード方法
+
+$ svn co -r6621 http://svn.rubyonrails.org/rails/spinoffs/prototype/trunk/ prototype
+$ cd src
+$ rake (../dist に prototype.js が出来る)
+
+svg & vml?
 
 ==
 
