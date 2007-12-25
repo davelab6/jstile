@@ -1,0 +1,70 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<script type="text/javascript">
+
+IE = !!(window.attachEvent && !window.opera);
+
+var SVGCanvas = new Object();
+var VMLCanvas = new Object();
+
+VMLCanvas.show = function(obj) {
+  var image = document.createElement("v:image");
+  obj._image = image;
+  image.src = obj.src;
+  image.style.width = obj.width;
+  image.style.height = obj.height;
+  image.style.position = "absolute";
+  document.body.appendChild(image);
+}
+
+VMLCanvas.rotation = function(obj, degree) {
+  obj._image.style.rotation = degree;
+}
+
+SVGCanvas.show = function(obj) {
+  var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "400");
+  svg.setAttribute("height", "400");
+
+  var image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  obj._image = image;
+  image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "robo.gif");
+  image.setAttribute("width", obj.width);
+  image.setAttribute("height", obj.height);
+
+  svg.appendChild(image);
+  document.body.appendChild(svg);
+}
+
+SVGCanvas.rotation = function(obj, degree) {
+  obj._image.setAttribute("transform", "rotate(" + degree + ", " + obj.width / 2 + ", " + obj.height / 2 + ")");
+}
+
+// Character
+robo = new Image();
+robo.src = "robo.gif";
+robo._rotation = 0;
+robo.setRotation = function(degree) {
+  this._rotation = degree;
+  robo.canvas.rotation(robo, degree);
+};
+robo.getRotation = function() { return this._rotation }
+robo.canvas = IE ? VMLCanvas : SVGCanvas;
+
+// Aminimation
+function tick() {
+  robo.setRotation(robo.getRotation() + 10);
+}
+setInterval(tick, 50);
+
+window.onload = function () { robo.canvas.show(robo) }
+
+</script>
+<style>
+v\:* { behavior: url(#default#VML); }
+</style>
+</head>
+<body>
+<h1>Animation Test SVG or VML </h1>
+</body>
+</html>
