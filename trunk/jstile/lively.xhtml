@@ -41,11 +41,11 @@
 </div>
 <script>
 function main() {
-  var world = WorldMorph(Canvas);
+  world = WorldMorph(Canvas);
   WorldMorph.setCurrent(world);
   world.displayWorldOn(Canvas);
 
-  var widget = ClockMorph(pt(60, 60), 50);
+  widget = ClockMorph(pt(60, 60), 50);
   world.addMorph(widget);
   widget.startSteppingScripts();
 }
