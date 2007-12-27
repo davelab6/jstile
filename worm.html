@@ -11,8 +11,6 @@ var SVGNS = "http://www.w3.org/2000/svg";
 VMLCanvas.newImageShape = function(obj) {
   var shape = document.createElement("v:image");
   shape.src = obj.src;
-  shape.style.width = obj.width;
-  shape.style.height = obj.height;
   return shape;
 }
 
@@ -30,30 +28,43 @@ VMLCanvas.newWorldShape = function(obj) {
   return group;
 }
 
+VMLCanvas.newPolylineShape = function(obj) {
+  var shape = document.createElement("v:polyline");
+  shape.setAttribute("strokecolor", obj.stroke);
+  shape.setAttribute("strokeweight", obj.strokeWidth);
+  shape.setAttribute("filled", "false");
+  return shape;
+}
+
 VMLCanvas.add = function(parent, child) {
   parent._shape.appendChild(child._shape);
 }
 
-VMLCanvas.rotation = function(obj, degree) {
-  obj._shape.style.rotation = degree;
-}
-
-VMLCanvas.update = function(obj) {
+VMLCanvas.updateRect = function(obj) {
+  obj._shape.style.width = obj.width;
+  obj._shape.style.height = obj.height;
   obj._shape.style.left = obj._x - obj.width / 2;
   obj._shape.style.top = obj._y - obj.height / 2;
-  obj._shape.style.rotation = obj._rotation;
+  obj._shape.style.rotation = obj._angle;
+}
+
+VMLCanvas.updatePolyline = function(obj) {
+  var points = "";
+  if (obj._vertices.length < 2) return;
+  for (var i = 0; i < obj._vertices.length; i++) {
+    points += Math.floor(obj._vertices[i][0]) + "," + Math.floor(obj._vertices[i][1]) + " ";
+  }
+//  obj._shape.setAttribute("points", points);
+  obj._shape.points.Value = points;
 }
 
 VMLCanvas.showAsWorld = function(obj) {
-  document.body.appendChild(obj._shape);
+  document.getElementById("world").appendChild(obj._shape);
 }
-
 
 SVGCanvas.newImageShape = function(obj) {
   var shape = document.createElementNS(SVGNS, "image");
   shape.setAttributeNS("http://www.w3.org/1999/xlink", "href", obj.src);
-  shape.setAttribute("width", obj.width);
-  shape.setAttribute("height", obj.height);
   return shape;
 }
 
@@ -71,57 +82,138 @@ SVGCanvas.newWorldShape = function(obj) {
   return svg;
 }
 
+SVGCanvas.newPolylineShape = function(obj) {
+  var shape = document.createElementNS(SVGNS, "polyline");
+  shape.setAttribute("stroke", obj.stroke);
+  shape.setAttribute("stroke-width", obj.strokeWidth);
+  shape.setAttribute("fill", "none");
+  return shape;
+}
+
 SVGCanvas.showAsWorld = function(obj) {
-  document.body.appendChild(obj._shape);
+  document.getElementById("world").appendChild(obj._shape);
 }
 
 SVGCanvas.add = function(parent, child) {
   parent._shape.appendChild(child._shape);
 }
 
-SVGCanvas.update = function(obj) {
+SVGCanvas.updateRect = function(obj) {
+  obj._shape.setAttribute("width", obj.width);
+  obj._shape.setAttribute("height", obj.height);
   var left = obj._x - obj.width / 2;
   var top = obj._y - obj.height / 2;
   obj._shape.setAttribute("transform",
     "translate(" + left + ", " + top + ") " + 
-    "rotate(" + obj._rotation + ", " + obj.width / 2 + ", " + obj.height / 2 + ")");
+    "rotate(" + obj._angle + ", " + obj.width / 2 + ", " + obj.height / 2 + ")");
 }
 
+SVGCanvas.updatePolyline = function(obj) {
+  var points = "";
+  if (obj._vertices.length < 2) return;
+  for (var i = 0; i < obj._vertices.length; i++) {
+    points += Math.floor(obj._vertices[i][0]) + "," + Math.floor(obj._vertices[i][1]) + " ";
+  }
+  obj._shape.setAttribute("points", points);
+}
+
+
 Canvas =  IE ? VMLCanvas : SVGCanvas;
+
+// Scheduler
+scheduler = {
+  tasks: [],
+  add: function(func) {
+    this.tasks.push(func);
+  },
+  tick: function() {
+    if (this.tasks.length > 0) {
+      (this.tasks.shift())();
+    }
+  },
+  timer: undefined,
+  initialize: function() {
+    this.tasks = [];
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(function () { scheduler.tick() }, 100);
+  }
+}
+
+scheduler.initialize();
 
 // World
 world = new Object();
 world.width = 600;
 world.height = 200;
-world.fill = "#66a255";
+world.fill = "#CF8E6B";
 world._shape = Canvas.newWorldShape(world);
 world.add = function (obj) {
   Canvas.add(this, obj);
-  Canvas.update(obj);
 }
 
-// Character
-robo = new Image();
-robo.src = "worm.png";
-robo._rotation = 0;
-robo._x = 300;
-robo._y = 100;
-robo._shape = Canvas.newImageShape(robo);
-robo.setRotation = function(degree) {
-  this._rotation = degree;
-  Canvas.update(robo);
+// Trail
+trail = new Object();
+trail.stroke = "#632D01";
+trail.strokeWidth = 2;
+trail._shape = Canvas.newPolylineShape(trail);
+trail._vertices = [];
+trail.addVertex = function (p) {
+  this._vertices.push(p);
+  Canvas.updatePolyline(this);
+}
+
+// Turtle
+turtle = new Image();
+turtle.src = "worm.png";
+turtle._angle = 0;
+turtle._x = 300;
+turtle._y = 100;
+turtle._shape = Canvas.newImageShape(turtle);
+
+turtle.setAngle = function(degree) {
+  this._angle = degree;
+  Canvas.updateRect(turtle);
 };
-robo.getRotation = function() { return this._rotation }
+turtle.getAngle = function() { return this._angle }
 
-world.add(robo);
-
-// Aminimation
-function tick() {
-  robo.setRotation(robo.getRotation() + 10);
+turtle.forwardBy = function(distance) {
+  var t = this;
+  scheduler.add(function() {
+    var radian = t._angle * Math.PI / 180;
+    t._x = t._x + (distance * (Math.sin(radian)));
+    t._y = t._y - (distance * (Math.cos(radian)));
+    Canvas.updateRect(turtle);
+    trail.addVertex([t._x, t._y]);
+   });
 }
-setInterval(tick, 50);
+turtle.forwardBy(0);
+
+turtle.turnBy = function(degree) {
+  var t = this;
+  scheduler.add(function() {
+    t._angle = t._angle + degree;
+    Canvas.updateRect(turtle);
+  });
+}
+
+world.add(trail);
+Canvas.updatePolyline(trail);
+world.add(turtle);
+Canvas.updateRect(turtle);
 
 window.onload = function () { Canvas.showAsWorld(world) }
+
+/* User Script
+for (var i = 1; i < 30; i++) {
+  turtle.forwardBy(50);
+  turtle.turnBy(59);
+}
+*/
+
+function doIt() {
+  scheduler.initialize();
+  eval(document.getElementById("workspace").value);
+}
 
 </script>
 <style>
@@ -129,6 +221,16 @@ v\:* { behavior: url(#default#VML); }
 </style>
 </head>
 <body>
-<h1>Animation Test SVG or VML </h1>
+<h1>Turtle Graphics Test with SVG or VML </h1>
 </body>
+<p id="world"/>
+<p>
+<textarea id="workspace"  cols="60" rows="6">
+for (var i = 1; i < 100; i++) {
+  turtle.forwardBy(i * 3);
+  turtle.turnBy(89);
+}
+</textarea>
+<input type="button" value="RUN" onclick="doIt()"/>
+</p>
 </html>

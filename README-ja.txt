@@ -1,6 +1,7 @@
 tilescript の実験
 
 goal: world の中を worm が動く
+goal: worm が タートルグラフィックの動きが出来る。
 
 ==
 
