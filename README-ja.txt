@@ -1,6 +1,12 @@
 tilescript の実験
 
-SVG + createElementNS : http://blogs.dion.ne.jp/kit/archives/5767781.html
+goal: world の中を worm が動く
+
+==
+
+参考:
+- http://www.tohoho-web.com/wwwvml.htm
+- SVG + createElementNS : http://blogs.dion.ne.jp/kit/archives/5767781.html
 
 goal: Lively Kernel でロケットを表示し、js から操作する。
 

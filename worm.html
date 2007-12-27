@@ -1,0 +1,134 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<script type="text/javascript">
+
+IE = !!(window.attachEvent && !window.opera);
+
+var SVGCanvas = new Object();
+var VMLCanvas = new Object();
+var SVGNS = "http://www.w3.org/2000/svg";
+
+VMLCanvas.newImageShape = function(obj) {
+  var shape = document.createElement("v:image");
+  shape.src = obj.src;
+  shape.style.width = obj.width;
+  shape.style.height = obj.height;
+  return shape;
+}
+
+VMLCanvas.newWorldShape = function(obj) {
+  var group = document.createElement("v:group");
+  group.coordsize = obj.width + "," + obj.height;
+  group.style.width = obj.width;
+  group.style.height = obj.height;
+
+  var rect = document.createElement("v:rect");
+  rect.style.width = "100%";
+  rect.style.height = "100%";
+  rect.fillcolor = obj.fill;
+  group.appendChild(rect);
+  return group;
+}
+
+VMLCanvas.add = function(parent, child) {
+  parent._shape.appendChild(child._shape);
+}
+
+VMLCanvas.rotation = function(obj, degree) {
+  obj._shape.style.rotation = degree;
+}
+
+VMLCanvas.update = function(obj) {
+  obj._shape.style.left = obj._x - obj.width / 2;
+  obj._shape.style.top = obj._y - obj.height / 2;
+  obj._shape.style.rotation = obj._rotation;
+}
+
+VMLCanvas.showAsWorld = function(obj) {
+  document.body.appendChild(obj._shape);
+}
+
+
+SVGCanvas.newImageShape = function(obj) {
+  var shape = document.createElementNS(SVGNS, "image");
+  shape.setAttributeNS("http://www.w3.org/1999/xlink", "href", obj.src);
+  shape.setAttribute("width", obj.width);
+  shape.setAttribute("height", obj.height);
+  return shape;
+}
+
+SVGCanvas.newWorldShape = function(obj) {
+  var svg = document.createElementNS(SVGNS, "svg");
+  svg.setAttribute("width", obj.width);
+  svg.setAttribute("height", obj.height);
+
+  var rect = document.createElementNS(SVGNS, "rect");
+  rect.setAttribute("fill", obj.fill);
+  rect.setAttribute("width", obj.width);
+  rect.setAttribute("height", obj.height);
+  svg.appendChild(rect);
+
+  return svg;
+}
+
+SVGCanvas.showAsWorld = function(obj) {
+  document.body.appendChild(obj._shape);
+}
+
+SVGCanvas.add = function(parent, child) {
+  parent._shape.appendChild(child._shape);
+}
+
+SVGCanvas.update = function(obj) {
+  var left = obj._x - obj.width / 2;
+  var top = obj._y - obj.height / 2;
+  obj._shape.setAttribute("transform",
+    "translate(" + left + ", " + top + ") " + 
+    "rotate(" + obj._rotation + ", " + obj.width / 2 + ", " + obj.height / 2 + ")");
+}
+
+Canvas =  IE ? VMLCanvas : SVGCanvas;
+
+// World
+world = new Object();
+world.width = 600;
+world.height = 200;
+world.fill = "#66a255";
+world._shape = Canvas.newWorldShape(world);
+world.add = function (obj) {
+  Canvas.add(this, obj);
+  Canvas.update(obj);
+}
+
+// Character
+robo = new Image();
+robo.src = "worm.png";
+robo._rotation = 0;
+robo._x = 300;
+robo._y = 100;
+robo._shape = Canvas.newImageShape(robo);
+robo.setRotation = function(degree) {
+  this._rotation = degree;
+  Canvas.update(robo);
+};
+robo.getRotation = function() { return this._rotation }
+
+world.add(robo);
+
+// Aminimation
+function tick() {
+  robo.setRotation(robo.getRotation() + 10);
+}
+setInterval(tick, 50);
+
+window.onload = function () { Canvas.showAsWorld(world) }
+
+</script>
+<style>
+v\:* { behavior: url(#default#VML); }
+</style>
+</head>
+<body>
+<h1>Animation Test SVG or VML </h1>
+</body>
+</html>
