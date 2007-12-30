@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Network example</title>
+    <script type="text/javascript" src="../scriptaculous/prototype.js"></script>
+    <script type="text/javascript" src="request.js"></script>
+    <script type="text/javascript">
+
+function get() {
+  ajax = new Ajax.Request(
+    $("url").value,
+    {
+      method: "get",
+      asynchronous: false,
+      requestHeaders: ["If-Modified-Since", "Thu, 01 Jun 1970 00:00:00 GMT"],
+      parameters: ""
+    });
+  $("field").value = ajax.transport.responseText;
+}
+
+function put() {
+  ajax = new Ajax.Request(
+      $("url").value,
+    {
+      method: "put", 
+      asynchronous: false,
+      postBody: $("field").value, 
+      onFailure: onFailure
+     });
+  alert(ajax.transport.status);
+}
+
+function onFailure(req) {
+  alert(req);
+}
+
+function propfind() {
+  ajax = new Ajax.Request(
+      $("url").value,
+    {
+      method: "propfind", 
+      asynchronous: false,
+      onFailure: onFailure
+     });
+  alert(ajax.transport.status);
+  $("field").value = ajax.transport.responseText;
+}
+            
+</script>
+</head>
+<body>
+  <h1>Network Example</h1>
+  <input id="url" type="text" value="http://localhost:8080/zip/hello.txt" size="100"/><br/>
+  <textarea id="field" cols="80" rows="5"></textarea>
+  <input type="button" value="get" onclick="get()"/>
+  <input type="button" value="put" onclick="put()"/>
+  <input type="button" value="propfind" onclick="propfind()"/>
+</body>
+</html>
