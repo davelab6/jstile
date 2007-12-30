@@ -4,20 +4,23 @@ goal: world の中を worm が動く
 goal: worm が タートルグラフィックの動きが出来る。
 goal: ビューワ
 
-== ガジェット
+== 文書構造
 
-http://igooglecon.jp/chapter03/index.html
-http://gmodules.com/ig/creator?synd=open&url=http://yamamiya.takashi.googlepages.com/gadget.xml
+Alex 形式とする
+["binop", "+", ["number", 3], ["number", 4]]
+
+["init", ["binop", "+", ["number", 3], ["number", 4]]] 初期化コード
+["source", ["binop", "+", ["number", 3], ["number", 4]]] でソースコード表示
+["tile", ["binop", "+", ["number", 3], ["number", 4]]] でタイルコード表示
+["dom", object] object には実際のオブジェクト。保存できない。
+["inspector", object] object には実際のオブジェクト。保存できない。
+
 
 
 
 == * はてなに Google ガジェットとしてタートルグラフィックスを貼り付けてみる。
 
-http://d.hatena.ne.jp/propella/20071227/p1 で作った javascript 版ター
-トルグラフィックスをそのままはてなに貼れないか試してみた。google ガジェッ
-トを経由すると簡単でした。むかし、アイデアとして毎日 etoys でインタラ
-クティブ日記を書くというのがありましたが、そういう事も可能になりそうで
-す。
+http://d.hatena.ne.jp/propella/20071227/p1 で作った javascript 版タートルグラフィックスをそのままはてなに貼れないか試してみた。google ガジェットを経由すると簡単でした。むかし、アイデアとして毎日 etoys でインタラクティブ日記を書くというのがありましたが、そういう事も可能になりそうです。
 
 <script src="http://gmodules.com/ig/ifr?url=http://yamamiya.takashi.googlepages.com/worm.xml&amp;synd=open&amp;w=260&amp;h=300&amp;title=Worm&amp;border=%23ffffff%7C3px%2C1px+solid+%23999999&amp;output=js"></script>
 
