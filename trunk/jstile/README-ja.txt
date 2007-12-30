@@ -16,7 +16,7 @@ Alex 形式とする
 ["inspector", object] object には実際のオブジェクト。保存できない。
 
 
-
+http://localhost:8080/js/jstile/
 
 == * はてなに Google ガジェットとしてタートルグラフィックスを貼り付けてみる。
 
