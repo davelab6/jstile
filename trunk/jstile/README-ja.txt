@@ -4,6 +4,36 @@ goal: world の中を worm が動く
 goal: worm が タートルグラフィックの動きが出来る。
 goal: ビューワ
 
+== ガジェット
+
+http://igooglecon.jp/chapter03/index.html
+http://gmodules.com/ig/creator?synd=open&url=http://yamamiya.takashi.googlepages.com/gadget.xml
+
+
+
+== * はてなに Google ガジェットとしてタートルグラフィックスを貼り付けてみる。
+
+http://d.hatena.ne.jp/propella/20071227/p1 で作った javascript 版ター
+トルグラフィックスをそのままはてなに貼れないか試してみた。google ガジェッ
+トを経由すると簡単でした。むかし、アイデアとして毎日 etoys でインタラ
+クティブ日記を書くというのがありましたが、そういう事も可能になりそうで
+す。
+
+<script src="http://gmodules.com/ig/ifr?url=http://yamamiya.takashi.googlepages.com/worm.xml&amp;synd=open&amp;w=260&amp;h=300&amp;title=Worm&amp;border=%23ffffff%7C3px%2C1px+solid+%23999999&amp;output=js"></script>
+
+参考
+- http://igooglecon.jp/chapter03/index.html
+- http://nyanjiro.no-blog.jp/web20/2007/08/igoogle__6ad8.html
+- http://www.itmedia.co.jp/news/articles/0610/04/news033.html
+
+** 追記1 このブログパーツ(笑 を貼るには以下をクリックしてください。
+
+http://gmodules.com/ig/creator?synd=open&url=http://yamamiya.takashi.googlepages.com/worm.xml
+
+** 追記2
+
+一応 IE と Windows 版 safari で確認してみました。
+
 ==
 
 参考:
