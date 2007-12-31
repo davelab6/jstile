@@ -1,7 +1,12 @@
 // ---------- Initialization ----------
 
-window.onload = function() {
-  autoexec();
+function autoexec(document) {
+  eval(OMetaParser.matchAllwith(document.getElementById("omsparser").value, "grammar").squish().join(''))
+  OMetaSqueakParser.translate = function(s) { return this.matchAllwith(s, "iTranslate") }
+  OMetaSqueakParser.eval      = function(s) { return eval(this.translate(s)) }
+  OMetaSqueakParser.eval(document.getElementById("mdsparser").value)
+  //OMetaSqueakParser.eval(document.getElementById("jsparser").value)
+  eval(document.getElementById("jsparser").value)
   addExpression();
 }
 
@@ -406,3 +411,16 @@ function findTop(tile) { return tile.parentNode.className == "tile" ? findTop(ti
 
 Array.prototype.eval = function() { return eval(this.makeCode()) }
 
+// ---------- Utilities ----------
+
+function getfile(url) {
+  ajax = new Ajax.Request(
+    url,
+    {
+      method: "get",
+      asynchronous: false,
+      parameters: "",
+      onException: function(req, e) { alert(e) }
+    });
+  return ajax.transport.responseText;
+}
