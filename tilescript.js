@@ -1,3 +1,6 @@
+// ---------- Configuration ----------
+storageUrl = "./data"; // Set WebDAV directory
+
 // ---------- Initialization ----------
 
 function autoexec(document) {
@@ -7,7 +10,25 @@ function autoexec(document) {
   OMetaSqueakParser.eval(document.getElementById("mdsparser").value)
   //OMetaSqueakParser.eval(document.getElementById("jsparser").value)
   eval(document.getElementById("jsparser").value)
-  addExpression();
+  loadDocument();
+}
+
+// ---------- Data Store ----------
+function loadDocument() {
+  var documentName = document.location.search.slice(1) || "Home";
+  document.title = documentName + " - TileScript";
+  $("header").firstChild.textContent = documentName;
+  $("header").firstChild.href = "tilescript.html?" + documentName;
+
+  var json = getfile(storageUrl + "/" + documentName + ".txt");
+  var tree = eval(json);
+  if (!tree) return;
+
+  for (var i = 1; i < tree.length; i++) {
+    var isTile = tree[i][0] == "tile";
+    var source = tree[i][1];
+    addExpression(source, isTile);
+  }
 }
 
 // ---------- User Interface ----------
@@ -36,6 +57,7 @@ function printIt(parent) {
   transcript.value += "tree: " + tree.printString() + "\n";
   transcript.value += "code: " + tree.makeCode() + "\n";
   transcript.value += tree.eval() + "\n";
+  //  console.log(tree);
 }
 
 function toggleTile(parent) {
@@ -58,15 +80,18 @@ function expressionNode(parent) {
   return parent.lastChild;
 }
 
-function addExpression() {
+function addExpression(source, isTile) {
   var place = $("addExpression");
   var p = document.createElement("p");
+  if (!source) source = "3 + 4";
   p.className = "expression";
   p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
 <input type='checkbox' onchange='toggleTile(this.parentNode)'> \
-<input class='tile' id='queryPlace' value='3 + 4'/>";
+<input class='tile' id='queryPlace' value='" + source + "'/>";
   place.parentNode.insertBefore(p, place);
-  toggleTile(p);
+  if (isTile) {
+    toggleTile(p);
+  }
 }
 
 // ---------- Tiles ----------
@@ -420,7 +445,7 @@ function getfile(url) {
       method: "get",
       asynchronous: false,
       parameters: "",
-      onException: function(req, e) { alert(e) }
+      //      onException: function(req, e) { alert(e) }
     });
   return ajax.transport.responseText;
 }
