@@ -78,10 +78,11 @@ function expressionNode(parent) {
 function addExpression(source, isTile) {
   var place = $("addExpression");
   var p = document.createElement("p");
+  var checked = isTile ? "" : " checked"
   if (!source) source = "3 + 4";
   p.className = "expression";
   p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
-<input type='checkbox' onchange='toggleTile(this.parentNode)'> \
+<input type='checkbox' onclick='toggleTile(this.parentNode)'" + checked + "> \
 <input class='tile' id='queryPlace' value='" + source + "'/>";
   place.parentNode.insertBefore(p, place);
   if (isTile) {
