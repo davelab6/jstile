@@ -71,7 +71,7 @@ Fail.prototype.toString = function() { return "match failed" }
 // left recursion detection
 
 function LeftRecursion() { }
-Object.prototype.isLeftRecursion = false
+// Object.prototype.isLeftRecursion = false
 LeftRecursion.prototype.isLeftRecursion = true
 LeftRecursion.prototype.detected = false
 
