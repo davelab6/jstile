@@ -3,13 +3,8 @@ storageUrl = "./data"; // Set WebDAV directory
 
 // ---------- Initialization ----------
 
-function autoexec(document) {
-  eval(OMetaParser.matchAllwith(document.getElementById("omsparser").value, "grammar").squish().join(''))
-  OMetaSqueakParser.translate = function(s) { return this.matchAllwith(s, "iTranslate") }
-  OMetaSqueakParser.eval      = function(s) { return eval(this.translate(s)) }
-  OMetaSqueakParser.eval(document.getElementById("mdsparser").value)
-  //OMetaSqueakParser.eval(document.getElementById("jsparser").value)
-  eval(document.getElementById("jsparser").value)
+window.onload = function() {
+  autoexec();
   loadDocument();
 }
 
@@ -17,8 +12,8 @@ function autoexec(document) {
 function loadDocument() {
   var documentName = document.location.search.slice(1) || "Home";
   document.title = documentName + " - TileScript";
-  $("header").firstChild.textContent = documentName;
-  $("header").firstChild.href = "tilescript.html?" + documentName;
+  var url = "tilescript.html?" + documentName;
+  $("header").innerHTML = "<a href='"+ url +"'>" + documentName + "</a>";
 
   var json = getfile(storageUrl + "/" + documentName + ".txt");
   var tree = eval(json);
