@@ -444,7 +444,7 @@ function getfile(url) {
     {
       method: "get",
       asynchronous: false,
-      parameters: "",
+      parameters: ""
       //      onException: function(req, e) { alert(e) }
     });
   return ajax.transport.responseText;
