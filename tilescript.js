@@ -1,32 +1,67 @@
 // ---------- Configuration ----------
-storageUrl = "./data"; // Set WebDAV directory
 
-// ---------- Initialization ----------
+StorageUrl = "data"; // Set WebDAV directory
 
-window.onload = function() {
-  autoexec();
-  loadDocument();
+// ---------- Initialize ----------
+
+UseDAV = false;
+DocumentTitle = "";
+SyncTimer = null;
+
+function initializeDocument() {
+  UseDAV = document.location.protocol == "http:";
+  syncTitle();
+  setInterval(syncTitle, 500);
 }
 
-// ---------- Data Store ----------
-function loadDocument() {
-  var documentName = document.location.search.slice(1) || "Home";
-  document.title = documentName + " - TileScript";
-  var url = "tilescript.html?" + documentName;
-  $("header").innerHTML = "<a href='"+ url +"'>" + documentName + "</a>";
-
-  var json = getfile(storageUrl + "/" + documentName + ".txt");
-  var tree = eval(json);
-  if (!tree) return;
-
-  for (var i = 1; i < tree.length; i++) {
-    var isTile = tree[i][0] == "tile";
-    var source = tree[i][1];
-    addExpression(source, isTile);
+function syncTitle() {
+  if (!getTitle()) {
+    go("Home");
+  } else if (DocumentTitle != getTitle()) {
+    go(getTitle());
   }
 }
 
+function go(name) {
+  DocumentTitle = name;
+  document.location.hash = "#" + name;
+  reload();
+}
+
+function getTitle() {
+    if ((!document.location.hash) ||
+        (document.location.hash.length < 2)) return undefined;
+  return document.location.hash.slice(1)
+}
+
 // ---------- User Interface ----------
+
+function _getTitle() {
+  if ((!document.location.hash) ||
+      (document.location.hash.length < 2)) return "Home";
+  return document.location.hash.slice(1)
+}
+
+function reload() {
+  var expressions = $("expressions");
+  while (expressions.childNodes.length > 0) {
+    expressions.removeChild(expressions.firstChild);
+  }
+  loadDocument();
+}
+
+function save() {
+  var expressions = $("expressions");
+  var values = [];
+  values.push("tilescript");
+  var children = expressions.childNodes;
+  for (var i = 0; i < children.length; i++) {
+    var nodeType = children[i].isSource() ? "source" : "tile";
+    var nodeValue = children[i].sourceCode();
+    values.push([nodeType, nodeValue]);
+  }
+  saveFile(StorageUrl + "/" + getTitle() + ".txt", values.toJSON());
+}
 
 function toggleVisible(element) {
   var style = element.style
@@ -83,8 +118,27 @@ function addExpression(source, isTile) {
   p.className = "expression";
   p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
 <input type='checkbox' onclick='toggleTile(this.parentNode)'" + checked + "> \
-<input class='tile' id='queryPlace' value='" + source + "'/>";
-  place.parentNode.insertBefore(p, place);
+<input type='text' class='tile' value='1'/>";
+
+  // build an expression tile
+  p.isSource = function() {
+    return this.getElementsByTagName("input")[0].checked;
+  }
+
+  p.expressionNode = function() {
+    return document.getElementsByClassName("tile", this)[0];
+  }
+
+  p.sourceCode = function() {
+    if (this.isSource()) {
+      return this.expressionNode().value;
+    } else {
+      return this.expressionNode().value.makeCode();
+    }
+  }
+
+  p.expressionNode().value = source;
+  $("expressions").appendChild(p);
   if (isTile) {
     toggleTile(p);
   }
@@ -432,7 +486,25 @@ function findTop(tile) { return tile.parentNode.className == "tile" ? findTop(ti
 
 Array.prototype.eval = function() { return eval(this.makeCode()) }
 
-// ---------- Utilities ----------
+// ---------- Data Storage ----------
+
+function loadDocument() {
+  var title = getTitle();
+
+  document.title = title + " - TileScript";
+  $("control").action = document.location.href;
+  $("header").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
+
+  var json = getfile(StorageUrl + "/" + title + ".txt");
+  var tree = eval(json);
+  if (!tree) return;
+
+  for (var i = 1; i < tree.length; i++) {
+    var isTile = tree[i][0] == "tile";
+    var source = tree[i][1];
+    addExpression(source, isTile);
+  }
+}
 
 function getfile(url) {
   ajax = new Ajax.Request(
@@ -440,8 +512,62 @@ function getfile(url) {
     {
       method: "get",
       asynchronous: false,
+      requestHeaders: ["If-Modified-Since", "Thu, 01 Jun 1970 00:00:00 GMT"],
       parameters: ""
       //      onException: function(req, e) { alert(e) }
     });
+  if (ajax.transport.status.toString().charAt(0) == "4") return "";
   return ajax.transport.responseText;
+}
+
+function saveFile(url, contents) {
+  if (UseDAV) {
+    return saveFileWithDAV(url, contents);
+  } else if (Prototype.Browser.Gecko) {
+    return saveFileWithMozilla(url, contents);
+  }
+}
+
+function saveFileWithDAV(url, contents) {
+  var ajax = new Ajax.Request(
+    url,
+    {
+      method: "put", 
+      asynchronous: false,
+      postBody: contents,
+      onFailure: function (e) {alert(e)}
+     });
+  alert(ajax.transport.status);
+}
+
+// http://ask.metafilter.com/34651/Saving-files-with-Javascript
+function saveFileWithMozilla(url, content)
+{
+  var directory = location.pathname.replace(/[^/]*$/, "");
+  var pathname = (directory + url).slice(1);
+  var filePath = pathname.replace(new RegExp("/","g"),"\\");
+
+    alert("Local saving is only supported for Mozilla + PC: "+ filePath);
+
+    if(window.Components)
+        try
+            {
+            netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+            var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+            file.initWithPath(filePath);
+            if (!file.exists())
+                file.create(0, 0664);
+            var out = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+            out.init(file, 0x20 | 0x02, 00004,null);
+            out.write(content, content.length);
+            out.flush();
+            out.close();
+            return(true);
+            }
+        catch(e)
+            {
+            alert("Exception while attempting to save\n\n" + e);
+            return(false);
+            }
+    return(null);
 }

@@ -15,8 +15,9 @@ Alex 形式とする
 ["dom", object] object には実際のオブジェクト。保存できない。
 ["inspector", object] object には実際のオブジェクト。保存できない。
 
-
 http://localhost:8080/js/jstile/
+http://www.tiddlywiki.com/
+http://ask.metafilter.com/34651/Saving-files-with-Javascript
 
 == * はてなに Google ガジェットとしてタートルグラフィックスを貼り付けてみる。
 

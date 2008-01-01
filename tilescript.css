@@ -1,13 +1,21 @@
 h1 {
-    text-align: right;
 	font-family: Verdana;
 	font-size: 36px;
 	font-weight: bold;
     margin: 0;
-    margin-bottom: 10px;
 	right: 36px;
 	top: 0px;
-	color: #bbcccc;
+    float: right;
+}
+
+h1 a:link { color: #bbcccc; }
+h1 a:visited { color: #cccccc; }
+h1 a:active { color: #bbdddd; }
+
+.control {
+    float: left;
+	width: 50%;
+    top: 32px;
 }
 
 .expression
