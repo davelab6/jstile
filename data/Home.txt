@@ -1,1 +1,1 @@
-["tilescript", ["tile", "(3+4)"], ["source", "{alert(1);\nalert(2);\nalert(3);\n}"], ["tile", "alert('hello')"], ["source", "go(\"SandBox\")"]]
+["tilescript", ["tile", "(3+(3+(3+(3+(3+4)))))"], ["source", "{ alert(1); alert(2); alert(3) }"], ["tile", "alert('hello')"], ["source", "go(\"SandBox\")"], ["tile", "(3+4)"]]
