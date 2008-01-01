@@ -112,15 +112,24 @@ function addExpression(source, isTile) {
   var checked = isTile ? "" : " checked"
   if (!source) source = "3 + 4";
   p.className = "expression";
-  p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
-<input type='checkbox' onclick='toggleTile(this.parentNode)'" + checked + "> \
-<textarea class='tile'></textarea>";
 
-  // build an expression tile
+  var expressionTool = document.createElement("div");
+  expressionTool.className = "expressionTool";
+  expressionTool.innerHTML = "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/> \
+    <input type='checkbox' class='checkbox' class='checkbox' onclick='toggleTile(this.parentNode.parentNode)' " + checked + "/> \
+    </div>";
+
+  var tileParent = document.createElement("div");
+  tileParent.className = "tileParent";
+  tileParent.innerHTML = "<textarea class='tile'></textarea></div><br style='clear: both'>";
+
+  p.appendChild(expressionTool);
+  p.appendChild(tileParent);
+  p.tileParent = tileParent
+;
   window.p = p;
 
-  p.tileParent = p;
-
+  // build an expression tile
   p.isSource = function() {
     return this.getElementsByTagName("input")[0].checked;
   }
