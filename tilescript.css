@@ -1,3 +1,16 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	text-align: center;
+}
+body div {
+	text-align: left;
+	margin: 0 auto;
+}
+
 h1 {
 	font-family: Verdana;
 	font-size: 36px;
@@ -16,15 +29,40 @@ h1 a:active { color: #bbdddd; }
     float: left;
 	width: 50%;
     top: 32px;
+    display: inline;
 }
 
 .expression
 {
-    font-size: 30px;
-    margin: 2px;
-    padding: 10px;
-    background:#E7FFE7;
-    border: 1px solid #84B584;
+/*    font-size: 30px; */
+/*    margin: 2px; */
+    padding: 0px;
+/*    background:#E7FFE7; */
+/*    border: 1px solid #84B584; */
+}
+
+.expressionTool
+{
+    float: left;
+    width: 50px;
+}
+
+.printIt
+{
+    vertical-align: text-bottom
+}
+
+.checkbox
+{
+    margin: 0
+}
+
+.tileParent {
+    border: 1px solid #cc8888;
+    margin-right: 10px;
+    margin-left : 50px;
+/*    float: left;
+    width: 90%; */
 }
 
 .toggle
@@ -43,6 +81,13 @@ input.tile
     background:#ffffff;
 }
 
+textarea.tile
+{
+    cursor: text;
+    text-align: left;
+    width: 100%;
+    font-size: medium;
+}
 .tile
 {
     cursor: move;
@@ -55,8 +100,22 @@ input.tile
     background:#ffffff;
 }
 
+td
+{
+    cursor: move;
+    font-size: 25px;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #888888;
+    text-align: center;
+/*    background:#d0f0d0; */
+    background:#ffffff;
+}
 
-.hoverclass
+
+
+
+    .hoverclass
 {
     background: #e8c0a0;
 }
