@@ -238,27 +238,31 @@ JSParser.prototype['parse'] = function(code) {
 }
 </textarea>
 
+<div>
   <h1 id="header"><a class="headerlink" href="">TileScript</a></h1>
   <form class="control" id="control" method="POST" action="">
-  <input type="button" value="home" onclick="go('Home')">
-  <!-- input type="button" value="print it (Alt + P)" onclick="printIt()">
-  <input type="button" value="do it (Alt + D)" onclick="doIt()" -->
-  <input type="submit" value="reload"/>
-  <input type="button" value="save" onclick="save()"/>
+    <input type="button" value="home" onclick="go('Home')">
+    <!-- input type="button" value="do it (Alt + D)" onclick="doIt()" -->
+    <input type="button" value="save" onclick="save()"/>
   </form>
 <br style="clear: both"/>
-  <p id="expressions"></p>
-  <a href="javascript:addExpression()" id="addExpression">more</a>
+</div>
 
-  <p>
+<div style="    border: 1px solid #84B584;">
+  <p id="expressions"></p>
+  <div style="clear: both"></div>
+  <a href="javascript:addExpression()" id="addExpression">more</a>
+</div>
+
+<div style="clear: both">
   <span class="toggle" onclick="this.value = toggleVisible($('transcriptElement'))">+/-</span>
   <div id="transcriptElement">
-    <textarea cols="80" rows="4" id="transcript"></textArea>
+    <textarea rows="4" id="transcript" style="display: block; width: 100%"></textArea>
   </div>
-  </p>
+</div>
 
-  <hr/>
-  <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a>
+<hr/>
+<div><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a></div>
 </body>
 </html>
 

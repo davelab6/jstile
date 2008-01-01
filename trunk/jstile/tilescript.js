@@ -77,7 +77,7 @@ function toggleVisible(element) {
 
 function printIt(parent) {
   var isSource = parent.getElementsByTagName("input")[0].checked;
-  var node = expressionNode(parent);
+  var node = parent.expressionNode();
   if (isSource) {
     var tree = node.value.makeTree();
   } else {
@@ -91,23 +91,19 @@ function printIt(parent) {
 }
 
 function toggleTile(parent) {
-  var isSource = parent.getElementsByTagName("input")[0].checked;
-  old = expressionNode(parent);
-  if (isSource) {
-    var input = document.createElement("input");
+  old = parent.expressionNode();
+  if (parent.isSource()) {
+    var input = document.createElement("textarea");
     input.className = "tile";
-    input.value = old.value.makeCode();
-    parent.replaceChild(input, old);
+    var source = old.value.makeCode();
+    input.rows = source.split("\n").length;
+    input.value = source;
+    parent.tileParent.replaceChild(input, old);
   } else {
     var newNode = old.value.makeTree().makeTile();
     adjustPadding(newNode);
-    parent.replaceChild(newNode, old)
+    parent.tileParent.replaceChild(newNode, old)
   }
-}
-
-function expressionNode(parent) {
-  return document.getElementsByClassName("tile", parent)[0];
-  return parent.lastChild;
 }
 
 function addExpression(source, isTile) {
@@ -118,15 +114,19 @@ function addExpression(source, isTile) {
   p.className = "expression";
   p.innerHTML = "<img src='exclamation.gif'  onclick='printIt(this.parentNode)'/> \
 <input type='checkbox' onclick='toggleTile(this.parentNode)'" + checked + "> \
-<input type='text' class='tile' value='1'/>";
+<textarea class='tile'></textarea>";
 
   // build an expression tile
+  window.p = p;
+
+  p.tileParent = p;
+
   p.isSource = function() {
     return this.getElementsByTagName("input")[0].checked;
   }
 
   p.expressionNode = function() {
-    return document.getElementsByClassName("tile", this)[0];
+    return document.getElementsByClassName("tile", this.tileParent)[0];
   }
 
   p.sourceCode = function() {
@@ -138,6 +138,8 @@ function addExpression(source, isTile) {
   }
 
   p.expressionNode().value = source;
+  p.expressionNode().rows = source.split("\n").length;
+
   $("expressions").appendChild(p);
   if (isTile) {
     toggleTile(p);
@@ -537,7 +539,7 @@ function saveFileWithDAV(url, contents) {
       postBody: contents,
       onFailure: function (e) {alert(e)}
      });
-  alert(ajax.transport.status);
+  //  alert(ajax.transport.status);
 }
 
 // http://ask.metafilter.com/34651/Saving-files-with-Javascript
