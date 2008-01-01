@@ -23,6 +23,7 @@ function syncTitle() {
 }
 
 function go(name) {
+  if (!name) return;
   DocumentTitle = name;
   document.location.hash = "#" + name;
   reload();
@@ -92,18 +93,21 @@ function printIt(parent) {
 
 function toggleTile(parent) {
   old = parent.expressionNode();
+  var newNode;
   if (parent.isSource()) {
-    var input = document.createElement("textarea");
-    input.className = "tile";
+    newNode = document.createElement("textarea");
+    newNode.className = "tile";
     var source = old.value.makeCode();
-    input.rows = source.split("\n").length;
-    input.value = source;
-    parent.tileParent.replaceChild(input, old);
+    newNode.rows = source.split("\n").length;
+    newNode.value = source;
+    parent.tileParent.replaceChild(newNode, old);
   } else {
-    var newNode = old.value.makeTree().makeTile();
+    newNode = old.value.makeTree().makeTile();
     adjustPadding(newNode);
-    parent.tileParent.replaceChild(newNode, old)
+    parent.tileParent.replaceChild(newNode, old);
   }
+  parent.tileParent.style.lineHeight = $(newNode).getHeight() + "px";
+window.newNode = newNode; // for debugging
 }
 
 function addExpression(source, isTile) {
@@ -121,12 +125,16 @@ function addExpression(source, isTile) {
 
   var tileParent = document.createElement("div");
   tileParent.className = "tileParent";
-  tileParent.innerHTML = "<textarea class='tile'></textarea></div><br style='clear: both'>";
+  tileParent.innerHTML = "<textarea class='tile'></textarea></div><!-- br style='clear: both' -->";
 
   p.appendChild(expressionTool);
   p.appendChild(tileParent);
-  p.tileParent = tileParent
-;
+  p.tileParent = tileParent;
+
+  var newLine = document.createElement("div");
+  newLine.style.clear = "both";
+  p.appendChild(newLine);
+
   window.p = p;
 
   // build an expression tile
