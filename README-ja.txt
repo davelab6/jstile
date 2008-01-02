@@ -10,6 +10,7 @@ todo done: toggle を綺麗に。
 todo done: 削除
 todo: HTML 記法
 todo: 結果表示
+todo: トランスクリプトを隠す
 
 == 文書構造
 
@@ -25,7 +26,7 @@ Alex 形式とする
 http://localhost:8080/js/jstile/
 http://www.tiddlywiki.com/
 http://ask.metafilter.com/34651/Saving-files-with-Javascript
-
+WYSIWIG editor http://a-h.parfe.jp/einfach/archives/2006/1213124637.html
 
 css 参考
 - ADP: floatレイアウトでつまづかないためのTips http://adp.daa.jp/archives/000250.html

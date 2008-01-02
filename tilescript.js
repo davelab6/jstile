@@ -83,8 +83,8 @@ function toggleVisible(element) {
 function printIt(row) {
   var source = row.sourceCode();
   var transcript = $("transcript");
-  transcript.value += "tree: " + source.makeTree().printString() + "\n";
-  transcript.value += "code: " + source + "\n";
+  //  transcript.value += "tree: " + source.makeTree().printString() + "\n";
+  //  transcript.value += "code: " + source + "\n";
   transcript.value += eval(source) + "\n";
 }
 

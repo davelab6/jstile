@@ -65,6 +65,22 @@ h1 a:active { color: #bbdddd; }
     margin-left: 1em;
     margin-right: 1em;
 }
+#transcriptElement {
+    z-index: 10;
+    position: fixed;
+    bottom: 0px;
+    left: 10px;
+    right: 10px;
+    margin-left: auto;
+    margin-right: auto;
+/*   background: #e0e8e8; */
+}
+#transcript {
+    width: 98%;
+    margin: auto;
+    display: block;
+    background: white;
+}
 
 .printIt
 {
@@ -131,6 +147,10 @@ span.tile
 }
 
 
+
+p {
+	padding-bottom: 0.5em;
+}
 
 
 td
