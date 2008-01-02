@@ -61,7 +61,7 @@ function save() {
   values.push("tilescript");
   var children = rows.childNodes;
   for (var i = 0; i < children.length; i++) {
-    var nodeType = children[i].isSource() ? "source" : "tile";
+    var nodeType = children[i].viewMod;
     var nodeValue = children[i].sourceCode();
     values.push([nodeType, nodeValue]);
   }
@@ -81,18 +81,11 @@ function toggleVisible(element) {
 }
 
 function printIt(row) {
-  var isSource = row.getElementsByTagName("input")[0].checked;
-  var node = row.rowNode();
-  if (isSource) {
-    var tree = node.value.makeTree();
-  } else {
-    var tree = node.value;
-  }
+  var source = row.sourceCode();
   var transcript = $("transcript");
-  transcript.value += "tree: " + tree.printString() + "\n";
-  transcript.value += "code: " + tree.makeCode() + "\n";
-  transcript.value += tree.eval() + "\n";
-  //  console.log(tree);
+  transcript.value += "tree: " + source.makeTree().printString() + "\n";
+  transcript.value += "code: " + source + "\n";
+  transcript.value += eval(source) + "\n";
 }
 
 function removeRow(row) {
@@ -106,14 +99,17 @@ function removeRow(row) {
 Row = {
   className: "row",
 
-  isSource: function() {
-    return this.rowNode().tagName != "SPAN";
-  },
   rowNode: function() {
     return document.getElementsByClassName("tile", this.valueParent)[0];
   },
+  printItButton: function() {
+    return document.getElementsByClassName("printIt", this.rowTool)[0];
+  },
   sourceCode: function() {
-    if (this.isSource()) {
+    var rowNode = this.rowNode();
+    if (rowNode.tagName == "TEXTAREA") {
+      return this.rowNode().value;
+    } else if (rowNode.tagName == "DIV") {
       return this.rowNode().value;
     } else {
       return this.rowNode().value.makeCode();
@@ -127,24 +123,48 @@ Row = {
     newNode.value = source;
     return newNode;
   },
-  setIsSource: function(isSource) {
-    old = this.rowNode();
+  newHTML: function(source) {
+    var newNode = document.createElement("div");
+    newNode.layoutChanged = function() {};
+    newNode.className = "tile";
+    //    newNode.innerHTML = source;
+    $(newNode).update(source);
+    newNode.value = source;
+    return newNode;
+  },
+  setViewMode: function(mode) {
+    var old = this.rowNode();
+    this.viewMode = mode;
     var newNode;
-    if (isSource) {
+    if (mode == "source") {
       newNode = this.newTextArea(this.sourceCode());
-    } else {
+      //      this.printItButton().style.display = "inline";
+    } else if (mode == "tile") {
       newNode = this.sourceCode().makeTree().makeTile();
+      //      this.printItButton().style.display = "none";
+    } else {
+      newNode = this.newHTML(this.sourceCode());
+            //      this.printItButton().style.display = "inline";
     }
     this.valueParent.replaceChild(newNode, old);
+    window.row = this;
   },
   toggleTile: function() {
-    this.setIsSource(!this.isSource());
+    var mode;
+    if (this.viewMode != "source") {
+      mode = "source";
+    } else if (this.sourceCode().charAt(0) == "<") {
+      mode = "html";
+    } else {
+      mode = "tile";
+    }
+    this.setViewMode(mode);
     this.valueParent.layoutChanged();
   }
 }
 
-function newRow(source, isSource) {
-  var checked = isSource ?" checked" : ""; 
+function newRow(source, viewMode) {
+  var checked = viewMode == "source" ?" checked" : ""; 
 
   var rowTool = Object.extend(document.createElement("div"), {
     className: "rowTool",
@@ -169,23 +189,24 @@ function newRow(source, isSource) {
     onmouseover: function() { this.className = "newLineEnter" },
     onmouseout: function() { this.className = "newLine" },
     onclick: function() {
-      var row = addRow('', true, this.parentNode);
+      var row = addRow('', "source", this.parentNode);
       $(row).visualEffect("BlindDown", {duration: 0.3});
     },
     title: "Add a new row here"
   });
 
   var p = Object.extend(document.createElement("p"), Row);
+  p.rowTool = rowTool;
   p.valueParent = valueParent;
   p.appendChild(rowTool);
   p.appendChild(valueParent);
   p.appendChild(newLine);
-  p.setIsSource(isSource);
+  p.setViewMode(viewMode);
   return p;
 }
 
-function addRow(source, isSource, after) {
-  var p = newRow(source, isSource);
+function addRow(source, viewMode, after) {
+  var p = newRow(source, viewMode);
   var rowNodes = $("rows").childNodes;
 
   var i;
@@ -221,9 +242,9 @@ function makeSpan() {
 function spanLayoutChanged() {
   var max = 0
   for (var idx = 0; idx < this.childNodes.length; idx++) {
-    window.child = this.childNodes[idx];
+    var child = this.childNodes[idx];
     if (child.layoutChanged) {
-      var padding = this.childNodes[idx].layoutChanged();
+      var padding = child.layoutChanged();
       if (padding > max) max = padding;
     }
   }
@@ -558,12 +579,15 @@ function loadDocument() {
 
   var json = getfile(StorageUrl + "/" + title + ".txt");
   var tree = eval(json);
-  if (!tree) return;
+  if (!tree) {
+    addRow("\"This is an empty page.\"", true);
+    return;
+  }
 
   for (var i = 1; i < tree.length; i++) {
-    var isSource = tree[i][0] == "source";
+    var viewMode = tree[i][0];
     var source = tree[i][1];
-    addRow(source, isSource);
+    addRow(source, viewMode);
   }
 }
 

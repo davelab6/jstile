@@ -1,1 +1,9 @@
-["tilescript", ["tile", "(3+(3+(3+(3+(3+4)))))"], ["source", "{ alert(1); alert(2); alert(3) }"], ["tile", "alert('hello')"], ["source", "go(\"SandBox\")"], ["tile", "(3+4)"]]
+["tilescript",
+        ["html", "<p><b>TileScript</b> is an interactive playfield for playing with Javascript language.</p>"],
+        ["tile", "(3+(3+(3+(3+(3+4)))))"],
+        ["source", "{ alert(1); alert(2); alert(3) }"],
+        ["tile", "alert('hello')"],
+        ["source", "go(\"SandBox\")"],
+        ["html", "<p><img src=\"exp/robo.gif\" style=\"float: right\">"]
+
+]

@@ -5,6 +5,7 @@
 
 body {
 	text-align: center;
+	font-family: Verdana;
 }
 body div {
 	text-align: left;
@@ -99,7 +100,13 @@ textarea.tile
     font-size: medium;
     border: 1px solid #dddddd;
 }
-.tile
+
+div.tile
+{
+    margin-left: 2em;
+}
+
+span.tile
 {
     cursor: move;
     font-size: 25px;

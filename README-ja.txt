@@ -7,9 +7,9 @@ goal: ビューワ
 == レイアウト
 
 todo done: toggle を綺麗に。
-todo: 削除
+todo done: 削除
+todo: HTML 記法
 todo: 結果表示
-todo: WIKI 記法
 
 == 文書構造
 
