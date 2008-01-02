@@ -240,8 +240,8 @@ JSParser.prototype['parse'] = function(code) {
 </head>
 <body>
 
-<div>
-  <h1 id="header"><a class="headerlink" href="placeholder">TileScript</a></h1>
+<div id="header">
+  <h1 id="title"><a class="headerlink" href="placeholder">TileScript</a></h1>
   <form class="control" id="control" method="post" action="">
     <input type="button" value="home" onclick="go('Home')"/>
     <!-- input type="button" value="do it (Alt + D)" onclick="doIt()" -->
@@ -251,17 +251,16 @@ JSParser.prototype['parse'] = function(code) {
 </div>
 
   <p id="rows"></p>
-  <div style="clear: both"></div>
+<br style="clear: both"/>
 
-<div style="clear: both">
+<div id="footer">
   <span class="toggle" onclick="this.value = toggleVisible($('transcriptElement'))">+/-</span>
   <div id="transcriptElement">
     <textarea rows="4" id="transcript" style="display: block; width: 100%"></textArea>
   </div>
-</div>
 
 <hr/>
-<div><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a></div>
+<p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a></p>
+</div>
 </body>
 </html>
-

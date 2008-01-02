@@ -544,7 +544,7 @@ function loadDocument() {
 
   document.title = title + " - TileScript";
   $("control").action = document.location.href;
-  $("header").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
+  $("title").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
 
   var json = getfile(StorageUrl + "/" + title + ".txt");
   var tree = eval(json);
