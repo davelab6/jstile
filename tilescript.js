@@ -85,7 +85,13 @@ function printIt(row) {
   var transcript = $("transcript");
   //  transcript.value += "tree: " + source.makeTree().printString() + "\n";
   //  transcript.value += "code: " + source + "\n";
-  transcript.value += eval(source) + "\n";
+  var result = eval(source);
+  transcript.value += result + "\n";
+  if (result != undefined) {
+    var newRow = addRow(result.printString(), "source", row);
+    $(newRow).visualEffect("BlindDown", {duration: 0.4});
+
+  }
 }
 
 function removeRow(row) {

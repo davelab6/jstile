@@ -8,9 +8,11 @@ goal: ビューワ
 
 todo done: toggle を綺麗に。
 todo done: 削除
-todo: HTML 記法
+todo done: HTML 記法
+todo done: トランスクリプトを隠す
 todo: 結果表示
-todo: トランスクリプトを隠す
+todo: パーツビン
+todo: 縦表示
 
 == 文書構造
 
