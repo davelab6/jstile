@@ -112,25 +112,27 @@ Row = {
       return this.rowNode().value.makeCode();
     }
   },
+  newTextArea: function(source) {
+    var newNode = document.createElement("textarea");
+    newNode.layoutChanged = function() {};
+    newNode.className = "tile";
+    newNode.rows = source.split("\n").length;
+    newNode.value = source;
+    return newNode;
+  },
   setIsSource: function(isSource) {
     old = this.rowNode();
     var newNode;
     if (isSource) {
-      newNode = document.createElement("textarea");
-      newNode.className = "tile";
-      var source = this.sourceCode();
-      newNode.rows = source.split("\n").length;
-      newNode.value = source;
+      newNode = this.newTextArea(this.sourceCode());
     } else {
       newNode = this.sourceCode().makeTree().makeTile();
-      adjustPadding(newNode);
     }
     this.valueParent.replaceChild(newNode, old);
-    this.valueParent.style.lineHeight = $(newNode).getHeight() + "px";
-    console.log($(newNode).getHeight());
   },
   toggleTile: function() {
     this.setIsSource(!this.isSource());
+    this.valueParent.layoutChanged();
   }
 }
 
@@ -146,8 +148,12 @@ function newRow(source, isSource) {
     
   var valueParent = Object.extend(document.createElement("div"), {
     className: "valueParent",
-    innerHTML: "<textarea class='tile'></textarea>"
+    layoutChanged: function() {
+      this.firstChild.layoutChanged();
+      this.style.lineHeight = $(this.firstChild).getHeight() + "px";
+    }
   });
+  valueParent.appendChild(Row.newTextArea(source));
 
   var newLine = Object.extend(document.createElement("div"), {
     className: "newLine",
@@ -164,9 +170,7 @@ function newRow(source, isSource) {
   p.appendChild(rowTool);
   p.appendChild(valueParent);
   p.appendChild(newLine);
-
-  p.rowNode().value = source;
-  p.rowNode().rows = source.split("\n").length;
+  p.setIsSource(isSource);
   return p;
 }
 
@@ -183,8 +187,8 @@ function addRow(source, isSource, after) {
   } else {
     $("rows").appendChild(p);
   }
+  p.valueParent.layoutChanged();
 
-  p.setIsSource(isSource);
   return p;
 }
 
@@ -197,9 +201,26 @@ String.prototype.makeTree = function () {
 function makeSpan() {
   var span = document.createElement("span")
   span.className = "tile";
+  span.layoutChanged = spanLayoutChanged;
   span.draggable = new Draggable(span, { ghosting: false, revert: true });
   Droppables.add(span, { onDrop: acceptDrop, accept: "tile", hoverclass: "hoverclass"});
   return span;
+}
+
+/* adjust the tile's padding based on the depth */
+function spanLayoutChanged() {
+  var max = 0
+  for (var idx = 0; idx < this.childNodes.length; idx++) {
+    window.child = this.childNodes[idx];
+    if (child.layoutChanged) {
+      var padding = this.childNodes[idx].layoutChanged();
+      if (padding > max) max = padding;
+    }
+  }
+  max += 2
+  if (this.style != undefined)
+    this.style.padding = max + "px"
+  return max
 }
 
 Array.prototype.dup = function() { return this.map(function(value) { return value instanceof Array ? value.dup() : value; }); }
@@ -506,25 +527,11 @@ function acceptDrop(element, target) {
     elementCopy.modelIdx = target.modelIdx
     parent.value[target.modelIdx] = elementCopy.value
   }
-  parent.replaceChild(elementCopy, target)
-  adjustPadding(findTop(elementCopy))
+  parent.replaceChild(elementCopy, target);
+  findTop(elementCopy).layoutChanged()
 }
 
-/* adjust the tile's padding based on the depth */
-function adjustPadding(tile) {
-  var max = 0
-  for (var idx = 0; idx < tile.childNodes.length; idx++) {
-    var padding = adjustPadding(tile.childNodes[idx])
-    if (padding > max) 
-      max = padding
-  }
-  max += 2
-  if (tile.style != undefined)
-    tile.style.padding = max + "px"
-  return max
-}
-
-function findTop(tile) { return tile.parentNode.className == "tile" ? findTop(tile.parentNode) : tile }
+function findTop(tile) { return (tile.parentNode.className == "tile" || tile.parentNode.className == "valueParent") ? findTop(tile.parentNode) : tile }
 
 // ---------- Evaluation ----------
 
