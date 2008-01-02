@@ -80,9 +80,9 @@ function toggleVisible(element) {
   }
 }
 
-function printIt(parent) {
-  var isSource = parent.getElementsByTagName("input")[0].checked;
-  var node = parent.rowNode();
+function printIt(row) {
+  var isSource = row.getElementsByTagName("input")[0].checked;
+  var node = row.rowNode();
   if (isSource) {
     var tree = node.value.makeTree();
   } else {
@@ -95,6 +95,13 @@ function printIt(parent) {
   //  console.log(tree);
 }
 
+function removeRow(row) {
+  $(row).visualEffect("BlindUp", {
+    duration: 0.3,
+    afterFinish: function() {row.parentNode.removeChild(row)}
+  });
+
+}
 
 Row = {
   className: "row",
@@ -141,7 +148,9 @@ function newRow(source, isSource) {
 
   var rowTool = Object.extend(document.createElement("div"), {
     className: "rowTool",
-    innerHTML: "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/>" +
+    innerHTML:
+    "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/>" +
+    "<img src='x.gif' onclick='removeRow(this.parentNode.parentNode)' class='printIt'/>" +
     "<input type='checkbox' class='checkbox' class='checkbox' onclick='this.parentNode.parentNode.toggleTile()' " + checked + "/>" +
     "</div>"
   });
@@ -160,7 +169,8 @@ function newRow(source, isSource) {
     onmouseover: function() { this.className = "newLineEnter" },
     onmouseout: function() { this.className = "newLine" },
     onclick: function() {
-      addRow('', true, this.parentNode);
+      var row = addRow('', true, this.parentNode);
+      $(row).visualEffect("BlindDown", {duration: 0.3});
     },
     title: "Add a new row here"
   });
