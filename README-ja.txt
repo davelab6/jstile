@@ -7,6 +7,9 @@ goal: ビューワ
 == レイアウト
 
 todo: toggle を綺麗に。
+todo: 削除
+todo: 結果表示
+todo: WIKI 記法
 
 == 文書構造
 
