@@ -32,7 +32,7 @@ h1 a:active { color: #bbdddd; }
     display: inline;
 }
 
-.expression
+.row
 {
 /*    font-size: 30px; */
 /*    margin: 2px; */
@@ -41,7 +41,7 @@ h1 a:active { color: #bbdddd; }
 /*    border: 1px solid #84B584; */
 }
 
-.expressionTool
+.rowTool
 {
     float: left;
     width: 50px;
@@ -57,7 +57,7 @@ h1 a:active { color: #bbdddd; }
     margin: 0
 }
 
-.tileParent {
+.valueParent {
     border: 1px solid #cc8888;
     margin-right: 10px;
     margin-left : 50px;
@@ -99,6 +99,21 @@ textarea.tile
 /*    background:#d0f0d0; */
     background:#ffffff;
 }
+
+.newLineEnter {
+    background-color: #ccffff;
+    height: 10px;
+    clear: both;
+}
+
+.newLine {
+    background-color: transparent;
+    height: 10px;
+    clear: both;
+}
+
+
+
 
 td
 {

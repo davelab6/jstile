@@ -2,6 +2,10 @@
 
 StorageUrl = "data"; // Set WebDAV directory
 
+if (window.console == undefined) {
+  console = {log: function () {}};
+}
+
 // ---------- Initialize ----------
 
 UseDAV = false;
@@ -44,18 +48,18 @@ function _getTitle() {
 }
 
 function reload() {
-  var expressions = $("expressions");
-  while (expressions.childNodes.length > 0) {
-    expressions.removeChild(expressions.firstChild);
+  var rows = $("rows");
+  while (rows.childNodes.length > 0) {
+    rows.removeChild(rows.firstChild);
   }
   loadDocument();
 }
 
 function save() {
-  var expressions = $("expressions");
+  var rows = $("rows");
   var values = [];
   values.push("tilescript");
-  var children = expressions.childNodes;
+  var children = rows.childNodes;
   for (var i = 0; i < children.length; i++) {
     var nodeType = children[i].isSource() ? "source" : "tile";
     var nodeValue = children[i].sourceCode();
@@ -78,7 +82,7 @@ function toggleVisible(element) {
 
 function printIt(parent) {
   var isSource = parent.getElementsByTagName("input")[0].checked;
-  var node = parent.expressionNode();
+  var node = parent.rowNode();
   if (isSource) {
     var tree = node.value.makeTree();
   } else {
@@ -91,76 +95,97 @@ function printIt(parent) {
   //  console.log(tree);
 }
 
-function toggleTile(parent) {
-  old = parent.expressionNode();
-  var newNode;
-  if (parent.isSource()) {
-    newNode = document.createElement("textarea");
-    newNode.className = "tile";
-    var source = old.value.makeCode();
-    newNode.rows = source.split("\n").length;
-    newNode.value = source;
-    parent.tileParent.replaceChild(newNode, old);
-  } else {
-    newNode = old.value.makeTree().makeTile();
-    adjustPadding(newNode);
-    parent.tileParent.replaceChild(newNode, old);
+
+Row = {
+  className: "row",
+
+  isSource: function() {
+    return this.rowNode().tagName != "SPAN";
+  },
+  rowNode: function() {
+    return document.getElementsByClassName("tile", this.valueParent)[0];
+  },
+  sourceCode: function() {
+    if (this.isSource()) {
+      return this.rowNode().value;
+    } else {
+      return this.rowNode().value.makeCode();
+    }
+  },
+  setIsSource: function(isSource) {
+    old = this.rowNode();
+    var newNode;
+    if (isSource) {
+      newNode = document.createElement("textarea");
+      newNode.className = "tile";
+      var source = this.sourceCode();
+      newNode.rows = source.split("\n").length;
+      newNode.value = source;
+    } else {
+      newNode = this.sourceCode().makeTree().makeTile();
+      adjustPadding(newNode);
+    }
+    this.valueParent.replaceChild(newNode, old);
+    this.valueParent.style.lineHeight = $(newNode).getHeight() + "px";
+    console.log($(newNode).getHeight());
+  },
+  toggleTile: function() {
+    this.setIsSource(!this.isSource());
   }
-  parent.tileParent.style.lineHeight = $(newNode).getHeight() + "px";
-window.newNode = newNode; // for debugging
 }
 
-function addExpression(source, isTile) {
-  var place = $("addExpression");
-  var p = document.createElement("p");
-  var checked = isTile ? "" : " checked"
-  if (!source) source = "3 + 4";
-  p.className = "expression";
+function newRow(source, isSource) {
+  var checked = isSource ?" checked" : ""; 
 
-  var expressionTool = document.createElement("div");
-  expressionTool.className = "expressionTool";
-  expressionTool.innerHTML = "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/> \
-    <input type='checkbox' class='checkbox' class='checkbox' onclick='toggleTile(this.parentNode.parentNode)' " + checked + "/> \
-    </div>";
+  var rowTool = Object.extend(document.createElement("div"), {
+    className: "rowTool",
+    innerHTML: "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/>" +
+    "<input type='checkbox' class='checkbox' class='checkbox' onclick='this.parentNode.parentNode.toggleTile()' " + checked + "/>" +
+    "</div>"
+  });
+    
+  var valueParent = Object.extend(document.createElement("div"), {
+    className: "valueParent",
+    innerHTML: "<textarea class='tile'></textarea>"
+  });
 
-  var tileParent = document.createElement("div");
-  tileParent.className = "tileParent";
-  tileParent.innerHTML = "<textarea class='tile'></textarea></div><!-- br style='clear: both' -->";
+  var newLine = Object.extend(document.createElement("div"), {
+    className: "newLine",
+    onmouseover: function() { this.className = "newLineEnter" },
+    onmouseout: function() { this.className = "newLine" },
+    onclick: function() {
+      addRow('', true, this.parentNode);
+    },
+    title: "Add a new row here"
+  });
 
-  p.appendChild(expressionTool);
-  p.appendChild(tileParent);
-  p.tileParent = tileParent;
-
-  var newLine = document.createElement("div");
-  newLine.style.clear = "both";
+  var p = Object.extend(document.createElement("p"), Row);
+  p.valueParent = valueParent;
+  p.appendChild(rowTool);
+  p.appendChild(valueParent);
   p.appendChild(newLine);
 
-  window.p = p;
+  p.rowNode().value = source;
+  p.rowNode().rows = source.split("\n").length;
+  return p;
+}
 
-  // build an expression tile
-  p.isSource = function() {
-    return this.getElementsByTagName("input")[0].checked;
+function addRow(source, isSource, after) {
+  var p = newRow(source, isSource);
+  var rowNodes = $("rows").childNodes;
+
+  var i;
+  for (i = 0; i < rowNodes.length; i++) {
+    if (rowNodes[i] == after) break;
+  }
+  if (rowNodes[i + 1]) {
+    $("rows").insertBefore(p, rowNodes[i + 1]);
+  } else {
+    $("rows").appendChild(p);
   }
 
-  p.expressionNode = function() {
-    return document.getElementsByClassName("tile", this.tileParent)[0];
-  }
-
-  p.sourceCode = function() {
-    if (this.isSource()) {
-      return this.expressionNode().value;
-    } else {
-      return this.expressionNode().value.makeCode();
-    }
-  }
-
-  p.expressionNode().value = source;
-  p.expressionNode().rows = source.split("\n").length;
-
-  $("expressions").appendChild(p);
-  if (isTile) {
-    toggleTile(p);
-  }
+  p.setIsSource(isSource);
+  return p;
 }
 
 // ---------- Tiles ----------
@@ -519,9 +544,9 @@ function loadDocument() {
   if (!tree) return;
 
   for (var i = 1; i < tree.length; i++) {
-    var isTile = tree[i][0] == "tile";
+    var isSource = tree[i][0] == "source";
     var source = tree[i][1];
-    addExpression(source, isTile);
+    addRow(source, isSource);
   }
 }
 

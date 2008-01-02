@@ -4,6 +4,10 @@ goal: world の中を worm が動く
 goal: worm が タートルグラフィックの動きが出来る。
 goal: ビューワ
 
+== レイアウト
+
+todo: toggle を綺麗に。
+
 == 文書構造
 
 Alex 形式とする
@@ -22,7 +26,7 @@ http://ask.metafilter.com/34651/Saving-files-with-Javascript
 
 css 参考
 - ADP: floatレイアウトでつまづかないためのTips http://adp.daa.jp/archives/000250.html
-
+- <script> タグの読み方 http://d.hatena.ne.jp/jknaoya/20071116
 == * はてなに Google ガジェットとしてタートルグラフィックスを貼り付けてみる。
 
 http://d.hatena.ne.jp/propella/20071227/p1 で作った javascript 版タートルグラフィックスをそのままはてなに貼れないか試してみた。google ガジェットを経由すると簡単でした。むかし、アイデアとして毎日 etoys でインタラクティブ日記を書くというのがありましたが、そういう事も可能になりそうです。
