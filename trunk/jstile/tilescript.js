@@ -61,7 +61,7 @@ function save() {
   values.push("tilescript");
   var children = rows.childNodes;
   for (var i = 0; i < children.length; i++) {
-    var nodeType = children[i].viewMod;
+    var nodeType = children[i].viewMode;
     var nodeValue = children[i].sourceCode();
     values.push([nodeType, nodeValue]);
   }
@@ -159,7 +159,9 @@ Row = {
       mode = "tile";
     }
     this.setViewMode(mode);
-    this.valueParent.layoutChanged();
+    if (mode == "tile") {
+      this.valueParent.layoutChanged();
+    }
   }
 }
 
@@ -218,8 +220,9 @@ function addRow(source, viewMode, after) {
   } else {
     $("rows").appendChild(p);
   }
-  p.valueParent.layoutChanged();
-
+  if (viewMode == "tile") {
+    p.valueParent.layoutChanged();
+  }
   return p;
 }
 
