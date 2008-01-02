@@ -253,14 +253,19 @@ JSParser.prototype['parse'] = function(code) {
   <p id="rows"></p>
 <br style="clear: both"/>
 
-<div id="footer">
-  <span class="toggle" onclick="this.value = toggleVisible($('transcriptElement'))">+/-</span>
-  <div id="transcriptElement">
-    <textarea rows="4" id="transcript" style="display: block; width: 100%"></textArea>
-  </div>
-
 <hr/>
+
+<div id="footer">
 <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a></p>
 </div>
+
+
+<div id="transcriptElement">
+  <div class="toggle" onclick="this.value = toggleVisible($('transcript'))" style="background: #e0e8e8; width: 98%; margin: auto;">Transcript [+/-]</div>
+  <textarea rows="4" id="transcript"></textArea>
+</div>
+
+
+
 </body>
 </html>
