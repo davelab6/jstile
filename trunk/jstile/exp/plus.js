@@ -5,7 +5,7 @@ window.onload = function(){
 
 function addTiles() {
   for (var i = 0; i < 10; i++) {
-    var span = document.createElement("span");
+    var span = document.createElement("div");
     span.innerHTML = "" + i;
     span.className = "tile";
     span.id = "proto_" + i;
