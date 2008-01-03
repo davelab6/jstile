@@ -652,11 +652,12 @@ function saveFileWithDAV(url, contents) {
 // http://ask.metafilter.com/34651/Saving-files-with-Javascript
 function saveFileWithMozilla(url, content)
 {
+  // very naive path conversion
   var filePath;
-  if(url.charAt(9) == ":") {
-	var directory = location.pathname.replace(/[^/]*$/, "");
-	var pathname = (directory + url).slice(1);
-	filePath = pathname.replace(new RegExp("/","g"),"\\");
+  var pathname = location.pathname;
+  if(pathname.charAt(2) == ":") {
+	var directory = pathname.replace(/[^/]*$/, "").slice(1);
+	filePath = (directory + url).replace(new RegExp("/","g"),"\\");
   } else {
 	var directory = location.pathname.replace(/[^/]*$/, "");
 	filePath = (directory + url);
