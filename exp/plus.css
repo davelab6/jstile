@@ -6,14 +6,21 @@ h1 {
 
 .tile
 {
+    float: left;
     background: white;
     cursor: move;
     font-size: 25px;
     margin: 2px;
-    padding: 2px;
+    padding: 0px;
     border: 1px solid black;
     text-align: center;
 }
+
+.passive {
+    cursor: default;
+    border: 1px solid transparent;
+}
+
 .hoverclass
 {
     background: #88ff88;
