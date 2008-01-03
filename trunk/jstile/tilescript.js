@@ -604,7 +604,7 @@ function loadDocument() {
   var json = getfile(StorageUrl + "/" + title + ".txt");
   var tree = eval(json);
   if (!tree) {
-    addRow("\"This is an empty page.\"", true);
+    addRow("\"This is an empty page.\"", "tile");
     return;
   }
 
@@ -652,11 +652,15 @@ function saveFileWithDAV(url, contents) {
 // http://ask.metafilter.com/34651/Saving-files-with-Javascript
 function saveFileWithMozilla(url, content)
 {
-  var directory = location.pathname.replace(/[^/]*$/, "");
-  var pathname = (directory + url).slice(1);
-  var filePath = pathname.replace(new RegExp("/","g"),"\\");
-
-    alert("Local saving is only supported for Mozilla + PC: "+ filePath);
+  var filePath;
+  if(url.charAt(9) == ":") {
+	var directory = location.pathname.replace(/[^/]*$/, "");
+	var pathname = (directory + url).slice(1);
+	filePath = pathname.replace(new RegExp("/","g"),"\\");
+  } else {
+	var directory = location.pathname.replace(/[^/]*$/, "");
+	filePath = (directory + url);
+  }
 
     if(window.Components)
         try
