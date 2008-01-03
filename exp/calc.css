@@ -16,19 +16,27 @@ h1 {
     font-size: 30px;
 }
 
-.tile
-{
+.tile {
     cursor: move;
     font-size: 25px;
-    margin: 2px;
-    padding: 2px;
+    vertical-align:middle;
+    margin: 0px;
+    padding: 0px;
     border: 1px solid #888888;
     text-align: center;
-//    background:#d0f0d0;
     background:#ffffff;
+}
+
+td {
+    margin: 0px;
+    padding: 0px;
 }
 
 .hoverclass
 {
     background: #e8c0a0;
+}
+
+br {
+    clear: both;
 }
