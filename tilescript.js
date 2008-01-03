@@ -419,12 +419,27 @@ Array.prototype.makeCodes["begin"] = function() {
   return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
 }
 Array.prototype.makeTiles["begin"] = function(span) {
+  var children = [];
   span.appendChild(document.createTextNode("{ "))
   for (var idx = 1; idx < this.length; idx++) {
-    span.appendChild(this.makeTile(idx))
-    span.appendChild(document.createTextNode("; "))
+    var div = document.createElement("div");
+
+    div.style.border = " 1px solid #888888";
+    div.layoutChanged = spanLayoutChanged;
+
+    var child = this.makeTile(idx);
+    div.appendChild(child);
+    span.appendChild(div);
+    children.push(child);
   }
   span.appendChild(document.createTextNode("}"))
+// function () {
+//     children.collect(function (row, index) {
+//       padding = row.layoutChanged();
+//       row.style.padding = padding + 2 + "px";
+//       //      row.style.lineHeight = $(row.firstChild).getHeight() + "px";
+//     })
+//   }
 }
 
 Array.prototype.makeCodes["func"] = function() {

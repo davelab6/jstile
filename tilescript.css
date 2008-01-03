@@ -117,21 +117,21 @@ textarea.tile
     border: 1px solid #dddddd;
 }
 
-div.tile
-{
+.tile {
+    background:#ffffff;
+}
+
+div.tile {
     margin-left: 2em;
 }
 
-span.tile
-{
+span.tile {
     cursor: move;
     font-size: 25px;
     margin: 2px;
     padding: 2px;
     border: 1px solid #888888;
     text-align: center;
-/*    background:#d0f0d0; */
-    background:#ffffff;
 }
 
 .newLineEnter {
@@ -146,6 +146,9 @@ span.tile
     clear: both;
 }
 
+.hoverclass {
+    background: #e8c0a0;
+}
 
 
 p {
@@ -163,12 +166,4 @@ td
     text-align: center;
 /*    background:#d0f0d0; */
     background:#ffffff;
-}
-
-
-
-
-    .hoverclass
-{
-    background: #e8c0a0;
 }
