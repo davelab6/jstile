@@ -113,45 +113,45 @@ Row = {
   },
   sourceCode: function() {
     var rowNode = this.rowNode();
-    if (rowNode.tagName == "TEXTAREA") {
+    console.log(this.rowNode());
+    if (rowNode.viewMode == "source") {
       return this.rowNode().value;
-    } else if (rowNode.tagName == "DIV") {
+    } else if (rowNode.viewMode == "html") {
       return this.rowNode().value;
     } else {
       return this.rowNode().value.makeCode();
     }
   },
-  newTextArea: function(source) {
-    var newNode = document.createElement("textarea");
-    newNode.layoutChanged = function() {};
-    newNode.className = "tile";
-    newNode.rows = source.split("\n").length;
-    newNode.value = source;
-    return newNode;
-  },
-  newHTML: function(source) {
-    var newNode = document.createElement("div");
-    newNode.layoutChanged = function() {};
-    newNode.className = "tile";
-    //    newNode.innerHTML = source;
-    $(newNode).update(source);
-    newNode.value = source;
-    return newNode;
+  newNodeBuild: {
+    source: function(source) {
+      var newNode = document.createElement("textarea");
+      newNode.viewMode = "source";
+      newNode.className = "tile";
+      newNode.layoutChanged = function() {};
+      newNode.rows = source.split("\n").length;
+      newNode.value = source;
+      return newNode;
+    },
+    html: function(source) {
+      var newNode = document.createElement("div");
+      newNode.viewMode = "html";
+      newNode.className = "tile";
+      newNode.layoutChanged = function() {};
+      $(newNode).update(source);
+      newNode.value = source;
+      return newNode;
+    },
+    tile: function(source) {
+      var newNode = source.makeTree().makeTile();
+      newNode.viewMode = "tile";
+      newNode.className = "tile";
+      return newNode;
+    }
   },
   setViewMode: function(mode) {
     var old = this.rowNode();
     this.viewMode = mode;
-    var newNode;
-    if (mode == "source") {
-      newNode = this.newTextArea(this.sourceCode());
-      //      this.printItButton().style.display = "inline";
-    } else if (mode == "tile") {
-      newNode = this.sourceCode().makeTree().makeTile();
-      //      this.printItButton().style.display = "none";
-    } else {
-      newNode = this.newHTML(this.sourceCode());
-            //      this.printItButton().style.display = "inline";
-    }
+    var newNode = this.newNodeBuild[mode](this.sourceCode());
     this.valueParent.replaceChild(newNode, old);
     window.row = this;
   },
@@ -190,7 +190,7 @@ function newRow(source, viewMode) {
       this.style.lineHeight = $(this.firstChild).getHeight() + "px";
     }
   });
-  valueParent.appendChild(Row.newTextArea(source));
+  valueParent.appendChild(Row.newNodeBuild.source(source));
 
   var newLine = Object.extend(document.createElement("div"), {
     className: "newLine",
@@ -418,28 +418,14 @@ Array.prototype.makeTiles["forIn"] = function(span) {
 Array.prototype.makeCodes["begin"] = function() {
   return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
 }
+
 Array.prototype.makeTiles["begin"] = function(span) {
-  var children = [];
   span.appendChild(document.createTextNode("{ "))
   for (var idx = 1; idx < this.length; idx++) {
-    var div = document.createElement("div");
-
-    div.style.border = " 1px solid #888888";
-    div.layoutChanged = spanLayoutChanged;
-
-    var child = this.makeTile(idx);
-    div.appendChild(child);
-    span.appendChild(div);
-    children.push(child);
+    span.appendChild(this.makeTile(idx))
+    span.appendChild(document.createTextNode("; "))
   }
   span.appendChild(document.createTextNode("}"))
-// function () {
-//     children.collect(function (row, index) {
-//       padding = row.layoutChanged();
-//       row.style.padding = padding + 2 + "px";
-//       //      row.style.lineHeight = $(row.firstChild).getHeight() + "px";
-//     })
-//   }
 }
 
 Array.prototype.makeCodes["func"] = function() {
