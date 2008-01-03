@@ -10,9 +10,9 @@ todo done: toggle を綺麗に。
 todo done: 削除
 todo done: HTML 記法
 todo done: トランスクリプトを隠す
-todo: 結果表示
-todo: パーツビン
+todo todo: 結果表示
 todo: 縦表示
+todo: パーツビン
 
 == 文書構造
 
