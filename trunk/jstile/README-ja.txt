@@ -4,6 +4,8 @@ goal: world の中を worm が動く
 goal: worm が タートルグラフィックの動きが出来る。
 goal: ビューワ
 
+== フォント
+http://home.tiscali.nl/developerscorner/fdc-varia/font-embedding.htm
 == レイアウト
 
 todo done: toggle を綺麗に。

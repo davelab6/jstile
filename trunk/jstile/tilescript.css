@@ -134,6 +134,14 @@ span.tile {
     text-align: center;
 }
 
+table.tile {
+    cursor: move;
+    font-size: 25px;
+    padding: 0px;
+    border: 1px solid #888888;
+    text-align: center;
+}
+
 .newLineEnter {
     background-color: #ccffff;
     height: 10px;
