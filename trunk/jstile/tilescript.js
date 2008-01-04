@@ -239,15 +239,13 @@ TileElement = {
   acceptDrop: function(droppee) {
     var parent = this.parentTile;
     var elementCopy = droppee.value.dup().makeTile();
-    //    if (this.modelIdx != undefined) {
-      elementCopy.modelIdx = this.modelIdx;
-      parent.value[this.modelIdx] = elementCopy.value;
-      elementCopy.parentTile = this.parentTile;
-    //    }
+    elementCopy.modelIdx = this.modelIdx;
+    parent.value[this.modelIdx] = elementCopy.value;
+    elementCopy.parentTile = this.parentTile;
     this.parentNode.replaceChild(elementCopy, this);
   },
   addColumn: function(element, colSpan, rowSpan) {
-    if (element.parentTile != undefined) {
+    if (element.parentTile !== undefined) {
       element.parentTile = this;
     }
     var td = document.createElement("td");
