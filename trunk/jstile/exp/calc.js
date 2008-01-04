@@ -52,8 +52,29 @@ function addTiles() {
 // ---------- Tile Constructor ----------
 
 TileElement = {
+  make: function(value, isDraggable) {
+    var element = Object.extend(document.createElement("table"), this);
+    element.tbody = document.createElement("tbody"),
+    element.tr = document.createElement("tr"),
+    element.tbody.appendChild(element.tr);
+    element.appendChild(element.tbody);
+    element.value = value;
+  
+    if (isDraggable) {
+      element.draggable = new Draggable(element,
+          { ghosting: false, revert: true });
+      Droppables.add(element,
+          { onDrop: function(e, droppable) { droppable.acceptDrop(e) },
+            accept: "tile",
+            hoverclass: "hoverclass"
+          });
+    }
+    return element;
+  },
+
   className: "tile",
   modelIdx: undefined,
+
   addColumn: function(element) {
     var td = document.createElement("td");
     td.appendChild(element);
@@ -84,36 +105,17 @@ TileElement = {
   }
 }
 
-function makeElement(value, isDraggable) {
-  var element = Object.extend(document.createElement("table"), TileElement);
-  var tbody = document.createElement("tbody");
-  var tr = document.createElement("tr");
-  element.tr = tr;
-  tbody.appendChild(tr);
-  element.appendChild(tbody);
-  element.value = value;
-  if (isDraggable) {
-    element.draggable = new Draggable(element,
-        { ghosting: false, revert: true });
-    Droppables.add(element,
-        { onDrop: function(e, droppable) { droppable.acceptDrop(e) },
-          accept: "tile",
-          hoverclass: "hoverclass"});
-  }
-  return element;
-}
-
 // ---------- Tiles ----------
 
 Number.prototype.makeTile = function() {
-  var element = makeElement(this, true);
+  var element = TileElement.make(this, true);
   element.addLabel("" + this);
   return element;
 }
 
 Array.prototype.makeTile = function() {
-  var element = makeElement(this, true);
-  var symbolTile = makeElement(null, false);
+  var element = TileElement.make(this, true);
+  var symbolTile = TileElement.make(null, false);
   symbolTile.addLabel(this[0]);
 
   var argTile1 = this[1].makeTile();
