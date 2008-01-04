@@ -64,7 +64,9 @@ h1 a:active { color: #bbdddd; }
 #footer {
     margin-left: 1em;
     margin-right: 1em;
+    margin-bottom: 2em;
 }
+
 #transcriptElement {
     z-index: 10;
     position: fixed;
@@ -73,32 +75,31 @@ h1 a:active { color: #bbdddd; }
     right: 10px;
     margin-left: auto;
     margin-right: auto;
-/*   background: #e0e8e8; */
-}
-#transcript {
+    background: #e0e8e8;
     width: 98%;
     margin: auto;
-    display: block;
+}
+
+#transcript {
+    width: 100%;
+    margin: auto;
     background: white;
 }
 
-.printIt
-{
-    vertical-align: text-bottom
-}
-
-.checkbox
-{
-    margin: 0
-}
-
-.toggle
-{
+#transcriptTab {
     cursor: pointer;
 }
 
-input.tile
-{
+.printIt {
+    vertical-align: text-bottom
+}
+
+.checkbox {
+    margin: 0
+}
+
+
+input.tile {
     cursor: text;
     font-size: 25px;
     margin: 2px;
@@ -108,8 +109,7 @@ input.tile
     background:#ffffff;
 }
 
-textarea.tile
-{
+textarea.tile {
     cursor: text;
     text-align: left;
     width: 98%;
@@ -150,20 +150,6 @@ span.tile {
     background: #e8c0a0;
 }
 
-
 p {
 	padding-bottom: 0.5em;
-}
-
-
-td
-{
-    cursor: move;
-    font-size: 25px;
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid #888888;
-    text-align: center;
-/*    background:#d0f0d0; */
-    background:#ffffff;
 }

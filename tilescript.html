@@ -261,11 +261,9 @@ JSParser.prototype['parse'] = function(code) {
 
 
 <div id="transcriptElement">
-  <div class="toggle" onclick="this.value = toggleVisible($('transcript'))" style="background: #e0e8e8; width: 98%; margin: auto;">Transcript [+/-]</div>
+  <div id="transcriptTab" onclick="$('transcript').toggle()">Transcript [+/-]</div>
   <textarea rows="4" id="transcript"></textArea>
 </div>
-
-
 
 </body>
 </html>

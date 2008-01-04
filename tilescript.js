@@ -16,6 +16,7 @@ function initializeDocument() {
   UseDAV = document.location.protocol == "http:";
   syncTitle();
   setInterval(syncTitle, 500);
+  $("transcript").hide();
 }
 
 function syncTitle() {
@@ -68,18 +69,6 @@ function save() {
   saveFile(StorageUrl + "/" + getTitle() + ".txt", values.toJSON());
 }
 
-function toggleVisible(element) {
-  var style = element.style
-  if (style.display == "none") {
-    style.display = "block"
-    return "hide"
-  }
-  else {
-    style.display = "none"
-    return "show"
-  }
-}
-
 function printIt(row) {
   var source = row.sourceCode();
   var transcript = $("transcript");
@@ -113,7 +102,6 @@ Row = {
   },
   sourceCode: function() {
     var rowNode = this.rowNode();
-    console.log(this.rowNode());
     if (rowNode.viewMode == "source") {
       return this.rowNode().value;
     } else if (rowNode.viewMode == "html") {
