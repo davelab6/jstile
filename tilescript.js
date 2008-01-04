@@ -167,7 +167,7 @@ function newRow(source, viewMode) {
   });
     
   var valueParent = Object.extend(document.createElement("div"), {
-    className: "valueParent",
+    className: "valueParent"
   });
   valueParent.appendChild(Row.newNodeBuild.source(source));
 
@@ -235,6 +235,7 @@ TileElement = {
   },
 
   className: "tile",
+  parentTile: null,
   acceptDrop: function(droppee) {
     var parent = this.parentTile;
     var elementCopy = droppee.value.dup().makeTile();
@@ -245,18 +246,25 @@ TileElement = {
     //    }
     this.parentNode.replaceChild(elementCopy, this);
   },
-  addColumn: function(element) {
+  addColumn: function(element, colSpan, rowSpan) {
+    if (element.parentTile != undefined) {
+      element.parentTile = this;
+    }
     var td = document.createElement("td");
+    if (colSpan) td.colSpan = colSpan;
+    if (rowSpan) td.rowSpan = rowSpan;
     td.appendChild(element);
     this.tr.appendChild(td);
     return td;
   },
   addLabel: function(string) {
-    this.addColumn(document.createTextNode(string));
+    var td = document.createElement("td");
+    td.appendChild(document.createTextNode(string));
+    this.tr.appendChild(td);
   },
-  addChild: function(child) {
-    child.parentTile = this;
-    this.addColumn(child);
+  addRow: function() {
+    this.tr = document.createElement("tr"),
+    this.tbody.appendChild(this.tr);
   }
 }
 
@@ -280,10 +288,10 @@ Array.prototype.makeTile = function(modelIdx) {
     return tile
   }
   var type = document.createTextNode(this[0]);
-  tile.addChild(type);
+  tile.addColumn(type);
   for (var idx = 1; idx < this.length; idx++) {
     var arg = this.makeTile(idx)
-    tile.addChild(arg);
+    tile.addColumn(arg);
   }
   return tile
 }
@@ -294,61 +302,65 @@ Array.prototype.makeCodes["break"]     = function()     { return "break" }
 Array.prototype.makeCodes["continue"]  = function()     { return "continue" }
 
 Array.prototype.makeCodes["number"] = function()     { return "" + this[1] }
-Array.prototype.makeTiles["number"] = function(tile) { tile.innerHTML = "" + tile.value[1] }
+Array.prototype.makeTiles["number"] = function(tile) { tile.addLabel("" + tile.value[1]) }
 
 Array.prototype.makeCodes["string"] = function()     { return this[1].printString() }
-Array.prototype.makeTiles["string"] = function(tile) { tile.innerHTML = "<i>" + tile.value[1] + "</i>"; }
+Array.prototype.makeTiles["string"] = function(tile) {
+  var i = document.createElement("i");
+  i.appendChild(document.createTextNode(tile.value[1]));
+  tile.addColumn(i);
+}
 
 Array.prototype.makeCodes["arr"] = function() {
-  return "[" + this.clone().splice(1).map(function(x) { return x.makeCode() }).join(", ") + "]"
+  return "[" + this.clone().splice(1, this.length - 1).map(function(x) { return x.makeCode() }).join(", ") + "]"
 }
 Array.prototype.makeTiles["arr"] = function(tile) {
-  tile.addChild(document.createTextNode("["))
+  tile.addLabel("[")
   for (var idx = 1; idx < this.length; idx++) {
     if (idx > 1)
-      tile.addChild(document.createTextNode(", "))
-    tile.addChild(this.makeTile(idx))
+      tile.addLabel(", ")
+    tile.addColumn(this.makeTile(idx))
   }
-  tile.addChild(document.createTextNode("]"))
+  tile.addLabel("]")
 }
 
 Array.prototype.makeCodes["unop"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["unop"] = function(tile) {
-  tile.addChild(document.createTextNode(this[1]))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel(this[1])
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["set"] = function() { return "(" + this[1].makeCode() + " = " + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["set"] = function(tile) {
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(" = "))
-  tile.addChild(this.makeTile(2))
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(" = ")
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["mset"] = function() { return "(" + this[1].makeCode() + " " + this[2] + "= " + this[3].makeCode() + ")" }
 Array.prototype.makeTiles["mset"] = function(tile) {
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(" " + this[2] + "= "))
-  tile.addChild(this.makeTile(3))
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(" " + this[2] + "= ")
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["binop"] = function() { return "(" + this[2].makeCode() + this[1] + this[3].makeCode() + ")" }
 Array.prototype.makeTiles["binop"] = function(tile) {
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode(this[1]))
-  tile.addChild(this.makeTile(3))
+  tile.addColumn(this.makeTile(2))
+  tile.addLabel(this[1])
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["preOp"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["preOp"] = function(tile) {
-  tile.addChild(document.createTextNode(this[1]))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel(this[1])
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["postOp"] = function() { return "(" + this[2].makeCode() + this[1] + ")" }
 Array.prototype.makeTiles["postOp"] = function(tile) {
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode(this[1]))
+  tile.addColumn(this.makeTile(2))
+  tile.addLabel(this[1])
 }
 
 Array.prototype.makeCodes["return"] = function() { return "return " + this[1].makeCode() }
@@ -356,80 +368,83 @@ Array.prototype.makeCodes["return"] = function() { return "return " + this[1].ma
 Array.prototype.makeCodes["if"] = function() { return "if (" + this[1].makeCode() + ")  " + this[2].makeCode() + "\n" +
                                                       "else  " + this[3].makeCode() }
 Array.prototype.makeTiles["if"] = function(tile) {
-  tile.addChild(document.createTextNode("if ("))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(")"))
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode(" else "))
-  tile.addChild(this.makeTile(3))
+  tile.addLabel("if (")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(")")
+  tile.addColumn(this.makeTile(2))
+  tile.addRow();
+  tile.addColumn(document.createTextNode("else"), 3)
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["condExpr"] = function() { return "(" + this[1].makeCode() + " ? " + this[2].makeCode() + " : " +
                                                                                                this[3].makeCode() + ")" }
 Array.prototype.makeTiles["condExpr"] = function(tile) {
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(" ? "))
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode(" : "))
-  tile.addChild(this.makeTile(3))
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(" ? ")
+  tile.addColumn(this.makeTile(2))
+  tile.addLabel(" : ")
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["while"] = function() { return "while (" + this[1].makeCode() + ") " + this[2].makeCode() }
 Array.prototype.makeTiles["while"] = function(tile) {
-  tile.addChild(document.createTextNode("while ("))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(") "))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel("while (")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(") ")
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["doWhile"] = function() { return "do {" + this[1].makeCode() + "} while (" + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["doWhile"] = function(tile) {
-  tile.addChild(document.createTextNode("do "))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(" while ("))
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode(")"))
+  tile.addLabel("do ")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(" while (")
+  tile.addColumn(this.makeTile(2))
+  tile.addLabel(")")
 }
 
 Array.prototype.makeCodes["for"] = function() { return "for (" + this[1].makeCode() + "; " +
                                                                  this[2].makeCode() + "; " +
                                                                  this[3].makeCode() + ") " + this[4].makeCode() }
 Array.prototype.makeTiles["for"] = function(tile) {
-  tile.addChild(document.createTextNode("for ("))
-  tile.addChild(this.makeTile(1)); tile.addChild(document.createTextNode("; "))
-  tile.addChild(this.makeTile(2)); tile.addChild(document.createTextNode("; "))
-  tile.addChild(this.makeTile(3)); tile.addChild(document.createTextNode(") "))
-  tile.addChild(this.makeTile(4))
+  tile.addLabel("for (")
+  tile.addColumn(this.makeTile(1)); tile.addLabel("; ")
+  tile.addColumn(this.makeTile(2)); tile.addLabel("; ")
+  tile.addColumn(this.makeTile(3)); tile.addLabel(") ")
+  tile.addColumn(this.makeTile(4))
 }
 
 Array.prototype.makeCodes["forIn"] = function() { return "for (" + this[1].makeCode() + " in " +
                                                                    this[2].makeCode() + ") " + this[3].makeCode() }
 Array.prototype.makeTiles["forIn"] = function(tile) {
-  tile.addChild(document.createTextNode("for ("))
-  tile.addChild(this.makeTile(1)); tile.addChild(document.createTextNode(" in "))
-  tile.addChild(this.makeTile(2)); tile.addChild(document.createTextNode(") "))
-  tile.addChild(this.makeTile(3))
+  tile.addLabel("for (")
+  tile.addColumn(this.makeTile(1)); tile.addLabel(" in ")
+  tile.addColumn(this.makeTile(2)); tile.addLabel(") ")
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["begin"] = function() {
-  return "{ " + this.clone().splice(1).map(function(s) { return s.makeCode() }).join("; ") + " }"
+  return "{ " + this.clone().splice(1, this.length - 1).map(function(s) { return s.makeCode() }).join("; ") + " }"
 }
 
 Array.prototype.makeTiles["begin"] = function(tile) {
-  tile.addChild(document.createTextNode("{ "))
+  tile.addColumn(document.createTextNode("{ "), null, this.length - 1);
   for (var idx = 1; idx < this.length; idx++) {
-    tile.addChild(this.makeTile(idx))
-    tile.addChild(document.createTextNode("; "))
+    tile.addColumn(this.makeTile(idx));
+    if (idx == 1) {
+      tile.addColumn(document.createTextNode("}"), null, this.length - 1);
+    }
+    if (idx < this.length - 1) tile.addRow();
   }
-  tile.addChild(document.createTextNode("}"))
 }
 
 Array.prototype.makeCodes["func"] = function() {
-  return "(function(" + this[1].clone().splice(1).join(", ") + ") " + this[2].makeCode() + ")"
+  return "(function(" + this[1].clone().splice(1, this.length - 1).join(", ") + ") " + this[2].makeCode() + ")"
 }
 Array.prototype.makeTiles["func"] = function(tile) {
-  tile.addChild(document.createTextNode("function(" + this[1].clone().splice(1).join(", ") + ")"))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel("function(" + this[1].clone().splice(1, this.length - 1).join(", ") + ")")
+  tile.addColumn(this.makeTile(2))
 }
 
 
@@ -438,62 +453,63 @@ Array.prototype.makeCodes["get"] = function() {
 }
 Array.prototype.makeTiles["get"] = function(tile) {
   if (this.length == 3) {
-    tile.addChild(this.makeTile(2))
-    tile.addChild(document.createTextNode("["))
-    tile.addChild(this.makeTile(1))
-    tile.addChild(document.createTextNode("]"))
+    tile.addColumn(this.makeTile(2))
+    tile.addLabel("[")
+    tile.addColumn(this.makeTile(1))
+    tile.addLabel("]")
   }
   else
-    tile.addChild(document.createTextNode(this[1]))
+    tile.addLabel(this[1])
 }
 
 Array.prototype.makeCodes["call"] = function() {
-  return this[1].makeCode() + "(" + this.clone().splice(2).map(function(a) { return a.makeCode() }).join(", ") + ")"
+  var code = this[1].makeCode() + "(" + this.clone().splice(2, this.length - 2).map(function(a) { return a.makeCode() }).join(", ") + ")";
+  return code;
 }
 Array.prototype.makeTiles["call"] = function(tile) {
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode("("))
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel("(")
   for (var idx = 2; idx < this.length; idx++) {
-    tile.addChild(this.makeTile(idx))
+    tile.addColumn(this.makeTile(idx))
     if (idx != this.length - 1)
-      tile.addChild(document.createTextNode(", "))
+      tile.addLabel(", ")
   }
-  tile.addChild(document.createTextNode(")"))
+  tile.addLabel(")")
 }
 
 Array.prototype.makeCodes["send"] = function() {
-  return this[2].makeCode() + "." + this[1] + "(" + this.clone().splice(3).map(function(a) { return a.makeCode() }).join(", ") + ")"
+  return this[2].makeCode() + "." + this[1] + "(" + this.clone().splice(3, this.length - 3).map(function(a) { return a.makeCode() }).join(", ") + ")"
 }
 Array.prototype.makeTiles["send"] = function(tile) {
-  tile.addChild(this.makeTile(2))
-  tile.addChild(document.createTextNode("." + this[1] + "("))
+  tile.addColumn(this.makeTile(2))
+  tile.addLabel("." + this[1] + "(")
   for (var idx = 3; idx < this.length; idx++) {
-    tile.addChild(this.makeTile(idx))
+    tile.addColumn(this.makeTile(idx))
     if (idx != this.length - 1)
-      tile.addChild(document.createTextNode(", "))
+      tile.addLabel(", ")
   }
-  tile.addChild(document.createTextNode(")"))
+  tile.addLabel(")")
 }
 
 Array.prototype.makeCodes["new"] = function() {
-  return "new " + this[1] + "(" + this.clone().splice(2).map(function(x) { return x.makeCode() }).join(", ") + ")"
+  return "new " + this[1] + "(" + this.clone().splice(2, this.length - 2).map(function(x) { return x.makeCode() }).join(", ") + ")"
 }
 Array.prototype.makeTiles["new"] = function(tile) {
-  tile.addChild(document.createTextNode("new " + this[1] + "("))
+  tile.addLabel("new " + this[1] + "(")
   for (var idx = 2; idx < this.length; idx++) {
     if (idx > 2)
-      tile.addChild(document.createTextNode(", "))
-    tile.addChild(this.makeTile(idx))
+      tile.addLabel(", ")
+    tile.addColumn(this.makeTile(idx))
   }
-  tile.addChild(document.createTextNode(")"))
+  tile.addLabel(")")
 }
 
 Array.prototype.makeCodes["var"] = function() {
   return "var " + this[1] + " = " + this[2].makeCode()
 }
 Array.prototype.makeTiles["var"] = function(tile) {
-  tile.addChild(document.createTextNode("var " + this[1] + " = "))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel("var " + this[1] + " = ")
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["throw"]  = function() { return "throw "  + this[1].makeCode() }
@@ -504,57 +520,57 @@ Array.prototype.makeCodes["try"] = function() {
          "finally { " + this[4].makeCode() + "}"
 }
 Array.prototype.makeTiles["try"] = function(tile) {
-  tile.addChild(document.createTextNode("try "))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(" catch (" + this[2] + ") "))
-  tile.addChild(this.makeTile(3))
-  tile.addChild(document.createTextNode(" finally "))
-  tile.addChild(this.makeTile(4))
+  tile.addLabel("try ")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(" catch (" + this[2] + ") ")
+  tile.addColumn(this.makeTile(3))
+  tile.addLabel(" finally ")
+  tile.addColumn(this.makeTile(4))
 }
 
 Array.prototype.makeCodes["json"] = function() {
-  return "({" + this.clone().splice(1).map(function(b) { return b.makeCode() }).join(", ") + "})"
+  return "({" + this.clone().splice(1, this.length - 1).map(function(b) { return b.makeCode() }).join(", ") + "})"
 }
-Array.prototype.makeTiles["json"] = function(tile) {
-  tile.addChild(document.createTextNode("{"))
-  for (var idx = 1; idx < this.length; idx++) {
-    if (idx > 1)
-      tile.addChild(document.createTextNode(", "))
-    tile.addChild(this.makeTile(idx))
-  }
-  tile.addChild(document.createTextNode("}"))
-}
+Array.prototype.makeTiles["json"] = Array.prototype.makeTiles["begin"];
 
 Array.prototype.makeCodes["binding"] = function() { return this[1].printString() + ": " + this[2].makeCode() }
 Array.prototype.makeTiles["binding"] = function(tile) {
-  tile.addChild(document.createTextNode(this[1] + ": "))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel(this[1] + ": ")
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["switch"] = function() {
-  return "switch (" + this[1].makeCode() + ") {" + this.clone().splice(2).map(function(c) { return c.makeCode() }).join("; ") + "}"
+  return "switch (" + this[1].makeCode() + ") {" + this.clone().splice(2, this.length - 2).map(function(c) { return c.makeCode() }).join("; ") + "}"
 }
 Array.prototype.makeTiles["switch"] = function(tile) {
-  tile.addChild(document.createTextNode("switch ("))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(") { "))
-  for (var idx = 2; idx < this.length; idx++)
-    tile.addChild(this.makeTile(idx))
-  tile.addChild(document.createTextNode(" }"))
+  tile.addLabel("switch (")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(")")
+  tile.addRow();
+  tile.addColumn(document.createTextNode("{"), null, this.length - 2);
+  for (var idx = 2; idx < this.length; idx++) {
+    if (idx > 2) {
+      tile.addRow();
+    }
+    tile.addColumn(this.makeTile(idx));
+    if (idx == 2) {
+      tile.addColumn(document.createTextNode("}"), null, this.length - 2);
+    }
+  }
 }
 
 Array.prototype.makeCodes["case"] = function() { return "case " + this[1].makeCode() + ": " + this[2].makeCode() }
 Array.prototype.makeTiles["case"] = function(tile) {
-  tile.addChild(document.createTextNode("case "))
-  tile.addChild(this.makeTile(1))
-  tile.addChild(document.createTextNode(": "))
-  tile.addChild(this.makeTile(2))
+  tile.addLabel("case ")
+  tile.addColumn(this.makeTile(1))
+  tile.addLabel(": ")
+  tile.addColumn(this.makeTile(2))
 }
 
 Array.prototype.makeCodes["default"] = function() { return "default: " + this[1].makeCode() }
 Array.prototype.makeTiles["default"] = function(tile) {
-  tile.addChild(document.createTextNode("default: "))
-  tile.addChild(this.makeTile(1))
+  tile.addLabel("default: ")
+  tile.addColumn(this.makeTile(1))
 }
 
 function findTop(tile) { return (tile.parentNode.className == "tile" || tile.parentNode.className == "valueParent") ? findTop(tile.parentNode) : tile }

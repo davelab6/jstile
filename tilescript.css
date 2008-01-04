@@ -136,7 +136,7 @@ span.tile {
 
 table.tile {
     cursor: move;
-    font-size: 25px;
+    font-size: 1em;
     padding: 0px;
     border: 1px solid #888888;
     text-align: center;
