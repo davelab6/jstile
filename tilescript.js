@@ -2,9 +2,8 @@
 
 StorageUrl = "data"; // Set WebDAV directory
 
-if (window.console == undefined) {
-  console = {log: function () {}};
-}
+if (window.console == undefined) { console = {log: function () {}}; }
+
 
 // ---------- Initialize ----------
 
@@ -15,50 +14,71 @@ IsDirty = false;
 
 function initializeDocument() {
   UseDAV = document.location.protocol == "http:";
-  syncTitle();
-  setInterval(syncTitle, 500);
+  DocumentPosition.initialize();
   $("transcript").hide();
+  document.body.onkeydown = onkeydown;
 }
 
-function syncTitle() {
-  if (!getTitle()) {
-    go("Home");
-  } else if (DocumentTitle != getTitle()) {
-    go(getTitle());
+// ---------- Page Navigation ----------
+
+DocumentPosition = {
+  position: "", /* a position is a hash in URL except '#' */
+  title: function() {
+    return (this.position.match(/^([^#]*)#?(.*)$/))[1];
+  },
+  division: function() {
+    return parseInt((this.position.match(/^([^#]*)#?(.*)$/))[2]) || 0;
+  },
+  go: function(newPosition) {
+    if (!newPosition) return;
+    document.location.hash = "#" + newPosition;
+    newTitle = (newPosition.match(/^([^#]*)#?(.*)$/))[1];
+    if (this.title() != newTitle) {
+      load(newTitle);
+    }
+
+    this.position = newPosition;
+    if (this.division()) {
+      if ($("rows").childNodes[this.division() - 1]) {
+        $($("rows").childNodes[this.division() - 1]).visualEffect("ScrollTo", {duration: 0.5});
+      }
+    }
+  },
+  next: function() {
+    this.go(this.title() + "#" + (this.division() + 1));
+  },
+  sync: function() {
+    if ((!document.location.hash) || (document.location.hash.length < 2)) {
+      this.go("Home");
+    } else if (document.location.hash != "#" + this.position) {
+      this.go(document.location.hash.slice(1));
+    }
+  },
+  initialize: function() {
+    DocumentPosition.sync();
+    setInterval(function() {DocumentPosition.sync()}, 500);
   }
-}
-
-function go(name) {
-  if (!name) return;
-  DocumentTitle = name;
-  document.location.hash = "#" + name;
-  reload();
-}
-
-function getTitle() {
-    if ((!document.location.hash) ||
-        (document.location.hash.length < 2)) return undefined;
-  return document.location.hash.slice(1)
 }
 
 // ---------- User Interface ----------
 
-function reload() {
-  var rows = $("rows");
-  while (rows.childNodes.length > 0) {
-    rows.removeChild(rows.firstChild);
-  }
-  loadDocument();
+function go(name) {
+  DocumentPosition.go(name);
+}
+
+function onkeydown(evt) {
+  evt = (evt) ? evt : window.event;
+  if (!evt) return;
+  var charCode = (evt.charCode) ? evt.charCode : evt.keyCode;
+  if (charCode != 32) return true;
+  DocumentPosition.next();
+  return false;
 }
 
 function setIsDirty(aBoolean) {
   IsDirty = aBoolean;
-  titleChanged();
-}
-
-function titleChanged() {
   var dirtyMark = IsDirty ? " * modified * " : ""
-  document.title = dirtyMark + getTitle() + " - TileScript";
+  document.title = dirtyMark + DocumentPosition.title() + " - TileScript";
 }
 
 function save() {
@@ -71,7 +91,7 @@ function save() {
     var nodeValue = children[i].sourceCode();
     values.push([nodeType, nodeValue]);
   }
-  saveFile(StorageUrl + "/" + getTitle() + ".txt", values.toJSON());
+  saveFile(StorageUrl + "/" + DocumentPosition.title() + ".txt", values.toJSON());
   setIsDirty(false);
 }
 
@@ -85,7 +105,6 @@ function printIt(row) {
   if (result != undefined) {
     var newRow = addRow(result.printString(), "source", row);
     $(newRow).visualEffect("BlindDown", {duration: 0.4});
-
   }
 }
 
@@ -588,8 +607,13 @@ Array.prototype.eval = function() { return eval(this.makeCode()) }
 
 // ---------- Data Storage ----------
 
-function loadDocument() {
-  var title = getTitle();
+function load(title) {
+
+  var rows = $("rows");
+  while (rows.childNodes.length > 0) {
+    rows.removeChild(rows.firstChild);
+  }
+  
   setIsDirty(false);
   $("control").action = document.location.href;
   $("title").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
