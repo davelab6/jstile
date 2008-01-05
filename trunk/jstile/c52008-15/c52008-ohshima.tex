@@ -1,0 +1,56 @@
+%\documentclass[conference]{IEEEtran}
+\documentclass[10pt,twocolumn]{article}
+\usepackage{timesnewp}
+\usepackage{latex8}
+\usepackage{graphics}
+\usepackage{cite}
+%\usepackage{doublespace}
+
+\pagestyle{empty}
+\begin{document}
+
+\title{Toward A More Scalable End-User Scripting Language}
+\author{%
+\begin{tabular}{cc}
+  \begin{tabular}{ccc}
+    Alessandro Warth$^{\dag}$ &\hspace*{1cm}  &  Takashi Yamamiya$^{\dag}$\\
+    {\it alex@vpri.org} &   & {\it takashi@vpri.org}\\
+\\
+    Yoshiki Ohshima$^{\dag}$  & & Scott Wallace$^{\dag}$\\
+    {\it yoshiki@vpri.org} & & {\it scott@vpri.org}
+  \end{tabular}\\
+\\
+\end{tabular}\\
+\begin{tabular}{c}
+$^{\dag}${\it Viewpoints Research Institute}\\
+{\it 1209 Grand Central Ave.}\\
+{\it Glendale, CA 91201}\\
+\end{tabular}
+}
+
+\maketitle\thispagestyle{empty}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}%
+\footnote[0]{This material is based upon work supported by the National Science
+Foundation under Grant No. 0639876.
+Any opinions, findings, and conclusions or recommendations expressed
+in this material are those of the author(s) and do not necessarily
+reflect the views of the National Science Foundation.}%
+\input{abstract}
+
+\input{intro}
+\input{js}
+\input{tiles}
+%\input{evaluator}
+\input{discussion}
+\input{related}
+\input{conclusions}
+
+\bibliographystyle{IEEEtran}
+\bibliography{sts}
+\end{document}
+
+%% for i in *.png
+%% do
+%%    "c:/Program Files/ImageMagick-6.0.1-Q16"/convert $i `basename $i .png`.eps
+%% done

@@ -1,0 +1,133 @@
+\Section{Our JavaScript Implementation}
+\label{sec:js}
+
+  JavaScript is a language that features a dynamic, prototype-based object
+model.  It has notably rich reflective features.  While existing
+implementations widely used in common web-browsers and elsewhere
+provide these dynamic and reflective features, we decided to implement
+our own JavaScript on top of Squeak, which is another
+dynamic language.  This approach allows us to change the
+language freely, to do deeper introspection of program execution, and
+to leverage the powerful Morphic GUI framework.
+
+  To capture the syntax structure of code, we have added a new macro
+system to the language.  We use macros as the internal
+representation of tiles in our tile-scripting system.  Since macro definitions are
+made in the same language, the end-user can write his own macros and hence define his own tiles, as we shall see below.
+
+  In the rest of this section, we briefly explain our base implementation of
+JavaScript and the macro system.
+
+\SubSection{The Base Implementation}
+
+  Our JavaScript parser and compiler are written in OMeta~\cite{wp07ometa}.
+%  OMeta is inspired by
+%Packrat parser~\cite{b02packrat} but it also provides multi-level
+%pattern matching features typically found in functional languages in
+%seamless manner.
+OMeta programs resemble EBNF grammars with interleaved
+semantic actions;
+we use a few different OMeta grammars to
+convert JavaScript programs to executable Smalltalk code.
+
+  A JavaScript object is a dictionary-like entity, so it is
+represented as a {\sf Dictionary} in Squeak.  JavaScript field accesses
+are converted to Squeak dictionary access-by-key operations, with
+delegation to the prototype object.
+
+  Our JavaScript implementation is written in $350$ lines of OMeta, together with
+$750$ lines of JavaScript library code written in JavaScript itself.  This
+compactness is one of the keys in this project, as we would like to
+make the inner workings of our system fully accessible to the user.
+
+\SubSection{The Macro System for Tiles}
+\label{ssec:macro system}
+
+\begin{figure}[tp]
+\begin{quote}
+\hspace*{0mm}\verb+macro @if(cond, tbranch, fbranch) {+\\
+\hspace*{5mm}\verb+if (cond)+\\
+\hspace*{10mm}\verb+tbranch+\\
+\hspace*{5mm}\verb+else+\\
+\hspace*{10mm}\verb+fbranch+\\
+\hspace*{0mm}\verb+}+\\
+\end{quote}
+\caption{Definition of the {\tt if} macro.}
+\label{fig:macro if}
+\end{figure}
+
+We have added a macro system to the base implementation described above.
+A macro definition begins with the {\tt macro} keyword, followed by a macro name,
+which must start with a {\tt @}.
+For example, Figure~\ref{fig:macro if} shows a macro version of the {\tt if-then-else} statement,
+which can be used as follows:
+
+\smallskip
+\noindent\verb+@if(5 > 6, alert("yes"), alert("no"))+
+\smallskip
+
+\begin{figure}[tp]
+\begin{quote}
+\hspace*{0mm}\verb+macro @repeat(k, body) {+\\
+\hspace*{5mm}\verb+var n = k+\\
+\hspace*{5mm}\verb+while (n-- > 0)+\\
+\hspace*{10mm}\verb+body+\\
+\hspace*{0mm}\verb+}+\\
+\end{quote}
+\caption{Definition of the {\tt @repeat} macro.}
+\label{fig:macro repeat}
+\end{figure}
+
+%  The arguments to the @-macro (in this example, {\tt alert("yes")}
+%and {\tt alert("no")}) are written in the same language and parsed in
+%the same parser, and the converted sub parse trees are embedded in the
+%macro definition written in the same language.
+
+  The example we are going to use in the rest of this paper is the {\tt
+repeat} statement.  Repeat is a simplified version of the {\tt while} loop
+that is useful in turtle geometry and other end-user oriented
+programs.  The macro definition of {\tt repeat} is given in Figure~\ref{fig:macro repeat}.
+Note that upon expansion, the local variable {\tt n}
+will get a unique internal name so that nested {\tt repeats} will work.
+
+  Macro expansion happens at compile time, whereas at parse time, macro
+applications are kept in the parse tree; a macro instantiation
+corresponds to a tile instance, and the conversion from/to the
+graphical tile is done to/from the parse node that represents the
+macro instantiation.  For example, when the user writes a code snippet
+with the macro, like:
+\begin{quote}
+{\tt @repeat(10, alert("hello"))}
+\end{quote}
+a {\tt repeat} object is created and its two fields are initialized
+with the arguments (i.e., a parse tree for {\em 10} and another parse tree for
+{\tt alert("hello")}).
+
+  Notice that the bodies of the macros in our system are written in the end-user language,
+which simplifies the task of creating a new tile.
+
+%% \begin{figure}[th]
+%% \begin{center}
+%% \begin{verbatim}
+%% primExprHd ::=
+%%         <tok '('> <expr>:e <tok ')'> => [e]
+%% |       <tok #name>:n                => [{#get. #ctxt. {#quote. n}}]
+%% |       <tok #number>:n              => [{#quote. n}]
+%% ...
+%% \end{verbatim}
+%% \end{center}
+%% \caption{A portion of our JavaScript parser}
+%% \label{fig:js expression}
+%% \end{figure}
+
+
+%%   Figure \ref{fig:js expression} shows a portion of
+%% the parser description.  The left-hand side of {\tt ::=} specifies the
+%% production name ({\tt primExprHd} in the figure) and the right-hand side
+%% specifies the choices delimited by {\tt |}.  The right hand side may contain other productions and non-terminals,
+%% and on the right-hand side of the {\tt =$>$} operator, the end result is returned as a Smalltalk
+%% Array created by the Squeak array constructor (enclosed by curly
+%% braces).  In another part of the definition, say the {\tt number}, the
+%% terminal symbol is specified by a string {\tt ''} or character and the
+%% parser tests whether the input stream at the current position matches it.
+

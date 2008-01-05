@@ -1,0 +1,35 @@
+\Section{Related Work}
+\label{sec:related}
+
+Scratch is a tile-based scripting language for kids. A pervasive simplicity and a well-polished user interface make Scratch a welcoming environment for first-time users.
+Naturally, this ease of use comes at a price.  Unlike most other programming languages, Scratch
+provides no form of abstraction (e.g., users cannot create their own tiles or functions.) Scratch projects that go beyond a certain threshold of
+sophistication tend to contain unwieldy programs that can be difficult to write and to maintain.
+
+%Scratch is a tile-based scripting language for kids. Unlike most other programming languages, Scratch
+%does not support any form of abstraction (e.g., users cannot create their own tiles or functions); this level of
+%simplicity, combined with a well-polished user interface, makes Scratch a welcoming environment for first-time users.
+%Unfortunately, this ease of use comes at a high price: Scratch projects that go beyond a certain threshold of
+%sophistication tend to contain unwieldy programs that are frustrating to write and to maintain.
+
+Our own Squeak Etoys, another easy-to-learn tile-based scripting language, supports user-defined
+procedures, or {\em scripts}. Although Etoys scripts cannot return values (which makes them less powerful than
+functions), they provide an important form of abstraction that in turn enables users to tackle moderately
+sophisticated projects without ``feeling like a dog standing on its hind legs''. This is clearly a step in
+the right direction, but we can do better.
+
+TileScript is our attempt to create an end-user programming language that is just as welcoming to new programmers as
+Scratch and Etoys, but which scales to arbitrarily complex tasks like a conventional programming language.
+
+Squeak's Universal Tiles (UniTiles) was an earlier attempt at creating a more scalable end-user scripting system.
+UniTiles was isomorphic to Smalltalk, which made it just as expressive as---but no easier to
+learn than---Smalltalk. Additionally, because Smalltalk does not support macros, a UniTiles implementation of our {\tt
+repeat} example would require its {\tt body} argument to be passed in as a block, which can be confusing to beginners.
+TileScript's macro construct and its associated user interface component make it easy for end-users to define their own
+control structures.
+
+Like TileScript, IMP~\cite{i70imp} allowed programmers to define their own control structures using a macro-like mechanism.
+The main difference between these two approaches is that IMP was based on syntax extension: each new control structure
+was accompanied by a BNF description of its intended syntax. The analog of syntax extension in TileScript is our
+tile-creation GUI, which allows end-users to design the look-and-feel of the tile associated with a particular macro. We
+believe this approach to provide a better fit with our intended users, who are not expert programmers.

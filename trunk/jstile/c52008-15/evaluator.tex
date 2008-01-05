@@ -1,0 +1,73 @@
+\Section{Execution}
+\label{sec:execution}
+
+  In the previous section, we provide an example to add a new kind of
+tile called {\tt repeat} to the language.  However, how is the
+semantics of it described?
+
+  The macro for {\tt repeat} defines a new JavaScript object that is
+used to represent the node in the parse tree.  For example, when the user
+writes a code snippet with the macro as:
+\begin{quote}
+{\tt @repeat(10, alert("hello"))}
+\end{quote}
+, a {\tt repeat} object is created and its two fields are initialized
+with these arguments (a parse tree for 10 and another parse tree for
+{\tt alert("hello")}).
+
+  As shown in Figure \ref{fig:macro repeat}, the macro specifies the
+semantics, but the we would like to make it accessible to the
+end-user.  Because the definition in Figure \ref{fig:macro repeat} is
+in the same language, we can re-use the same GUI ``scriptor'' widget
+for defining the expanded form.
+
+
+
+
+%%   The semantics definition for this is done by writing a method called
+%% {\tt eval()} in the same language.  For {\tt Repeat} case, the use
+%% would write the {\tt eval()} method as follows.
+%% \begin{figure}[th]
+%% \begin{center}
+%% \begin{verbatim}
+%% Repeat.prototype.eval = function(ctxt) {
+%%    var i = this.n(ctxt).eval(ctxt)
+%%    while (i > 0) {
+%%       i = i - 1
+%%       body(ctxt).eval(ctxt)
+%%    }
+%% }
+%% \end{verbatim}
+%% \end{center}
+%% \end{figure}
+
+%% As you see, {\tt eval()} function recursively calls other elements'
+%% {\tt eval()}.  The {\tt ctxt} argument is the dynamic execution
+%% context so that if there is a variable reference in {\tt body}, it can
+%% correctly look up the value.
+
+%%   So far, it seems relatively simple. But our goal is not only provide
+%% an easy way to define a new tile, but also ``isomorphic'' projection
+%% of the tile language and textual language.  Each language element,
+%% including {\tt while} used above, field access, and a method
+%% definition have to have the tile representation.
+
+%%   This means that for the {\tt while} syntax, we define {\tt While}
+%% object and {\tt eval()} method, and for the {\tt function} syntax to
+%% define a new function, we define {\tt Function} object and {\tt
+%% eval()}.  In these {\tt eval()}s, we cannot use what we are
+%% defining otherwise the meta-circularity doesn't terminate.
+
+%% \begin{table}[th]
+%% \caption{Primitives}
+%% \label{tab:primitives}
+
+%% \begin{tabular}{l|l}
+%% \end{tabular}
+%% \end{table}
+
+%%   For this reason, we provide a 0-level construct for certain
+%% primitive language construct.  Table \ref{tab:primitives} shows the
+%% such primitives.  The {\tt eval()} for these primitives are also
+%% written in JavaScript; but they are not the same thing.  (How?)
+
