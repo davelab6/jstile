@@ -11,6 +11,7 @@ if (window.console == undefined) {
 UseDAV = false;
 DocumentTitle = "";
 SyncTimer = null;
+IsDirty = false;
 
 function initializeDocument() {
   UseDAV = document.location.protocol == "http:";
@@ -42,18 +43,22 @@ function getTitle() {
 
 // ---------- User Interface ----------
 
-function _getTitle() {
-  if ((!document.location.hash) ||
-      (document.location.hash.length < 2)) return "Home";
-  return document.location.hash.slice(1)
-}
-
 function reload() {
   var rows = $("rows");
   while (rows.childNodes.length > 0) {
     rows.removeChild(rows.firstChild);
   }
   loadDocument();
+}
+
+function setIsDirty(aBoolean) {
+  IsDirty = aBoolean;
+  titleChanged();
+}
+
+function titleChanged() {
+  var dirtyMark = IsDirty ? " * modified * " : ""
+  document.title = dirtyMark + getTitle() + " - TileScript";
 }
 
 function save() {
@@ -67,6 +72,7 @@ function save() {
     values.push([nodeType, nodeValue]);
   }
   saveFile(StorageUrl + "/" + getTitle() + ".txt", values.toJSON());
+  setIsDirty(false);
 }
 
 function printIt(row) {
@@ -117,6 +123,7 @@ Row = {
       newNode.className = "tile";
       newNode.rows = source.split("\n").length;
       newNode.value = source;
+      newNode.onchange = function() { setIsDirty(true) };
       return newNode;
     },
     html: function(source) {
@@ -231,6 +238,7 @@ TileElement = {
        accept: "tile",
        hoverclass: "hoverclass"}
     );
+    //    element.ondblclick = function(evt) {alert("edit"); evt.cancelBubble = true;};
     return element;
   },
 
@@ -243,6 +251,7 @@ TileElement = {
     parent.value[this.modelIdx] = elementCopy.value;
     elementCopy.parentTile = this.parentTile;
     this.parentNode.replaceChild(elementCopy, this);
+    setIsDirty(true);
   },
   addColumn: function(element, colSpan, rowSpan) {
     if (element.parentTile !== undefined) {
@@ -581,8 +590,7 @@ Array.prototype.eval = function() { return eval(this.makeCode()) }
 
 function loadDocument() {
   var title = getTitle();
-
-  document.title = title + " - TileScript";
+  setIsDirty(false);
   $("control").action = document.location.href;
   $("title").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
 
