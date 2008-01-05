@@ -3,9 +3,45 @@
 	padding: 0;
 }
 
+/* ----- For Generic Users ----- */
+
+p {
+	margin: 1em;
+}
+h1 {
+    margin: 1em;
+}
+
+h2 {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border-bottom: 5px solid #8080c0;
+    padding-bottom: 5px;
+
+}
+
+h3 {
+    margin: 0.5em;
+}
+
+ul {
+    margin-left: 2em;
+}
+
+/* ----- For C5 Presentation ----- */
+
+.author {
+    display: inline;
+    font-weight: bold;
+    margin: 1em;
+}
+
+/* ----- For Tile Script User Interface ----- */
+
 body {
 	text-align: center;
 	font-family: Verdana;
+/*    font-size: x-large; */
 }
 body div {
 	text-align: left;
@@ -19,7 +55,8 @@ body div {
     margin-bottom: 2em;
 }
 
-h1 {
+#title {
+    margin: 0px;
     position: absolute;
     bottom: 0px;
     left: 10px;
@@ -75,7 +112,6 @@ h1 a:active { color: #bbdddd; }
     right: 10px;
     margin-left: auto;
     margin-right: auto;
-    background: #e0e8e8;
     width: 98%;
     margin: auto;
 }
@@ -83,11 +119,15 @@ h1 a:active { color: #bbdddd; }
 #transcript {
     width: 100%;
     margin: auto;
-    background: white;
+    border: 1px solid #888888;
 }
 
 #transcriptTab {
     cursor: pointer;
+    background: #e0e8e8;
+    padding-right: 6px;
+    padding-left: 6px;
+    border: 1px solid #888888;
 }
 
 .printIt {
@@ -156,8 +196,4 @@ table.tile {
 
 .hoverclass {
     background: #e8c0a0;
-}
-
-p {
-	padding-bottom: 0.5em;
 }
