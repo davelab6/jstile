@@ -16,7 +16,8 @@ function initializeDocument() {
   UseDAV = document.location.protocol == "http:";
   DocumentPosition.initialize();
   $("transcript").hide();
-  document.body.onkeydown = onkeydown;
+  Event.observe(window, "keydown", onShortCutKey); // For Firefox
+  Event.observe(document.body, "keydown", onShortCutKey); // For IE
 }
 
 // ---------- Page Navigation ----------
@@ -66,13 +67,13 @@ function go(name) {
   DocumentPosition.go(name);
 }
 
-function onkeydown(evt) {
-  evt = (evt) ? evt : window.event;
-  if (!evt) return;
-  var charCode = (evt.charCode) ? evt.charCode : evt.keyCode;
-  if (charCode != 32) return true;
+function onShortCutKey(evt) {
+  if (!["HTML", "BODY"].include(Event.element(evt).tagName)) {
+    return true;
+  }
+  if (evt.keyCode != 32) return;
   DocumentPosition.next();
-  return false;
+  Event.stop(evt);
 }
 
 function setIsDirty(aBoolean) {

@@ -12,13 +12,13 @@ todo done: toggle を綺麗に。
 todo done: 削除
 todo done: HTML 記法
 todo done: トランスクリプトを隠す
-todo todo: 結果表示
+todo done: 結果表示
 todo done: 縦表示
 todo done: dirty フラグ
+todo done: ページ内ジャンプ
 
+todo: textarea でページ内ジャンプを無効にする。
 todo: HTML の ! を隠す。
-todo: ページ内ジャンプ
-todo: プレゼンモード
 todo: パーツビン
 todo: エディタ
 
