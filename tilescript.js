@@ -104,8 +104,10 @@ function save() {
     var nodeValue = children[i].sourceCode();
     values.push([nodeType, nodeValue]);
   }
-  saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", values.toJSON());
-  setIsDirty(false);
+  var result = saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", values.toJSON());
+  if (result) {
+    setIsDirty(false);
+  }
 }
 
 function printIt(row) {
@@ -125,7 +127,7 @@ function removeRow(row) {
     duration: 0.3,
     afterFinish: function() {row.parentNode.removeChild(row)}
   });
-
+  setIsDirty(true);
 }
 
 Row = {
@@ -634,8 +636,8 @@ function load(position) {
   var tree = eval(json);
   if (!tree) {
     addRow("\"This is an empty page.\"", "tile");
-    return;
     $("loading").hide();
+    return;
   }
 
   for (var i = 1; i < tree.length; i++) {
@@ -675,9 +677,13 @@ function saveFileWithDAV(url, contents) {
       method: "put", 
       asynchronous: false,
       postBody: contents,
-      onFailure: function (e) {alert(e)}
+      onFailure: function (e) {/* alert(e.printString());*/}
      });
-  //  alert(ajax.transport.status);
+  window.ajax = ajax;
+  if (!ajax.success()) {
+    alert(ajax.transport.statusText);
+  }
+  return ajax.success()
 }
 
 // http://ask.metafilter.com/34651/Saving-files-with-Javascript

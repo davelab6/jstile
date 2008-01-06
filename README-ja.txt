@@ -18,8 +18,8 @@ todo done: dirty フラグ
 todo done: ページ内ジャンプ
 todo done: textarea でページ内ジャンプを無効にする。
 todo done: position オブジェクトをクラスにする。(title が変)
+todo done: HTML の ! を隠す。
 
-todo: HTML の ! を隠す。
 todo: パーツビン
 todo: エディタ
 
