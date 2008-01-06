@@ -17,7 +17,8 @@ todo done: 縦表示
 todo done: dirty フラグ
 todo done: ページ内ジャンプ
 
-todo: textarea でページ内ジャンプを無効にする。
+todo done: textarea でページ内ジャンプを無効にする。
+todo: position オブジェクトをクラスにする。(title が変)
 todo: HTML の ! を隠す。
 todo: パーツビン
 todo: エディタ
