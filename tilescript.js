@@ -4,17 +4,15 @@ StorageUrl = "data"; // Set WebDAV directory
 
 if (window.console == undefined) { console = {log: function () {}}; }
 
-
 // ---------- Initialize ----------
 
 UseDAV = false;
-DocumentTitle = "";
 SyncTimer = null;
 IsDirty = false;
 
 function initializeDocument() {
   UseDAV = document.location.protocol == "http:";
-  DocumentPosition.initialize();
+  DocPosition.startSync();
   $("transcript").hide();
   Event.observe(window, "keydown", onShortCutKey); // For Firefox
   Event.observe(document.body, "keydown", onShortCutKey); // For IE
@@ -22,49 +20,63 @@ function initializeDocument() {
 
 // ---------- Page Navigation ----------
 
-DocumentPosition = {
-  position: "", /* a position is a hash in URL except '#' */
-  title: function() {
-    return (this.position.match(/^([^#]*)#?(.*)$/))[1];
-  },
-  division: function() {
-    return parseInt((this.position.match(/^([^#]*)#?(.*)$/))[2]) || 0;
-  },
-  go: function(newPosition) {
-    if (!newPosition) return;
-    document.location.hash = "#" + newPosition;
-    newTitle = (newPosition.match(/^([^#]*)#?(.*)$/))[1];
-    if (this.title() != newTitle) {
-      load(newTitle);
-    }
+DocPosition = Class.create();
+DocPosition.prototype = {
+  title: "",
+  division: 0,
 
-    this.position = newPosition;
-    if (this.division()) {
-      if ($("rows").childNodes[this.division() - 1]) {
-        $($("rows").childNodes[this.division() - 1]).visualEffect("ScrollTo", {duration: 0.5});
-      }
+  initialize: function(newTitle, newDivition) {
+    this.title = newTitle;
+    this.division = newDivition || 0;
+  },
+  hash: function() {
+    if (this.division) {
+      return "#" + this.title + "#" + this.division;
+    } else {
+      return "#" + this.title;
     }
   },
   next: function() {
-    this.go(this.title() + "#" + (this.division() + 1));
-  },
-  sync: function() {
-    if ((!document.location.hash) || (document.location.hash.length < 2)) {
-      this.go("Home");
-    } else if (document.location.hash != "#" + this.position) {
-      this.go(document.location.hash.slice(1));
-    }
-  },
-  initialize: function() {
-    DocumentPosition.sync();
-    setInterval(function() {DocumentPosition.sync()}, 500);
+    return new DocPosition(this.title, this.division + 1);
   }
+}
+
+DocPosition.fromName =  function(name) {
+  var array = name.match(/^([^#]*)#?(.*)$/);
+  return new this(array[1], array[2]);
+}
+
+DocPosition.current = new DocPosition("", 0);
+
+DocPosition.go = function(newPosition) {
+  document.location.hash = newPosition.hash();
+  if (this.current.title != newPosition.title) {
+    load(newPosition);
+  }
+  if (newPosition.division) {
+    if ($("rows").childNodes[newPosition.division - 1]) {
+      $($("rows").childNodes[newPosition.division - 1]).visualEffect("ScrollTo", {duration: 0.5});
+    }
+  }
+  this.current = newPosition;
+  setIsDirty(false);
+}
+DocPosition.sync = function() {
+  if ((!document.location.hash) || (document.location.hash.length < 2)) {
+    this.go(this.fromName("Home", 0));
+  } else if (document.location.hash != this.current.hash()) {
+    this.go(this.fromName(document.location.hash.slice(1)));
+  }
+}
+DocPosition.startSync = function() {
+  this.sync();
+  setInterval(function() {DocPosition.sync()}, 500);
 }
 
 // ---------- User Interface ----------
 
 function go(name) {
-  DocumentPosition.go(name);
+  DocPosition.go(DocPosition.fromName(name));
 }
 
 function onShortCutKey(evt) {
@@ -72,14 +84,14 @@ function onShortCutKey(evt) {
     return true;
   }
   if (evt.keyCode != 32) return;
-  DocumentPosition.next();
+  DocPosition.go(DocPosition.current.next());
   Event.stop(evt);
 }
 
 function setIsDirty(aBoolean) {
   IsDirty = aBoolean;
   var dirtyMark = IsDirty ? " * modified * " : ""
-  document.title = dirtyMark + DocumentPosition.title() + " - TileScript";
+  document.title = dirtyMark + DocPosition.current.title + " - TileScript";
 }
 
 function save() {
@@ -92,7 +104,7 @@ function save() {
     var nodeValue = children[i].sourceCode();
     values.push([nodeType, nodeValue]);
   }
-  saveFile(StorageUrl + "/" + DocumentPosition.title() + ".txt", values.toJSON());
+  saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", values.toJSON());
   setIsDirty(false);
 }
 
@@ -608,18 +620,17 @@ Array.prototype.eval = function() { return eval(this.makeCode()) }
 
 // ---------- Data Storage ----------
 
-function load(title) {
+function load(position) {
 
   var rows = $("rows");
   while (rows.childNodes.length > 0) {
     rows.removeChild(rows.firstChild);
   }
   
-  setIsDirty(false);
   $("control").action = document.location.href;
-  $("title").innerHTML = "<a href='"+ location.href +"'>" + title + "</a>";
+  $("title").innerHTML = "<a href='#"+ position.title +"'>" + position.title + "</a>";
 
-  var json = getfile(StorageUrl + "/" + title + ".txt");
+  var json = getfile(StorageUrl + "/" + position.title + ".txt");
   var tree = eval(json);
   if (!tree) {
     addRow("\"This is an empty page.\"", "tile");
