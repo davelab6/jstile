@@ -81,7 +81,7 @@ function go(name) {
 
 function onShortCutKey(evt) {
   if (!["HTML", "BODY"].include(Event.element(evt).tagName)) {
-    return true;
+    return;
   }
   if (evt.keyCode != 32) return;
   DocPosition.go(DocPosition.current.next());
@@ -96,18 +96,21 @@ function setIsDirty(aBoolean) {
 
 function save() {
   var rows = $("rows");
-  var values = [];
-  values.push("tilescript");
+  var text = "";
+  $("loading").show();
+
+  text += "[\"tilescript\",\n";
   var children = rows.childNodes;
   for (var i = 0; i < children.length; i++) {
     var nodeType = children[i].viewMode;
     var nodeValue = children[i].sourceCode();
-    values.push([nodeType, nodeValue]);
+    text += ([nodeType, nodeValue]).toJSON() + ",\n";
   }
-  var result = saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", values.toJSON());
-  if (result) {
-    setIsDirty(false);
-  }
+  text += "]\n";
+
+  var result = saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", text);
+  if (result) setIsDirty(false);
+  $("loading").hide();
 }
 
 function printIt(row) {
