@@ -621,6 +621,7 @@ Array.prototype.eval = function() { return eval(this.makeCode()) }
 
 function load(position) {
 
+  $("loading").show();
   var rows = $("rows");
   while (rows.childNodes.length > 0) {
     rows.removeChild(rows.firstChild);
@@ -634,6 +635,7 @@ function load(position) {
   if (!tree) {
     addRow("\"This is an empty page.\"", "tile");
     return;
+    $("loading").hide();
   }
 
   for (var i = 1; i < tree.length; i++) {
@@ -641,6 +643,7 @@ function load(position) {
     var source = tree[i][1];
     addRow(source, viewMode);
   }
+  $("loading").hide();
 }
 
 function getfile(url) {
