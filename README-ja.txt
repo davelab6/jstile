@@ -16,13 +16,12 @@ todo done: 結果表示
 todo done: 縦表示
 todo done: dirty フラグ
 todo done: ページ内ジャンプ
-
 todo done: textarea でページ内ジャンプを無効にする。
-todo: position オブジェクトをクラスにする。(title が変)
+todo done: position オブジェクトをクラスにする。(title が変)
+
 todo: HTML の ! を隠す。
 todo: パーツビン
 todo: エディタ
-
 
 == 文書構造
 
