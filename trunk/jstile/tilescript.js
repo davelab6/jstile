@@ -112,7 +112,6 @@ function printIt(row) {
   var source = row.sourceCode();
   var transcript = $("transcript");
   //  transcript.value += "tree: " + source.makeTree().printString() + "\n";
-  //  transcript.value += "code: " + source + "\n";
   var result = eval(source);
   transcript.value += result + "\n";
   if (result != undefined) {
@@ -178,7 +177,7 @@ Row = {
     this.viewMode = mode;
     var newNode = this.newNodeBuild[mode](this.sourceCode());
     this.valueParent.replaceChild(newNode, old);
-    window.row = this;
+    this.printItButton().setOpacity(mode == "html" ? 0.1 : 1);
   },
   toggleTile: function() {
     var mode;
