@@ -23,6 +23,8 @@ todo done: HTML の ! を隠す。
 todo: パーツビン
 todo: エディタ
 
+note: ローカルで日本語保存不可能。
+
 == 文書構造
 
 Alex 形式とする

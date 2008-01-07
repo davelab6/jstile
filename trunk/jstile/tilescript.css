@@ -41,6 +41,12 @@ ul {
 body {
 	text-align: center;
 	font-family: Verdana;
+    background: white;
+    background-image: url(back.gif);
+//    background-position: top left;
+    background-repeat: repeat-x;
+/* background-attachment: fixed; */
+
 /*    font-size: x-large; */
 }
 body div {
@@ -138,11 +144,13 @@ h1 a:active { color: #bbdddd; }
 }
 
 .printIt {
-    vertical-align: text-bottom
+    margin: 1px;
+    vertical-align: text-bottom;
 }
 
 .checkbox {
-    margin: 0
+    margin: 1px;
+    vertical-align: text-top;
 }
 
 
