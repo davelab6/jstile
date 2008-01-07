@@ -203,8 +203,8 @@ function newRow(source, viewMode) {
   var rowTool = Object.extend(document.createElement("div"), {
     className: "rowTool",
     innerHTML:
-    "<img src='exclamation.gif' onclick='printIt(this.parentNode.parentNode)' class='printIt'/>" +
-    "<img src='x.gif' onclick='removeRow(this.parentNode.parentNode)' class='printIt'/>" +
+    "<input type='image' title='Print it' src='exclamation.gif' value='print it' onclick='printIt(this.parentNode.parentNode)' class='printIt'/>" +
+    "<input type='image' title='Remove it' src='x.gif' value='remove' onclick='removeRow(this.parentNode.parentNode)' class='printIt'/>" +
     "<input type='checkbox' class='checkbox' class='checkbox' onclick='this.parentNode.parentNode.toggleTile()' " + checked + "/>" +
     "</div>"
   });
