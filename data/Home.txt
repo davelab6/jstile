@@ -1,14 +1,6 @@
 ["tilescript",
 ["html", "<p><b><a href=\"#TileScript\">TileScript</a></b> is an interactive playfield for playing with Javascript language.</p>"],
-["tile", "(3+(3+(3+(3+4))))"],
-["source", "{ alert(1); alert(2); alert(3) }"],
-["source", "alert('hello')"],
-["source", "go(\"SandBox\")"],
-["source", "go('Object')"],
-["source", "go('Script')"],
-["source", "go('examples')"],
-["source", "go('FCConverter')"],
-["source", "go('About-ja')"],
-["source", "go('Random')"],
-["html", "<p><img src=\"exp/robo.gif\" style=\"float: right\">"],
+["html", "<ul>\n<li><a href=\"#SandBox\">SandBox</a></li>\n<li><a href=\"#Object\">Object</a></li>\n<li><a href=\"#Script\">Script</a></li>\n<li><a href=\"#examples\">examples</a></li>\n<li><a href=\"#FCConverter\">FCConverter</a></li>\n<li><a href=\"#About-ja\">About-ja</a></li>\n<li><a href=\"#Random\">Random</a></li>\n<ul>"],
+["source", "(3+4)"],
+["html", "<p><img src=\"exp/robo.gif\" style=\"float: right\">"]
 ]

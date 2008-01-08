@@ -3,5 +3,5 @@
 ["html", "<p>\nFahrenheit: <input id=\"f\" value=\"86\" style=\"font-size: x-large\">\nCentigrade: <input id=\"c\" value=\"30\" style=\"font-size: x-large\">\n</p>"],
 ["html", "<p>\nPlease push two <img src=\"exclamation.gif\"> buttons bellow.\nAnd edit above numbers.\n</p>"],
 ["source", "$('f').onblur = function () {$(\"c\").value = ($(\"f\").value - 32) / 1.8};\nundefined;"],
-["source", "$('c').onblur = function () {$(\"f\").value = ($(\"c\").value * 1.8) + 32};\nundefined;"],
+["source", "$('c').onblur = function () {$(\"f\").value = ($(\"c\").value * 1.8) + 32};\nundefined;"]
 ]
