@@ -17,6 +17,7 @@ function initializeDocument() {
   Event.observe(window, "keydown", onShortCutKey); // For Firefox
   Event.observe(document.body, "keydown", onShortCutKey); // For IE
   Editor.initialize();
+  Viewer.startSync();
 }
 
 // ---------- Page Navigation ----------
@@ -77,7 +78,13 @@ DocPosition.startSync = function() {
 // ---------- User Interface ----------
 
 function go(name) {
+  if (IsDirty) {
+    if (!confirm("The page was modified, do you want to discard it?")) {
+      return false;
+    }
+  }
   DocPosition.go(DocPosition.fromName(name));
+  return false;
 }
 
 function onShortCutKey(evt) {
@@ -117,6 +124,7 @@ function save() {
   var result = saveFile(StorageUrl + "/" + DocPosition.current.title + ".txt", text);
   if (result) setIsDirty(false);
   $("loading").hide();
+  return false;
 }
 
 function printIt(row) {
@@ -698,13 +706,46 @@ Editor = Object.extend(document.createElement("input"), {
     this.valueType = element.value[0];
     this.value = element.value[1];
     this.select();
-    window.el = element;
   }
 });
 
-// ---------- Evaluation ----------
+// ---------- Viewer ----------
 
-Array.prototype.eval = function() { return eval(this.makeCode()) }
+Viewer = {
+  systemVars: {},
+  isShow: false,
+  hide: function() {
+    $("viewer").addClassName("viewerHide");
+    $("body").addClassName("viewerHide");
+    this.isShow = false;
+  },
+  show: function() {
+    $("viewer").removeClassName("viewerHide");
+    $("body").removeClassName("viewerHide");
+    this.isShow = true;
+  },
+  toggle: function() {
+    if (this.isShow) { this.hide() } else { this.show() }
+  },
+  startSync: function() {
+    for (var key in window) {
+      this.systemVars[key] = true;
+    }
+    this.sync();
+    setInterval(function() { Viewer.sync()}, 500);
+  },
+  sync: function() {
+    this.localVars = {};
+    var status = "";
+    for (var key in window) {
+      if (!this.systemVars[key]) {
+        this.localVars[key] = window[key];
+        status += key + ": " + window[key].toString() + "<br/>";
+      }
+    }
+    $("viewer").innerHTML = status;
+  }
+}
 
 // ---------- Data Storage ----------
 
@@ -766,7 +807,6 @@ function saveFileWithDAV(url, contents) {
       postBody: contents,
       onFailure: function (e) {/* alert(e.printString());*/}
      });
-  window.ajax = ajax;
   if (!ajax.success()) {
     alert(ajax.transport.statusText);
   }
