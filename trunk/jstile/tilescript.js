@@ -105,7 +105,12 @@ function save() {
   for (var i = 0; i < children.length; i++) {
     var nodeType = children[i].viewMode;
     var nodeValue = children[i].sourceCode();
-    text += ([nodeType, nodeValue]).toJSON() + ",\n";
+    text += ([nodeType, nodeValue]).toJSON();
+    if (i != children.length - 1) {
+      text +=  ",\n";
+    } else {
+      text += "\n";
+    }
   }
   text += "]\n";
 
@@ -121,7 +126,7 @@ function printIt(row) {
   var result = eval(source);
   transcript.value += result + "\n";
   if (result != undefined) {
-    var newRow = addRow(result.printString(), "source", row);
+    var newRow = addRow(result.toString(), "source", row);
     $(newRow).visualEffect("BlindDown", {duration: 0.4});
   }
 }

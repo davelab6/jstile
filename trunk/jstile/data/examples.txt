@@ -8,5 +8,5 @@
 ["tile", "for (var i = 0; (i<3); (i++)) { alert('hi') }"],
 ["tile", "{ alert('hello'); alert('world') }"],
 ["tile", "(function(x, y) { return (x+y) })"],
-["tile", "(o = new Object())"],
+["tile", "(o = new Object())"]
 ]

@@ -177,23 +177,15 @@ textarea.tile {
     background: #F5EABC;
 }
 
+/* for html mode */
 div.tile {
     margin-left: 2em;
     background: transparent;
 }
 
-span.tile {
-    cursor: move;
-    font-size: 25px;
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid #888888;
-    text-align: center;
-}
-
 table.tile {
     cursor: move;
-    font-size: 1em;
+    font-size: large;
     padding: 0px;
     border: 1px solid #888888;
     text-align: center;
