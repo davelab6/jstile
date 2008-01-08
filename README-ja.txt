@@ -20,7 +20,8 @@ todo done: textarea でページ内ジャンプを無効にする。
 todo done: position オブジェクトをクラスにする。(title が変)
 todo done: HTML の ! を隠す。
 
-todo: エディタ
+todo: 数値の文字にドラッグ時色が変わるように
+todo: 数値と文字別々のエディタ
 
 todo: パーツビン
 
