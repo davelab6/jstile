@@ -19,11 +19,14 @@ todo done: ページ内ジャンプ
 todo done: textarea でページ内ジャンプを無効にする。
 todo done: position オブジェクトをクラスにする。(title が変)
 todo done: HTML の ! を隠す。
-
-todo: 数値の文字にドラッグ時色が変わるように
-todo: 数値と文字別々のエディタ
+todo done: 新しい行にドラッグ出来るように。
+todo done: 一番根元のタイルの操作でエラーが出る。
+todo done: 数値の文字にドラッグ時色が変わるように
+todo done: 数値と文字別々のエディタ
 
 todo: パーツビン
+
+
 
 note: ローカルで日本語保存不可能。
 
