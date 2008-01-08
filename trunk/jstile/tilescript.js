@@ -280,7 +280,9 @@ TileElement = {
     // Event.observe(this, "dblclick", function(evt) { alert(); Editor.edit(this) });
     this.ondblclick =  function(evt) {
       var evt = evt ? evt : window.event;
-      Editor.edit(this);
+      if (["string", "number"].include(this.value[0])) {
+        Editor.edit(this);
+      }
       Event.stop(evt);
     };
     return element;
@@ -357,13 +359,17 @@ Array.prototype.makeCodes["break"]     = function()     { return "break" }
 Array.prototype.makeCodes["continue"]  = function()     { return "continue" }
 
 Array.prototype.makeCodes["number"] = function()     { return "" + this[1] }
-Array.prototype.makeTiles["number"] = function(tile) { tile.addLabel("" + tile.value[1]) }
+Array.prototype.makeTiles["number"] = function(tile) {
+  tile.addLabel("" + tile.value[1]);
+  tile.style.background = "#F5EABC";
+}
 
 Array.prototype.makeCodes["string"] = function()     { return this[1].printString() }
 Array.prototype.makeTiles["string"] = function(tile) {
   var i = document.createElement("i");
   i.appendChild(document.createTextNode(tile.value[1]));
   tile.addColumn(i);
+  tile.style.background = "#E4FBB0";
 }
 
 Array.prototype.makeCodes["arr"] = function() {
