@@ -1,0 +1,9 @@
+["tilescript",
+["html", "<h2>What is Pseudorandom number generator?</h2>"],
+["html", "<p>Press <img src=\"exclamation.gif\"/>.</p>"],
+["tile", "{ (A = 13); (B = 5); (M = 24); (X = 0) }"],
+["html", "<p>Press <img src=\"exclamation.gif\"/> to see how numbers are made</p>"],
+["source", "next = function() {\n  X = (A * X + B) % M;\n}\nsequence = [];\nfor (i = 0; i < 30; i++) {\n  next();\n  sequence.push(X);\n}\nsequence;\n"],
+["html", "<p>Choose other numbers as constants A, B, M, then try again.</p>"],
+["html", "<p>mixed congruential method</p>"],
+]
