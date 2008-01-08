@@ -240,12 +240,15 @@ JSParser.prototype['parse'] = function(code) {
 </head>
 <body>
 
+<div id="body" class="viewerHide">
+
 <div id="header">
   <h1 id="title"><a class="headerlink" href="placeholder">TileScript</a></h1>
   <form class="control" id="control" method="post" action="">
-    <input type="image" title="Go home" src="home.gif" value="home" onclick="go('Home')"/>
+    <input type="image" title="Toggle Viewer" src="view.gif" value="viewer" onclick="Viewer.toggle(); return false"/>
+    <input type="image" title="Go home" src="home.gif" value="home" onclick="go('Home'); return false"/>
     <!-- input type="button" value="do it (Alt + D)" onclick="doIt()" -->
-    <input type="image" title="Save the document" src="save.gif" value="save" onclick="save()"/>
+    <input type="image" title="Save the document" src="save.gif" value="save" onclick="save(); return false"/>
   </form>
 <br style="clear: both"/>
 </div>
@@ -261,10 +264,15 @@ JSParser.prototype['parse'] = function(code) {
 <p><a href="http://tinlizzie.org/svn/trunk/jstile/">http://tinlizzie.org/svn/trunk/jstile/</a></p>
 </div>
 
-
 <div id="transcriptElement">
   <span id="transcriptTab" onclick="$('transcript').toggle()">Transcript [+/-]</span>
   <textarea rows="4" id="transcript"></textArea>
 </div>
+</div>
+
+<div id="viewer" class="viewerHide">
+This is a parts bin
+</div>
+
 </body>
 </html>

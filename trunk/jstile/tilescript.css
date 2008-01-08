@@ -193,16 +193,41 @@ table.tile {
 
 .newLineEnter {
     background-color: #ccffff;
-    height: 10px;
+    height: 6px;
     clear: both;
 }
 
 .newLine {
     background-color: transparent;
-    height: 10px;
+    height: 4px;
     clear: both;
 }
 
 .hoverclass {
     background: #e8c0a0;
+}
+
+
+#viewer {
+    position: fixed;
+    float: right;
+    border-left: 2px solid #888888;
+    margin: 0px;
+    width: 25%;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    background: #f0f0f0;
+}
+
+#viewer.viewerHide {
+    display: none;
+}
+
+#body.viewerHide {
+    margin-right: 0%;
+}
+
+#body {
+    margin-right: 25%;
 }
