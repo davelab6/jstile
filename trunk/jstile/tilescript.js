@@ -153,7 +153,7 @@ Row = {
       return this.rowNode().value.makeCode();
     }
   },
-  newNodeBuild: {
+  newElement: {
     source: function(source) {
       var newNode = document.createElement("textarea");
       newNode.viewMode = "source";
@@ -181,7 +181,7 @@ Row = {
   setViewMode: function(mode) {
     var old = this.rowNode();
     this.viewMode = mode;
-    var newNode = this.newNodeBuild[mode](this.sourceCode());
+    var newNode = this.newElement[mode](this.sourceCode());
     this.valueParent.replaceChild(newNode, old);
     this.printItButton().setOpacity(mode == "html" ? 0.1 : 1);
   },
@@ -195,6 +195,32 @@ Row = {
       mode = "tile";
     }
     this.setViewMode(mode);
+  }
+}
+
+NewLineBar = {
+  className: "newLine",
+  title: "Add a new row here",
+
+  // Constructor
+  newElement: function() {
+    var element = Object.extend(document.createElement("div"), NewLineBar);
+    Droppables.add(element, {
+      accept: "tile",
+      hoverclass: "hoverclass",
+      onDrop: function(droppee, target) {
+        element.addNewLine(droppee.value.makeCode(), "tile");
+      }
+    });
+    return element;
+  },
+
+  onmouseover: function() { this.className = "newLineEnter" },
+  onmouseout: function() { this.className = "newLine" },
+  onclick: function() { this.addNewLine("", "source") },
+  addNewLine: function(source, mode) {
+    var row = addRow(source, mode, this.parentNode);
+    $(row).visualEffect("BlindDown", {duration: 0.3});
   }
 }
 
@@ -213,18 +239,9 @@ function newRow(source, viewMode) {
   var valueParent = Object.extend(document.createElement("div"), {
     className: "valueParent"
   });
-  valueParent.appendChild(Row.newNodeBuild.source(source));
+  valueParent.appendChild(Row.newElement.source(source));
 
-  var newLine = Object.extend(document.createElement("div"), {
-    className: "newLine",
-    onmouseover: function() { this.className = "newLineEnter" },
-    onmouseout: function() { this.className = "newLine" },
-    onclick: function() {
-      var row = addRow('', "source", this.parentNode);
-      $(row).visualEffect("BlindDown", {duration: 0.3});
-    },
-    title: "Add a new row here"
-  });
+  var newLine = NewLineBar.newElement();
 
   var p = Object.extend(document.createElement("p"), Row);
   p.rowTool = rowTool;
@@ -291,14 +308,18 @@ TileElement = {
   className: "tile",
   parentTile: null,
   acceptDrop: function(droppee) {
+    if (this.include(droppee)) return;
+    setIsDirty(true);
     var parent = this.parentTile;
     var elementCopy = droppee.value.dup().makeTile();
-    if (this.include(droppee)) return;
+    if (!parent) {
+      // If the tile is topmost, replace it.
+      return this.parentNode.replaceChild(elementCopy, this);
+    }
     elementCopy.modelIdx = this.modelIdx;
     parent.value[this.modelIdx] = elementCopy.value;
     elementCopy.parentTile = this.parentTile;
     this.parentNode.replaceChild(elementCopy, this);
-    setIsDirty(true);
   },
   include: function(element) {
     return this.getElementsByClassName("tile").include(element);
@@ -361,7 +382,7 @@ Array.prototype.makeCodes["continue"]  = function()     { return "continue" }
 Array.prototype.makeCodes["number"] = function()     { return "" + this[1] }
 Array.prototype.makeTiles["number"] = function(tile) {
   tile.addLabel("" + tile.value[1]);
-  tile.style.background = "#F5EABC";
+  $(tile).addClassName("numberTile");
 }
 
 Array.prototype.makeCodes["string"] = function()     { return this[1].printString() }
@@ -369,7 +390,7 @@ Array.prototype.makeTiles["string"] = function(tile) {
   var i = document.createElement("i");
   i.appendChild(document.createTextNode(tile.value[1]));
   tile.addColumn(i);
-  tile.style.background = "#E4FBB0";
+  $(tile).addClassName("stringTile");
 }
 
 Array.prototype.makeCodes["arr"] = function() {
@@ -634,13 +655,11 @@ Array.prototype.makeTiles["default"] = function(tile) {
   tile.addColumn(this.makeTile(1))
 }
 
-function findTop(tile) { return (tile.parentNode.className == "tile" || tile.parentNode.className == "valueParent") ? findTop(tile.parentNode) : tile }
-
 // ---------- Editor ----------
 
 Editor = Object.extend(document.createElement("input"), {
   className: "editor",
-  type: "text",
+  valueType: "string",
   object: null,
   initialize: function() {
     document.body.appendChild(this);
@@ -655,7 +674,10 @@ Editor = Object.extend(document.createElement("input"), {
     this.hide();
     var object = this.object;
     this.object = null; // this.object is reset before evaluate to handle error.
-    var newTile = this.value.makeTree().makeTile();
+    var newValue = this.valueType == "number" ?
+        parseFloat(this.value) : this.value.toString()
+    var newTile = [this.valueType, newValue].makeTile();
+
     object.acceptDrop(newTile);
   },
   onblur: function() {
@@ -668,7 +690,8 @@ Editor = Object.extend(document.createElement("input"), {
     this.object = element;
     this.show();
     Position.clone(element, this);
-    this.value = element.value.makeCode();
+    this.valueType = element.value[0];
+    this.value = element.value[1];
     this.select();
     window.el = element;
   }
