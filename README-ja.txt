@@ -20,8 +20,9 @@ todo done: textarea でページ内ジャンプを無効にする。
 todo done: position オブジェクトをクラスにする。(title が変)
 todo done: HTML の ! を隠す。
 
-todo: パーツビン
 todo: エディタ
+
+todo: パーツビン
 
 note: ローカルで日本語保存不可能。
 

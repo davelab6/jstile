@@ -16,6 +16,7 @@ function initializeDocument() {
   $("transcript").hide();
   Event.observe(window, "keydown", onShortCutKey); // For Firefox
   Event.observe(document.body, "keydown", onShortCutKey); // For IE
+  Editor.initialize();
 }
 
 // ---------- Page Navigation ----------
@@ -274,7 +275,14 @@ TileElement = {
        accept: "tile",
        hoverclass: "hoverclass"}
     );
-    //    element.ondblclick = function(evt) {alert("edit"); evt.cancelBubble = true;};
+
+    // Strange, this event handler doesn't work
+    // Event.observe(this, "dblclick", function(evt) { alert(); Editor.edit(this) });
+    this.ondblclick =  function(evt) {
+      var evt = evt ? evt : window.event;
+      Editor.edit(this);
+      Event.stop(evt);
+    };
     return element;
   },
 
@@ -283,11 +291,15 @@ TileElement = {
   acceptDrop: function(droppee) {
     var parent = this.parentTile;
     var elementCopy = droppee.value.dup().makeTile();
+    if (this.include(droppee)) return;
     elementCopy.modelIdx = this.modelIdx;
     parent.value[this.modelIdx] = elementCopy.value;
     elementCopy.parentTile = this.parentTile;
     this.parentNode.replaceChild(elementCopy, this);
     setIsDirty(true);
+  },
+  include: function(element) {
+    return this.getElementsByClassName("tile").include(element);
   },
   addColumn: function(element, colSpan, rowSpan) {
     if (element.parentTile !== undefined) {
@@ -617,6 +629,44 @@ Array.prototype.makeTiles["default"] = function(tile) {
 }
 
 function findTop(tile) { return (tile.parentNode.className == "tile" || tile.parentNode.className == "valueParent") ? findTop(tile.parentNode) : tile }
+
+// ---------- Editor ----------
+
+Editor = Object.extend(document.createElement("input"), {
+  className: "editor",
+  type: "text",
+  object: null,
+  initialize: function() {
+    document.body.appendChild(this);
+    $(this).hide();
+    Event.observe(this, "keydown", function(evt) {
+      if (evt.keyCode != 13) return;
+      Editor.acceptValue();
+      Event.stop(evt);
+    });
+  },
+  acceptValue: function() {
+    this.hide();
+    var object = this.object;
+    this.object = null; // this.object is reset before evaluate to handle error.
+    var newTile = this.value.makeTree().makeTile();
+    object.acceptDrop(newTile);
+  },
+  onblur: function() {
+    this.acceptValue();
+  },
+  edit: function(element) {
+    if (this.object) {
+      this.acceptValue();
+    }
+    this.object = element;
+    this.show();
+    Position.clone(element, this);
+    this.value = element.value.makeCode();
+    this.select();
+    window.el = element;
+  }
+});
 
 // ---------- Evaluation ----------
 
