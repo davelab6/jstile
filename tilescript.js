@@ -139,13 +139,16 @@ function save() {
 function printIt(row) {
   var source = row.sourceCode();
   var transcript = $("transcript");
-  //  transcript.value += "tree: " + source.makeTree().printString() + "\n";
   var result = eval(source);
-  transcript.value += result + "\n";
+  println(result);
   if (result != undefined) {
     var newRow = addRow(result.toString(), "source", row);
     $(newRow).visualEffect("BlindDown", {duration: 0.4});
   }
+}
+
+function println(string) {
+  $("transcript").value += string + "\n";
 }
 
 function removeRow(row) {
@@ -194,7 +197,9 @@ Row = {
       return newNode;
     },
     tile: function(source) {
-      var newNode = source.makeTree().makeTile();
+      var tree = source.makeTree();
+      var newNode = tree.makeTile();
+      println(tree.inspect());
       newNode.viewMode = "tile";
       newNode.className = "tile";
       return newNode;
