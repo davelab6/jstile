@@ -17,6 +17,13 @@ function initializeDocument() {
   Event.observe(window, "keydown", onShortCutKey); // For Firefox
   Event.observe(document.body, "keydown", onShortCutKey); // For IE
   Editor.initialize();
+
+  window.onbeforeunload = function(event) {
+    event = event || window.event; 
+    if (IsDirty) {
+      event.returnValue = 'This page is modified.';
+    }
+  }
   Viewer.startSync();
 }
 
@@ -53,7 +60,14 @@ DocPosition.current = new DocPosition("", 0);
 DocPosition.go = function(newPosition) {
   document.location.hash = newPosition.hash();
   if (this.current.title != newPosition.title) {
+    if (IsDirty) {
+      if (!confirm("The page was modified, do you want to discard it?")) {
+        document.location.hash = this.current.hash();
+        return;
+      }
+    }
     load(newPosition);
+    setIsDirty(false);
   }
   if (newPosition.division) {
     if ($("rows").childNodes[newPosition.division - 1]) {
@@ -61,7 +75,6 @@ DocPosition.go = function(newPosition) {
     }
   }
   this.current = newPosition;
-  setIsDirty(false);
 }
 DocPosition.sync = function() {
   if ((!document.location.hash) || (document.location.hash.length < 2)) {
@@ -78,11 +91,6 @@ DocPosition.startSync = function() {
 // ---------- User Interface ----------
 
 function go(name) {
-  if (IsDirty) {
-    if (!confirm("The page was modified, do you want to discard it?")) {
-      return false;
-    }
-  }
   DocPosition.go(DocPosition.fromName(name));
   return false;
 }
@@ -762,7 +770,6 @@ Viewer = {
     for (var i = 0; i < this.viewer.childNodes.length; i++) {
       var child = this.viewer.childNodes[i];
       if (child.model) {
-        window.child = child;
         if (unused[child.model.key]) {
           this.viewer.removeChild(child);
         } else {
