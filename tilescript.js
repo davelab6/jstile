@@ -228,15 +228,24 @@ NewLineBar = {
   newElement: function() {
     var element = Object.extend(document.createElement("div"), NewLineBar);
     Droppables.add(element, {
-      accept: "tile",
+      accept: ["tile", "watcher"],
       hoverclass: "hoverclass",
       onDrop: function(droppee, target) {
-        element.addNewLine(droppee.value.makeCode(), "tile");
+        //        element.addNewLine(droppee.value.makeCode(), "tile");
+        target.acceptDrop(droppee);
       }
     });
     return element;
   },
 
+  acceptDrop: function(droppee) {
+    if (droppee.className == "tile") {
+      this.addNewLine(droppee.value.makeCode(), "tile");
+    } else if (droppee.className == "watcher") {
+      this.addNewLine("<div class='watcher' key='" + droppee.model.key +
+                      "'></div>", "html");
+    }
+  },
   onmouseover: function() { this.className = "newLineEnter" },
   onmouseout: function() { this.className = "newLine" },
   onclick: function() { this.addNewLine("", "source") },
@@ -740,7 +749,7 @@ Viewer = {
   startSync: function() {
     this.viewer = $("viewer");
     var vars = Object.keys(window);
-    vars = vars.concat(["effect_class", "s", "tag_name"]);
+    vars = vars.concat(["effect_class", "s", "tag_name", "deepest"]);
     for (var i = 0; i < vars.length; i++) {
       this.systemVars[vars[i]] = true;
     }
@@ -762,7 +771,7 @@ Viewer = {
         delete this.watchers[key];
       } else {
         newWatchers[key] = new Watcher(key);
-        this.viewer.appendChild(newWatchers[key].element);
+        this.viewer.appendChild(newWatchers[key].element());
       }
     }
     var unused = this.watchers;
@@ -774,28 +783,56 @@ Viewer = {
         if (unused[child.model.key]) {
           this.viewer.removeChild(child);
         } else {
-          child.model.update();
+          //          child.model.update();
         }
       }
     }
+    Watcher.update();
   }
 }
 
 Watcher = Class.create();
+Watcher.update = function() {
+  var watchers = document.getElementsByClassName("watcher");
+  for (var i = 0; i < watchers.length; i++) {
+    if (watchers[i].model) {
+      watchers[i].model.update();
+    } else {
+      var model = Watcher.adoptModel(watchers[i]);
+      if (model) model.update();
+    }
+  }
+}
+Watcher.adoptModel = function(element) {
+  var key = element.getAttribute("key");
+  if (!key) return;
+  var watcher = new Watcher(key);
+  watcher.buildElement(element);
+  return element.model;
+}
+
 Watcher.prototype = {
   lastValue: null,
+  _element: null,
   initialize: function(key) {
-    var self = this;
     this.key = key;
-    this.element = document.createElement("div");
-    this.element.className = "watcher";
-    this.element.appendChild(document.createTextNode(key + ":"));
+  },
+  element: function() {
+    if (this._element) return this._element;
+    this.buildElement(document.createElement("div"));
+    return this._element;
+  },
+  buildElement: function(element) {
+    var self = this;
+    element.className = "watcher";
+    element.appendChild(document.createTextNode(this.key + ":"));
     this.input = document.createElement("input");
     this.input.onblur = function() { self.accept() }
-    this.element.appendChild(this.input);
-    this.element.model = this;
-
-    new Draggable(this.element, { ghosting: false, revert: true });
+    element.appendChild(this.input);
+    element.model = this;
+    this._element = element;
+    new Draggable(element, { ghosting: false, revert: true });
+    return element;
   },
   update: function() {
     var newValue = window[this.key];
