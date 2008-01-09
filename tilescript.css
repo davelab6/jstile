@@ -231,3 +231,16 @@ table.tile {
 #body {
     margin-right: 25%;
 }
+
+.watcher {
+    font-size: large;
+    cursor: move;
+    margin: 2px;
+    border: 1px solid #888888;
+}
+
+.watcher input {
+    margin: 2px;
+    font-size: large;
+    border: 1px solid #888888;
+}
