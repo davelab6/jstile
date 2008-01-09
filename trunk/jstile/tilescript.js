@@ -712,38 +712,92 @@ Editor = Object.extend(document.createElement("input"), {
 // ---------- Viewer ----------
 
 Viewer = {
-  systemVars: {},
-  isShow: false,
+  systemVars: {}, // Keys of the dictionary are used in the system.
+  watchers: {}, // A dictionary of { key: Watcher }
+  isShow: function() {
+    return !($("viewer").classNames().include("viewerHide"));
+  },
   hide: function() {
     $("viewer").addClassName("viewerHide");
     $("body").addClassName("viewerHide");
-    this.isShow = false;
   },
   show: function() {
     $("viewer").removeClassName("viewerHide");
     $("body").removeClassName("viewerHide");
-    this.isShow = true;
   },
   toggle: function() {
-    if (this.isShow) { this.hide() } else { this.show() }
+    if (this.isShow()) { this.hide() } else { this.show() }
   },
   startSync: function() {
-    for (var key in window) {
-      this.systemVars[key] = true;
+    this.viewer = $("viewer");
+    var vars = Object.keys(window);
+    vars = vars.concat(["effect_class", "s", "tag_name"]);
+    for (var i = 0; i < vars.length; i++) {
+      this.systemVars[vars[i]] = true;
     }
+
     this.sync();
     setInterval(function() { Viewer.sync()}, 500);
   },
   sync: function() {
-    this.localVars = {};
-    var status = "";
-    for (var key in window) {
-      if (!this.systemVars[key]) {
-        this.localVars[key] = window[key];
-        status += key + ": " + window[key].toString() + "<br/>";
+    var newWatchers = {};
+
+    var userVars = Object.keys(window).select(function(each) {
+      return !Viewer.systemVars[each]
+    })
+
+    for (var i = 0; i < userVars.length; i++) {
+      var key = userVars[i];
+      if (this.watchers[key]) {
+        newWatchers[key] = this.watchers[key];
+        delete this.watchers[key];
+      } else {
+        newWatchers[key] = new Watcher(key);
+        this.viewer.appendChild(newWatchers[key].element);
       }
     }
-    $("viewer").innerHTML = status;
+    var unused = this.watchers;
+    this.watchers = newWatchers;
+    
+    for (var i = 0; i < this.viewer.childNodes.length; i++) {
+      var child = this.viewer.childNodes[i];
+      if (child.model) {
+        window.child = child;
+        if (unused[child.model.key]) {
+          this.viewer.removeChild(child);
+        } else {
+          child.model.update();
+        }
+      }
+    }
+  }
+}
+
+Watcher = Class.create();
+Watcher.prototype = {
+  lastValue: null,
+  initialize: function(key) {
+    var self = this;
+    this.key = key;
+    this.element = document.createElement("div");
+    this.element.className = "watcher";
+    this.element.appendChild(document.createTextNode(key + ":"));
+    this.input = document.createElement("input");
+    this.input.onblur = function() { self.accept() }
+    this.element.appendChild(this.input);
+    this.element.model = this;
+
+    new Draggable(this.element, { ghosting: false, revert: true });
+  },
+  update: function() {
+    var newValue = window[this.key];
+    if (this.lastValue != newValue) {
+      this.input.value = newValue;
+      this.lastValue = newValue;
+    }
+  },
+  accept: function() {
+    window[this.key] = eval(this.input.value);
   }
 }
 
