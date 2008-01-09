@@ -6,7 +6,7 @@
 /* ----- For Generic Users ----- */
 
 p {
-	margin: 1em;
+	margin: 0.5em;
 }
 h1 {
     margin: 1em;
@@ -75,9 +75,9 @@ body div {
     text-align: left;
 }
 
-h1 a:link { color: #bbcccc; }
-h1 a:visited { color: #cccccc; }
-h1 a:active { color: #bbdddd; }
+h1 a:link { color: #AFC79E; }
+h1 a:visited { color: #AFC79E; }
+h1 a:active { color: #6A8C51; }
 
 .control {
     position: absolute;
@@ -192,14 +192,14 @@ table.tile {
 }
 
 .newLineEnter {
-    background-color: #ccffff;
-    height: 4px;
+    background-color: #DFB875;
+    height: 6px;
     clear: both;
 }
 
 .newLine {
     background-color: transparent;
-    height: 4px;
+    height: 6px;
     clear: both;
 }
 
