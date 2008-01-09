@@ -58,17 +58,18 @@ DocPosition.fromName =  function(name) {
 DocPosition.current = new DocPosition("", 0);
 
 DocPosition.go = function(newPosition) {
-  document.location.hash = newPosition.hash();
   if (this.current.title != newPosition.title) {
     if (IsDirty) {
       if (!confirm("The page was modified, do you want to discard it?")) {
-        document.location.hash = this.current.hash();
         return;
       }
     }
+    document.location.hash = newPosition.hash(); // duplicate, fix it later
     load(newPosition);
     setIsDirty(false);
   }
+  document.location.hash = newPosition.hash();
+
   if (newPosition.division) {
     if ($("rows").childNodes[newPosition.division - 1]) {
       $($("rows").childNodes[newPosition.division - 1]).visualEffect("ScrollTo", {duration: 0.5});
