@@ -142,7 +142,7 @@ function printIt(row) {
   var result = eval(source);
   println(result);
   if (result != undefined) {
-    var newRow = addRow(result.toString(), "source", row);
+    var newRow = addRow(result.toString(), "result", row);
     $(newRow).visualEffect("BlindDown", {duration: 0.4});
   }
 }
@@ -178,14 +178,25 @@ Row = {
       return this.rowNode().value.makeCode();
     }
   },
-  newElement: {
+  newExprElement: {
     source: function(source) {
       var newNode = document.createElement("textarea");
       newNode.viewMode = "source";
       newNode.className = "tile";
       newNode.rows = source.split("\n").length;
       newNode.value = source;
-      newNode.onchange = function() { setIsDirty(true) };
+      newNode.onchange = function() {
+        newNode.rows = newNode.value.split("\n").length;
+        setIsDirty(true)
+      };
+      return newNode;
+    },
+    result: function(source) {
+      var newNode = document.createElement("textarea");
+      newNode.viewMode = "result";
+      newNode.className = "tile";
+      newNode.rows = source.split("\n").length;
+      newNode.value = source;
       return newNode;
     },
     html: function(source) {
@@ -208,9 +219,9 @@ Row = {
   setViewMode: function(mode) {
     var old = this.rowNode();
     this.viewMode = mode;
-    var newNode = this.newElement[mode](this.sourceCode());
+    var newNode = this.newExprElement[mode](this.sourceCode());
     this.valueParent.replaceChild(newNode, old);
-    this.printItButton().setOpacity(mode == "html" ? 0.1 : 1);
+    this.printItButton().setOpacity(["html", "result"].include(mode) ? 0.1 : 1);
   },
   toggleTile: function() {
     var mode;
@@ -275,7 +286,7 @@ function newRow(source, viewMode) {
   var valueParent = Object.extend(document.createElement("div"), {
     className: "valueParent"
   });
-  valueParent.appendChild(Row.newElement.source(source));
+  valueParent.appendChild(Row.newExprElement.source(source));
 
   var newLine = NewLineBar.newElement();
 
@@ -547,12 +558,8 @@ Array.prototype.makeCodes["begin"] = function() {
 }
 
 Array.prototype.makeTiles["begin"] = function(tile) {
-  tile.addColumn(document.createTextNode("{ "), null, this.length - 1);
   for (var idx = 1; idx < this.length; idx++) {
     tile.addColumn(this.makeTile(idx));
-    if (idx == 1) {
-      tile.addColumn(document.createTextNode("}"), null, this.length - 1);
-    }
     if (idx < this.length - 1) tile.addRow();
   }
 }
@@ -585,7 +592,8 @@ Array.prototype.makeCodes["call"] = function() {
   return code;
 }
 Array.prototype.makeTiles["call"] = function(tile) {
-  tile.addColumn(this.makeTile(1))
+  //  tile.addColumn(this.makeTile(1))
+  tile.addLabel(this[1].makeCode())
   tile.addLabel("(")
   for (var idx = 2; idx < this.length; idx++) {
     tile.addColumn(this.makeTile(idx))
@@ -760,7 +768,7 @@ Viewer = {
     }
 
     this.sync();
-    setInterval(function() { Viewer.sync()}, 500);
+    setInterval(function() { Viewer.sync()}, 200);
   },
   sync: function() {
     var newWatchers = {};
@@ -787,8 +795,6 @@ Viewer = {
       if (child.model) {
         if (unused[child.model.key]) {
           this.viewer.removeChild(child);
-        } else {
-          //          child.model.update();
         }
       }
     }
@@ -845,6 +851,7 @@ Watcher.prototype = {
       this.input.value = newValue;
       this.lastValue = newValue;
     }
+    this.input.disabled = !(["string", "number"].include(typeof newValue));
   },
   accept: function() {
     window[this.key] = eval(this.input.value);
