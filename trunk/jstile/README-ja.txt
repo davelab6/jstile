@@ -4,10 +4,6 @@ goal: world の中を worm が動く
 goal: worm が タートルグラフィックの動きが出来る。
 goal: ビューワ
 
-== フォント
-http://home.tiscali.nl/developerscorner/fdc-varia/font-embedding.htm
-== レイアウト
-
 todo done: toggle を綺麗に。
 todo done: 削除
 todo done: HTML 記法
@@ -23,13 +19,42 @@ todo done: 新しい行にドラッグ出来るように。
 todo done: 一番根元のタイルの操作でエラーが出る。
 todo done: 数値の文字にドラッグ時色が変わるように
 todo done: 数値と文字別々のエディタ
+todo done: watcher 文字と数字以外は編集不能に
 
+todo: scrable
+
+todo: textarea blur 時に大きさチェック
+todo: enter で watcher 入力
+todo: 関数名をドラッグできないようにする。
 todo: パーツビン
-
+todo: 加速度
+todo: 虚数
 todo: 乱数発生器プロットする。
 todo: 複素数の掛け算。
 
 note: ローカルで日本語保存不可能。
+
+== 必要な DAV の設定
+
+<Directory "/var/www/html/jstile/data">
+    Header add MS-Author-Via "DAV"
+    DAV On
+    AuthName "a WebDAV folder for jstile"
+    AuthType Basic
+    AuthUserFile /etc/httpd/conf/.dav
+    <LimitExcept GET OPTIONS REPORT>
+      Require valid-user
+    </LimitExcept>
+    Options Indexes
+</Directory>
+
+[takashi@localhost conf]$ cat /etc/httpd/conf/.dav
+tinlizzie:$apr1$oX/lL/..$rbmvpF13HUAAYx.Mr.q4c/
+user/pass: tinlizzie/everyday
+
+== フォント
+http://home.tiscali.nl/developerscorner/fdc-varia/font-embedding.htm
+== レイアウト
 
 == 文書構造
 
