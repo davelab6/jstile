@@ -47,7 +47,7 @@ var Droppables = {
   findDeepestChild: function(drops) {
     deepest = drops[0];
       
-    for (i = 1; i < drops.length; ++i)
+    for (var i = 1; i < drops.length; ++i)
       if (Element.isParent(drops[i].element, deepest.element))
         deepest = drops[i];
     
@@ -98,7 +98,7 @@ var Droppables = {
     });
         
     if(affected.length>0) {
-      drop = Droppables.findDeepestChild(affected);
+      var drop = Droppables.findDeepestChild(affected);
       Position.within(drop.element, point[0], point[1]);
       if(drop.onHover)
         drop.onHover(element, drop.element, Position.overlap(drop.overlap, drop.element));
