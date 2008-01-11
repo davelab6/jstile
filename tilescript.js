@@ -404,8 +404,6 @@ Array.prototype.makeCodeNoMacros = function() {
   var ast = MacroExpander.matchwith(this, "trans");
   return MJSTranslator.matchwith(ast, "transWithoutMacros");
 }
-Array.prototype.makeCodes = new Object()
-
 Array.prototype.makeTile = function(modelIdx) {
   var tile;
   if (modelIdx != undefined) {
@@ -428,17 +426,11 @@ Array.prototype.makeTile = function(modelIdx) {
 }
 Array.prototype.makeTiles = new Object()
 
-Array.prototype.makeCodes["this"]      = function()     { return "this" }
-Array.prototype.makeCodes["break"]     = function()     { return "break" }
-Array.prototype.makeCodes["continue"]  = function()     { return "continue" }
-
-Array.prototype.makeCodes["number"] = function()     { return "" + this[1] }
 Array.prototype.makeTiles["number"] = function(tile) {
   tile.addLabel("" + tile.value[1]);
   $(tile).addClassName("numberTile");
 }
 
-Array.prototype.makeCodes["string"] = function()     { return this[1].printString() }
 Array.prototype.makeTiles["string"] = function(tile) {
   var i = document.createElement("i");
   i.appendChild(document.createTextNode(tile.value[1]));
@@ -446,9 +438,6 @@ Array.prototype.makeTiles["string"] = function(tile) {
   $(tile).addClassName("stringTile");
 }
 
-Array.prototype.makeCodes["arr"] = function() {
-  return "[" + this.clone().splice(1, this.length - 1).map(function(x) { return x.makeCode() }).join(", ") + "]"
-}
 Array.prototype.makeTiles["arr"] = function(tile) {
   tile.addLabel("[")
   for (var idx = 1; idx < this.length; idx++) {
@@ -459,49 +448,39 @@ Array.prototype.makeTiles["arr"] = function(tile) {
   tile.addLabel("]")
 }
 
-Array.prototype.makeCodes["unop"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["unop"] = function(tile) {
   tile.addLabel(this[1])
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["set"] = function() { return "(" + this[1].makeCode() + " = " + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["set"] = function(tile) {
   tile.addColumn(this.makeTile(1))
   tile.addLabel(" = ")
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["mset"] = function() { return "(" + this[1].makeCode() + " " + this[2] + "= " + this[3].makeCode() + ")" }
 Array.prototype.makeTiles["mset"] = function(tile) {
   tile.addColumn(this.makeTile(1))
   tile.addLabel(" " + this[2] + "= ")
   tile.addColumn(this.makeTile(3))
 }
 
-Array.prototype.makeCodes["binop"] = function() { return "(" + this[2].makeCode() + this[1] + this[3].makeCode() + ")" }
 Array.prototype.makeTiles["binop"] = function(tile) {
   tile.addColumn(this.makeTile(2))
   tile.addLabel(this[1])
   tile.addColumn(this.makeTile(3))
 }
 
-Array.prototype.makeCodes["preop"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["preop"] = function(tile) {
   tile.addLabel(this[1])
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["postop"] = function() { return "(" + this[2].makeCode() + this[1] + ")" }
 Array.prototype.makeTiles["postop"] = function(tile) {
   tile.addColumn(this.makeTile(2))
   tile.addLabel(this[1])
 }
 
-Array.prototype.makeCodes["return"] = function() { return "return " + this[1].makeCode() }
-
-Array.prototype.makeCodes["if"] = function() { return "if (" + this[1].makeCode() + ")  " + this[2].makeCode() + "\n" +
-                                                      "else  " + this[3].makeCode() }
 Array.prototype.makeTiles["if"] = function(tile) {
   tile.addLabel("if (")
   tile.addColumn(this.makeTile(1))
@@ -512,8 +491,6 @@ Array.prototype.makeTiles["if"] = function(tile) {
   tile.addColumn(this.makeTile(3))
 }
 
-Array.prototype.makeCodes["condExpr"] = function() { return "(" + this[1].makeCode() + " ? " + this[2].makeCode() + " : " +
-                                                                                               this[3].makeCode() + ")" }
 Array.prototype.makeTiles["condExpr"] = function(tile) {
   tile.addColumn(this.makeTile(1))
   tile.addLabel(" ? ")
@@ -522,45 +499,38 @@ Array.prototype.makeTiles["condExpr"] = function(tile) {
   tile.addColumn(this.makeTile(3))
 }
 
-Array.prototype.makeCodes["while"] = function() { return "while (" + this[1].makeCode() + ") " + this[2].makeCode() }
 Array.prototype.makeTiles["while"] = function(tile) {
   tile.addLabel("while (")
   tile.addColumn(this.makeTile(1))
   tile.addLabel(") ")
-  tile.addColumn(this.makeTile(2))
+  tile.addRow()
+  tile.addColumn(this.makeTile(2), 3)
 }
 
-Array.prototype.makeCodes["doWhile"] = function() { return "do {" + this[1].makeCode() + "} while (" + this[2].makeCode() + ")" }
 Array.prototype.makeTiles["doWhile"] = function(tile) {
-  tile.addLabel("do ")
-  tile.addColumn(this.makeTile(1))
+  tile.addLabel("do", 3)
+  tile.addRow()
+  tile.addColumn(this.makeTile(1), 3)
+  tile.addRow()
   tile.addLabel(" while (")
   tile.addColumn(this.makeTile(2))
   tile.addLabel(")")
 }
 
-Array.prototype.makeCodes["for"] = function() { return "for (" + this[1].makeCode() + "; " +
-                                                                 this[2].makeCode() + "; " +
-                                                                 this[3].makeCode() + ") " + this[4].makeCode() }
 Array.prototype.makeTiles["for"] = function(tile) {
   tile.addLabel("for (")
   tile.addColumn(this.makeTile(1)); tile.addLabel("; ")
   tile.addColumn(this.makeTile(2)); tile.addLabel("; ")
   tile.addColumn(this.makeTile(3)); tile.addLabel(") ")
-  tile.addColumn(this.makeTile(4))
+  tile.addRow()
+  tile.addColumn(this.makeTile(4), 7)
 }
 
-Array.prototype.makeCodes["forIn"] = function() { return "for (" + this[1].makeCode() + " in " +
-                                                                   this[2].makeCode() + ") " + this[3].makeCode() }
 Array.prototype.makeTiles["forIn"] = function(tile) {
   tile.addLabel("for (")
   tile.addColumn(this.makeTile(1)); tile.addLabel(" in ")
   tile.addColumn(this.makeTile(2)); tile.addLabel(") ")
   tile.addColumn(this.makeTile(3))
-}
-
-Array.prototype.makeCodes["begin"] = function() {
-  return "{ " + this.clone().splice(1, this.length - 1).map(function(s) { return s.makeCode() }).join("; ") + " }"
 }
 
 Array.prototype.makeTiles["begin"] = function(tile) {
@@ -570,18 +540,13 @@ Array.prototype.makeTiles["begin"] = function(tile) {
   }
 }
 
-Array.prototype.makeCodes["func"] = function() {
-  return "(function(" + this[1].clone().splice(1, this.length - 1).join(", ") + ") " + this[2].makeCode() + ")"
-}
 Array.prototype.makeTiles["func"] = function(tile) {
   tile.addLabel("function(" + this[1].join(", ") + ")")
+  tile.addRow()
   tile.addColumn(this.makeTile(2))
 }
 
 
-Array.prototype.makeCodes["get"] = function() {
-  return this.length == 3 ?  this[2].makeCode() + "[" + this[1].makeCode() + "]" : this[1]
-}
 Array.prototype.makeTiles["get"] = function(tile) {
   if (this.length == 3) {
     tile.addColumn(this.makeTile(2))
@@ -593,10 +558,6 @@ Array.prototype.makeTiles["get"] = function(tile) {
     tile.addLabel(this[1])
 }
 
-Array.prototype.makeCodes["call"] = function() {
-  var code = this[1].makeCode() + "(" + this.clone().splice(2, this.length - 2).map(function(a) { return a.makeCode() }).join(", ") + ")";
-  return code;
-}
 Array.prototype.makeTiles["call"] = function(tile) {
   //  tile.addColumn(this.makeTile(1))
   tile.addLabel(this[1].makeCode())
@@ -609,9 +570,6 @@ Array.prototype.makeTiles["call"] = function(tile) {
   tile.addLabel(")")
 }
 
-Array.prototype.makeCodes["send"] = function() {
-  return this[2].makeCode() + "." + this[1] + "(" + this.clone().splice(3, this.length - 3).map(function(a) { return a.makeCode() }).join(", ") + ")"
-}
 Array.prototype.makeTiles["send"] = function(tile) {
   tile.addColumn(this.makeTile(2))
   tile.addLabel("." + this[1] + "(")
@@ -623,9 +581,6 @@ Array.prototype.makeTiles["send"] = function(tile) {
   tile.addLabel(")")
 }
 
-Array.prototype.makeCodes["new"] = function() {
-  return "new " + this[1] + "(" + this.clone().splice(2, this.length - 2).map(function(x) { return x.makeCode() }).join(", ") + ")"
-}
 Array.prototype.makeTiles["new"] = function(tile) {
   tile.addLabel("new " + this[1] + "(")
   for (var idx = 2; idx < this.length; idx++) {
@@ -637,7 +592,10 @@ Array.prototype.makeTiles["new"] = function(tile) {
 }
 
 Array.prototype.makeTiles["expand"] = function(tile) {
-  tile.addLabel("@" + this[1] + "(");
+  var b = document.createElement("b");
+  b.appendChild(document.createTextNode(this[1]));
+  tile.addColumn(b);
+  tile.addLabel("(");
   for (var idx = 2; idx < this.length; idx++) {
     if (idx > 2)
       tile.addLabel(", ")
@@ -647,25 +605,20 @@ Array.prototype.makeTiles["expand"] = function(tile) {
 }
 
 Array.prototype.makeTiles["macro"] = function(tile) {
-  tile.addLabel("macro @" + this[1] + "(" + this[2].join(", ") + ")")
-  tile.addColumn(this.makeTile(3))
+  tile.addLabel("macro ");
+  var b = document.createElement("b");
+  b.appendChild(document.createTextNode(this[1]));
+  tile.addColumn(b);
+  tile.addLabel("(" + this[2].join(", ") + ")");
+  tile.addRow();
+  tile.addColumn(this.makeTile(3), 2);
 }
 
-Array.prototype.makeCodes["var"] = function() {
-  return "var " + this[1] + " = " + this[2].makeCode()
-}
 Array.prototype.makeTiles["var"] = function(tile) {
   tile.addLabel("var " + this[1] + " = ")
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["throw"]  = function() { return "throw "  + this[1].makeCode() }
-
-Array.prototype.makeCodes["try"] = function() {
-  return "try {" + this[1].makeCode() + "} " +
-         "catch (" + this[2] + ") { " + this[3].makeCode() + " } " +
-         "finally { " + this[4].makeCode() + "}"
-}
 Array.prototype.makeTiles["try"] = function(tile) {
   tile.addLabel("try ")
   tile.addColumn(this.makeTile(1))
@@ -675,38 +628,32 @@ Array.prototype.makeTiles["try"] = function(tile) {
   tile.addColumn(this.makeTile(4))
 }
 
-Array.prototype.makeCodes["json"] = function() {
-  return "({" + this.clone().splice(1, this.length - 1).map(function(b) { return b.makeCode() }).join(", ") + "})"
-}
 Array.prototype.makeTiles["json"] = Array.prototype.makeTiles["begin"];
 
-Array.prototype.makeCodes["binding"] = function() { return this[1].printString() + ": " + this[2].makeCode() }
 Array.prototype.makeTiles["binding"] = function(tile) {
   tile.addLabel(this[1] + ": ")
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["switch"] = function() {
-  return "switch (" + this[1].makeCode() + ") {" + this.clone().splice(2, this.length - 2).map(function(c) { return c.makeCode() }).join("; ") + "}"
-}
 Array.prototype.makeTiles["switch"] = function(tile) {
   tile.addLabel("switch (")
   tile.addColumn(this.makeTile(1))
   tile.addLabel(")")
   tile.addRow();
-  tile.addColumn(document.createTextNode("{"), null, this.length - 2);
+  //tile.addColumn(document.createTextNode("{"), null, this.length - 2);
   for (var idx = 2; idx < this.length; idx++) {
     if (idx > 2) {
       tile.addRow();
     }
-    tile.addColumn(this.makeTile(idx));
+    tile.addColumn(this.makeTile(idx), 3);
+/*
     if (idx == 2) {
       tile.addColumn(document.createTextNode("}"), null, this.length - 2);
     }
+*/
   }
 }
 
-Array.prototype.makeCodes["case"] = function() { return "case " + this[1].makeCode() + ": " + this[2].makeCode() }
 Array.prototype.makeTiles["case"] = function(tile) {
   tile.addLabel("case ")
   tile.addColumn(this.makeTile(1))
@@ -714,7 +661,6 @@ Array.prototype.makeTiles["case"] = function(tile) {
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["default"] = function() { return "default: " + this[1].makeCode() }
 Array.prototype.makeTiles["default"] = function(tile) {
   tile.addLabel("default: ")
   tile.addColumn(this.makeTile(1))

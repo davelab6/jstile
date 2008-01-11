@@ -188,7 +188,7 @@ table.tile {
     font-size: large;
     padding: 0px;
     border: 1px solid #888888;
-    text-align: center;
+    text-align: left;
 }
 
 .newLineEnter {
