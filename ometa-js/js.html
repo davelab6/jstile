@@ -327,7 +327,9 @@ ometa JSParser : Parser {
   iName        ::= <firstAndRest #nameFirst #nameRest>:r                                           => [r join: ''].
   name         ::= <iName>:n ?[(self isKeyword: n) not]                                            => [{#name. n}].
   keyword      ::= <iName>:k ?[self isKeyword: k]                                                  => [{k. k}].
-  number       ::= <digit>+:ds                                                                     => [{#number. parseInt value: (ds join: '')}].
+  number       ::= <digit>+:ws ('.' <digit>* | <empty> => [{''}]):fs                               => [{#number. parseFloat value:
+                                                                                                         (ws join: ''), '.',
+                                                                                                         (fs join: '')}].
   escapeChar   ::= '\\' <char>:c                                                                   => ['\\', c].
   str          ::= "'" (<escapeChar> | ~"'" <char>)*:cs "'"                                        => [{#string. cs join: ''}]
                  | '"' (<escapeChar> | ~'"' <char>)*:cs '"'                                        => [{#string. cs join: ''}].
