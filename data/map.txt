@@ -1,0 +1,5 @@
+["tilescript",
+["tile", "macro @map(v,op,lst){{var ans=[];for (var idx=0;(idx<lst['length']);idx++) {v=lst[idx];ans.push(op)};ans}}"],
+["tile", "x=0"],
+["tile", "@map(x,(x*x),[1,2,3,4,5,6,7,8,9,10])"]
+]
