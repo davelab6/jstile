@@ -25,13 +25,13 @@ todo done: 複素数の掛け算。
 todo done: 出力に inspect を使う。
 todo done: 関数名をドラッグできないようにする。
 todo done: scrable
+todo done: ドラッグ後の watcher 広く
+todo pending: パーツビン
+todo done: 乱数発生器プロットする。
 
-
-todo: ドラッグ後の watcher 広く
 todo: enter で watcher 入力
-todo: パーツビン
+
 todo: 加速度
-todo: 乱数発生器プロットする。
 
 note: ローカルで日本語保存不可能。
 

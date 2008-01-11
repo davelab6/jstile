@@ -1,13 +1,18 @@
 ["tilescript",
 ["html", "<h2>What is Pseudorandom number generator?</h2>"],
+["html", "<img src=\"data/rand.png\">"],
 ["html", "<p>Press <img src=\"exclamation.gif\"/>.</p>"],
-["tile", "{ (A = 13); (B = 5); (M = 24); (X = 0) }"],
+["tile", "{X=0;A=13;B=5;M=24}"],
 ["html", "<p>Press <img src=\"exclamation.gif\"/> to see how numbers are made</p>"],
-["tile", "(X = (((A*X)+B)%M))"],
-["source", "sequence = [];\nfor (i = 0; i < 30; i++) {\n  X = (A * X + B) % M;\n  sequence.push(X);\n}\nsequence;\n"],
+["tile", "X=(((A*X)+B)%M)"],
+["source", "sequence = [];\nX = 0;\nfor (i = 0; i < 30; i++) {\n  X = (A * X + B) % M;\n  sequence.push(X);\n}\nsequence;"],
 ["html", "<p>Edit followed numbers and try again.</p>"],
 ["html", "<div class='watcher' key='A'></div>"],
 ["html", "<div class='watcher' key='B'></div>"],
 ["html", "<div class='watcher' key='M'></div>"],
-["html", "<div class='watcher' key='X'></div>"]
+["html", "<div class='watcher' key='X'></div>"],
+["html", "<canvas id=\"canvas\" width=\"400\" height=\"200\">\n</canvas>"],
+["source", "canvas = $(\"canvas\");\nctx = canvas.getContext('2d');\nctx.clearRect(0, 0, canvas.width, canvas.height);\nctx.save();\nctx.scale(1, 5);\n// ctx.scale(1, 0.00000005);\nctx.beginPath();\nctx.moveTo(0, 0);\nfor (i = 0; i < 400; i++) {\n  X = (A * X + B) % M;\n  ctx.lineTo(i, X);\n}\nctx.stroke();\nctx.restore();"],
+["html", "<p><i>Numerical Recipes in C</i> advocates a generator of this form with:</p>"],
+["tile", "{A=1664525;B=1013904223;M=Math.pow(2,32)}"]
 ]
