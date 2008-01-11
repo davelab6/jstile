@@ -814,11 +814,18 @@ Watcher.prototype = {
   },
   update: function() {
     var newValue = window[this.key];
+    var editable = isEditable(newValue);
+    this.input.disabled = !editable;
     if (this.lastValue != newValue) {
       this.input.value = Object.inspect(newValue);
       this.lastValue = newValue;
+      return;
     }
-    this.input.disabled = !(isEditable(newValue));
+    if (editable &&
+        Object.inspect(this.lastValue) != Object.inspect(newValue)) {
+          this.input.value = Object.inspect(newValue);
+          this.lastValue = newValue;
+        }
   },
   accept: function() {
     window[this.key] = eval(this.input.value);
