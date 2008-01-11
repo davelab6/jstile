@@ -28,6 +28,10 @@ ul {
     margin-left: 2em;
 }
 
+canvas {
+    border: 1px solid #8080c0;
+}
+
 /* ----- For C5 Presentation ----- */
 
 .author {

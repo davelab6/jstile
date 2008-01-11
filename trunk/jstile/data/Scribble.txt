@@ -1,5 +1,7 @@
 ["tilescript",
 ["html", "<canvas id=\"canvas\" width=\"400\" height=\"200\"\n  style=\"border: 4px solid #99cccc\">\n</canvas>"],
-["source", "canvas = $(\"canvas\");\nctx = canvas.getContext('2d');\nctx.beginPath();\nctx.strokeStyle = \"rgba(255, 128, 64, 0.1)\";\nctx.lineWidth = 8;\n\n"],
+["source", "canvas = $(\"canvas\");\nctx = canvas.getContext('2d');\nctx.beginPath();"],
+["tile", "(ctx['strokeStyle'] = 'rgba(255, 128, 64, 0.1)')"],
+["tile", "(ctx['lineWidth'] = 8)"],
 ["source", "canvas.onmousemove = function (e) {\n  x = e.pageX - this.offsetLeft;\n  y = e.pageY - this.offsetTop;\n  ctx.lineTo(x, y);\n  ctx.stroke();\n}\n"]
 ]
