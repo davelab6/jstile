@@ -1,0 +1,5 @@
+["tilescript",
+["tile", "macro @repeat(k,s){{var n=k;while ((n-->0)) {s}}}"],
+["tile", "x=3"],
+["tile", "@repeat(4,++x)"]
+]

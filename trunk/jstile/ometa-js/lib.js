@@ -40,6 +40,8 @@ Object.prototype.ownPropertyNames = function() {
   return r
 }
 
+Object.prototype.hasProperty = function(p) { return this[p] != undefined }
+
 
 // some functional programming stuff
 

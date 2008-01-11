@@ -120,7 +120,7 @@ function save() {
   var children = rows.childNodes;
   for (var i = 0; i < children.length; i++) {
     var nodeType = children[i].viewMode;
-    var nodeValue = children[i].sourceCode();
+    var nodeValue = children[i].sourceCode(false);
     text += ([nodeType, nodeValue]).toJSON();
     if (i != children.length - 1) {
       text +=  ",\n";
@@ -137,7 +137,7 @@ function save() {
 }
 
 function printIt(row) {
-  var source = row.sourceCode();
+  var source = row.sourceCode(true);
   var transcript = $("transcript");
   var result = eval(source);
   println(result);
@@ -168,14 +168,16 @@ Row = {
   printItButton: function() {
     return document.getElementsByClassName("printIt", this.rowTool)[0];
   },
-  sourceCode: function() {
+  sourceCode: function(delMacros) {
     var rowNode = this.rowNode();
     if (rowNode.viewMode == "source") {
       return this.rowNode().value;
     } else if (rowNode.viewMode == "html") {
       return this.rowNode().value;
     } else {
-      return this.rowNode().value.makeCode();
+      return delMacros ?
+               this.rowNode().value.makeCodeNoMacros() :
+               this.rowNode().value.makeCode();
     }
   },
   newExprElement: {
@@ -219,7 +221,7 @@ Row = {
   setViewMode: function(mode) {
     var old = this.rowNode();
     this.viewMode = mode;
-    var newNode = this.newExprElement[mode](this.sourceCode());
+    var newNode = this.newExprElement[mode](this.sourceCode(false));
     this.valueParent.replaceChild(newNode, old);
     this.printItButton().setOpacity(["html", "result"].include(mode) ? 0.1 : 1);
   },
@@ -227,7 +229,7 @@ Row = {
     var mode;
     if (this.viewMode != "source") {
       mode = "source";
-    } else if (this.sourceCode().charAt(0) == "<") {
+    } else if (this.sourceCode(false).charAt(0) == "<") {
       mode = "html";
     } else {
       mode = "tile";
@@ -319,7 +321,7 @@ function addRow(source, viewMode, after) {
 // ---------- Tiles ----------
 
 String.prototype.makeTree = function () {
-  return JSParser.parse(this);
+  return MJSParser.frontEndParse(this);
 }
 
 TileElement = {
@@ -396,7 +398,11 @@ TileElement = {
 Array.prototype.dup = function() { return this.map(function(value) { return value instanceof Array ? value.dup() : value; }); }
 
 Array.prototype.makeCode = function() {
-  return this.makeCodes[this[0]] == undefined ? this.printString() : this.makeCodes[this[0]].apply(this)
+  return MJSTranslator.matchwith(this, "trans");
+}
+Array.prototype.makeCodeNoMacros = function() {
+  var ast = MacroExpander.matchwith(this, "trans");
+  return MJSTranslator.matchwith(ast, "transWithoutMacros");
 }
 Array.prototype.makeCodes = new Object()
 
@@ -480,14 +486,14 @@ Array.prototype.makeTiles["binop"] = function(tile) {
   tile.addColumn(this.makeTile(3))
 }
 
-Array.prototype.makeCodes["preOp"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
-Array.prototype.makeTiles["preOp"] = function(tile) {
+Array.prototype.makeCodes["preop"] = function() { return "(" + this[1] + this[2].makeCode() + ")" }
+Array.prototype.makeTiles["preop"] = function(tile) {
   tile.addLabel(this[1])
   tile.addColumn(this.makeTile(2))
 }
 
-Array.prototype.makeCodes["postOp"] = function() { return "(" + this[2].makeCode() + this[1] + ")" }
-Array.prototype.makeTiles["postOp"] = function(tile) {
+Array.prototype.makeCodes["postop"] = function() { return "(" + this[2].makeCode() + this[1] + ")" }
+Array.prototype.makeTiles["postop"] = function(tile) {
   tile.addColumn(this.makeTile(2))
   tile.addLabel(this[1])
 }
@@ -568,7 +574,7 @@ Array.prototype.makeCodes["func"] = function() {
   return "(function(" + this[1].clone().splice(1, this.length - 1).join(", ") + ") " + this[2].makeCode() + ")"
 }
 Array.prototype.makeTiles["func"] = function(tile) {
-  tile.addLabel("function(" + this[1].clone().splice(1, this.length - 1).join(", ") + ")")
+  tile.addLabel("function(" + this[1].join(", ") + ")")
   tile.addColumn(this.makeTile(2))
 }
 
@@ -628,6 +634,21 @@ Array.prototype.makeTiles["new"] = function(tile) {
     tile.addColumn(this.makeTile(idx))
   }
   tile.addLabel(")")
+}
+
+Array.prototype.makeTiles["expand"] = function(tile) {
+  tile.addLabel("@" + this[1] + "(");
+  for (var idx = 2; idx < this.length; idx++) {
+    if (idx > 2)
+      tile.addLabel(", ")
+    tile.addColumn(this.makeTile(idx))
+  }
+  tile.addLabel(")");
+}
+
+Array.prototype.makeTiles["macro"] = function(tile) {
+  tile.addLabel("macro @" + this[1] + "(" + this[2].join(", ") + ")")
+  tile.addColumn(this.makeTile(3))
 }
 
 Array.prototype.makeCodes["var"] = function() {

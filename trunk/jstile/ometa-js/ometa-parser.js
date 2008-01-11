@@ -210,7 +210,7 @@ OMetaParser.rule = function() {
   xs = ["this._or(", xs.delimWith(", "), ")"]
   this.ruleLocals = this.ruleLocals.ownPropertyNames()
   this.ruleLocals = this.ruleLocals.length > 0 ? ["var ", this.ruleLocals.delimWith(", "), "; "] : ""
-  return [this.grammarName, ".", name, " = function() { var $elf = this; ", this.ruleLocals, " return ", xs, " }"]
+  return [this.grammarName, "['", name, "'] = function() { var $elf = this; ", this.ruleLocals, " return ", xs, " }"]
 }
 OMetaParser.rulePart = function() {
   var $elf         = this,

@@ -1,12 +1,12 @@
 ["tilescript",
 ["tile", "(3+4)"],
-["tile", "[1, 2, 3]"],
-["tile", "(a = ({'a': 'alpha', 'b': 'beta'}))"],
-["tile", "(a['hello'] = 'world')"],
-["source", "if (true)  { alert('hello') }\n"],
-["tile", "if (true)  { alert('ok') }\nelse  { alert('bad') }"],
-["tile", "for (var i = 0; (i<3); (i++)) { alert('hi') }"],
-["tile", "{ alert('hello'); alert('world') }"],
-["tile", "(function(x, y) { return (x+y) })"],
-["tile", "(o = new Object())"]
+["tile", "[1,2,3]"],
+["tile", "a=({'a': 'alpha','b': 'beta'})"],
+["tile", "a['hello']='world'"],
+["source", "@foo(bar, 3)\n"],
+["tile", "if (true){alert('ok')}else{alert('bad')}"],
+["tile", "for (var i=0;(i<3);i++) alert('hi')"],
+["tile", "{alert('hello');alert('world')}"],
+["tile", "(function (x,y) {return (x+y)})"],
+["tile", "o=new Object()"]
 ]

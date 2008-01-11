@@ -265,6 +265,13 @@ OMeta = {
       this._applyWithArgs("exactly", xs.at(idx))
     return xs
   },
+  notLast: function() {
+    var $elf = this,
+        rule = this._apply("anything"),
+        r    = this._apply(rule)
+    this._lookahead(function() { return $elf._apply(rule) })
+    return r
+  },
 
   initialize: function() { },
   // #match:with: and #matchAll:with: are a grammar's "public interface"
