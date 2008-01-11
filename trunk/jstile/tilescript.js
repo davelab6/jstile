@@ -142,7 +142,7 @@ function printIt(row) {
   var result = eval(source);
   println(result);
   if (result != undefined) {
-    var newRow = addRow(result.toString(), "result", row);
+    var newRow = addRow(Object.inspect(result), "result", row);
     $(newRow).visualEffect("BlindDown", {duration: 0.4});
   }
 }
@@ -815,10 +815,10 @@ Watcher.prototype = {
   update: function() {
     var newValue = window[this.key];
     if (this.lastValue != newValue) {
-      this.input.value = newValue;
+      this.input.value = Object.inspect(newValue);
       this.lastValue = newValue;
     }
-    this.input.disabled = !(["string", "number"].include(typeof newValue));
+    this.input.disabled = !(isEditable(newValue));
   },
   accept: function() {
     window[this.key] = eval(this.input.value);
@@ -926,4 +926,28 @@ function saveFileWithMozilla(url, content)
             return(false);
             }
     return(null);
+}
+
+// ---------- Utilities ----------
+
+function isEditable(object) {
+  switch(typeof object) {
+  case "number": return true;
+  case "string": return true;
+  case "boolean": return true;
+  case "function": return false;
+  case "undefined": return false;
+  }
+  if (object instanceof Array) {
+    for (var i = 0; i < object.length; i++) {
+      if (!isEditable(object[i])) return false;
+    }
+    return true;
+  } else if (object instanceof Date) {
+    return true;
+  }
+  for (var key in object) {
+    if (!isEditable(object[key])) return false;
+  }
+  return true;
 }

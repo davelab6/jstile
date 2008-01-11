@@ -248,3 +248,7 @@ table.tile {
     font-size: large;
     border: 1px solid #888888;
 }
+
+.tile .watcher input {
+    width: 80%;
+}

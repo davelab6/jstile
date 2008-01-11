@@ -21,16 +21,17 @@ todo done: 数値の文字にドラッグ時色が変わるように
 todo done: 数値と文字別々のエディタ
 todo done: watcher 文字と数字以外は編集不能に
 todo done: textarea blur 時に大きさチェック
+todo done: 複素数の掛け算。
+todo done: 出力に inspect を使う。
+todo done: 関数名をドラッグできないようにする。
+todo done: scrable
 
-todo: scrable
 
-todo: 出力に json を使う。
+todo: ドラッグ後の watcher 広く
 todo: enter で watcher 入力
-todo: 関数名をドラッグできないようにする。
 todo: パーツビン
 todo: 加速度
 todo: 乱数発生器プロットする。
-todo: 複素数の掛け算。
 
 note: ローカルで日本語保存不可能。
 
