@@ -4,9 +4,10 @@
 ["tile", "a=({'a': 'alpha','b': 'beta'})"],
 ["tile", "a['hello']='world'"],
 ["source", "@foo(bar, 3)\n"],
-["tile", "if (true){alert('ok')}else{alert('bad')}"],
-["tile", "for (var i=0;(i<3);i++) alert('hi')"],
+["tile", "if (true) {alert('ok')} else {alert('bad')}"],
+["tile", "for (var i=0;(i<3);i++) {alert('hi')}"],
 ["tile", "{alert('hello');alert('world')}"],
 ["tile", "(function (x,y) {return (x+y)})"],
-["tile", "o=new Object()"]
+["tile", "while ((x<y)) {x++}"],
+["tile", "do {x++} while ((x<y))"]
 ]
