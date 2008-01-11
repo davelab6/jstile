@@ -171,13 +171,13 @@ Row = {
   sourceCode: function(delMacros) {
     var rowNode = this.rowNode();
     if (rowNode.viewMode == "source") {
-      return this.rowNode().value;
+      return delMacros ?  rowNode.value.makeTree().makeCodeNoMacros() : rowNode.value;
     } else if (rowNode.viewMode == "html") {
-      return this.rowNode().value;
+      return rowNode.value;
     } else {
       return delMacros ?
-               this.rowNode().value.makeCodeNoMacros() :
-               this.rowNode().value.makeCode();
+               rowNode.value.makeCodeNoMacros() :
+               rowNode.value.makeCode();
     }
   },
   newExprElement: {
