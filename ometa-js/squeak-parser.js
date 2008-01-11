@@ -306,18 +306,23 @@ SqueakParser.unaryExpr = function() {
                   })
 }
 SqueakParser.unit = function() {
-  var $elf = this
-  return this._or(function() { return $elf._apply("literal") },
-                  function() { return $elf._apply("identifier") },
-                  function() { return $elf._apply("arrayLit") },
-                  function() { return $elf._apply("arrayConstr") },
-                  function() { return $elf._applyWithArgs("block", true) },
-                  function() {
-                    $elf._applyWithArgs("token", "(")
-                    var r = $elf._apply("expr")
-                    $elf._applyWithArgs("token", ")")
-                    return ["(", r, ")"]
-                  })
+  var $elf = this,
+      r    = this._or(function() { return $elf._apply("literal") },
+                      function() { return $elf._apply("identifier") },
+                      function() { return $elf._apply("arrayLit") },
+                      function() { return $elf._apply("arrayConstr") },
+                      function() { return $elf._applyWithArgs("block", true) },
+                      function() {
+                        $elf._applyWithArgs("token", "(")
+                        var r = $elf._apply("expr")
+                        $elf._applyWithArgs("token", ")")
+                        return ["(", r, ")"]
+                      })
+  return this._or(function() {
+                    $elf._applyWithArgs("exactly", ".")
+                    return ["(", r, ".", $elf._apply("tsIdentifier"), ")"]
+                  },
+                  function() { return r })
 }
 
 SqueakParser.typeTable =

@@ -92,7 +92,7 @@ Object.prototype.or                 = function(x)    { return this.asBoolean() |
 Object.prototype.ifTrueifFalse      = function(t, f) { return this.asBoolean() ? t() : f() }
 Object.prototype.ifFalseifTrue      = function(f, t) { return this.asBoolean() ? t() : f() }
 Object.prototype.ifTrue             = function(t)    { return this.asBoolean() ? t() : null }
-Object.prototype.ifFalse            = function(t)    { return this.asBoolean() ? null : f() }
+Object.prototype.ifFalse            = function(f)    { return this.asBoolean() ? null : f() }
 Function.prototype.whileTrue        = function(f)    { while (this().asBoolean())  f(); return null }
 Function.prototype.whileFalse       = function(f)    { while (this().not()) f(); return null }
 
@@ -158,14 +158,16 @@ Number.prototype["//"]   = function(that) { return Math.floor(this / that) }
 Number.prototype["\\"]   = function(that) { return this %   that }
 Number.prototype.negated = function()     { return -this }
 
-String.prototype[","]  = function(that) { return this +   that }
-Object.prototype["<"]  = function(that) { return this <   that }
-Object.prototype["<="] = function(that) { return this <=  that }
-Object.prototype["="]  = function(that) { return this ==  that }
-Object.prototype[">="] = function(that) { return this >=  that }
-Object.prototype[">"]  = function(that) { return this >   that }
-Object.prototype["~="] = function(that) { return this !=  that }
-Object.prototype["=="] = function(that) { return this === that }
+Array.prototype[","]     = function(that) { return this.concat(that) }
+
+String.prototype[","]    = function(that) { return this +   that }
+Object.prototype["<"]    = function(that) { return this <   that }
+Object.prototype["<="]   = function(that) { return this <=  that }
+Object.prototype["="]    = function(that) { return this ==  that }
+Object.prototype[">="]   = function(that) { return this >=  that }
+Object.prototype[">"]    = function(that) { return this >   that }
+Object.prototype["~="]   = function(that) { return this !=  that }
+Object.prototype["=="]   = function(that) { return this === that }
 
 Object.prototype.sendUnaryMessage  = function(m) { return this[m].call(this) }
 Object.prototype.sendBinaryMessage = function(m) { return this[m].call(this, arguments[1]) }

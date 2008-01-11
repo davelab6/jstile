@@ -27,15 +27,15 @@
 Parser = OMeta.delegated()
 Parser.listOf = function() {
   var $elf  = this,
-      rule  = this._apply("anything")
+      rule  = this._apply("anything"),
       delim = this._apply("anything")
   return this._or(function() {
-                    var r = $elf._many(function() {
-                                         $elf._applyWithArgs("token", delim)
-                                         return $elf._apply(rule)
-                                       },
-                                       $elf._apply(rule))
-                    return r
+                    var r = $elf._apply(rule)
+                    return $elf._many(function() {
+                                        $elf._applyWithArgs("token", delim)
+                                        return $elf._apply(rule)
+                                      },
+                                      r)
                   },
                   function() { return [] })
 }
@@ -43,5 +43,19 @@ Parser.token = function() {
   var cs = this._apply("anything")
   this._apply("spaces")
   return this._applyWithArgs("seq", cs)
+}
+Parser.parse = function() {
+  var rule = this._apply("anything"),
+      ans  = this._apply(rule)
+  this._apply("end")
+  return ans
+}
+Parser.parsewith = function(text, rule) {
+  try { return this.matchAllwith(text, rule) }
+  catch (e) {
+    if (e instanceof Fail)
+      e.failPos = e.matcher.input.realPos() - 1
+    throw e
+  }
 }
 

@@ -1,0 +1,698 @@
+<!--
+  Copyright (c) 2007 Alessandro Warth <awarth@cs.ucla.edu>
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation
+  files (the "Software"), to deal in the Software without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the
+  Software is furnished to do so, subject to the following
+  conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  OTHER DEALINGS IN THE SOFTWARE.
+!-->
+
+<html>
+  <head>
+    <title>Source-to-Source JavaScript Compiler in OMeta/JS</title>
+    <script src="lib.js"></script>
+    <script src="ometa-base.js"></script>
+    <script src="parser.js"></script>
+    <script src="squeak-parser.js"></script>
+    <script src="squeak-lib.js"></script>
+    <script src="ometa-parser.js"></script>
+    <script>
+
+// *****************************************************************************
+// *** The code below was adapted from Takashi Yamamiya's Javascript Workspace,
+// *** http://metatoys.org/propella/js/workspace.js
+
+/* event handler for short cut key */
+function onShortCutKey(evt)
+{
+  evt = (evt) ? evt : window.event;
+  if (!evt) return;
+  var charCode = (evt.charCode) ? evt.charCode : evt.keyCode;
+  if (!(evt.altKey || evt.ctrlKey || evt.metaKey)) {
+    return true;
+  }
+  if (charCode == 68)
+    doIt();
+  else if (charCode == 80)
+    printIt();
+  else
+    return true
+  if (evt.preventDefault) {
+    evt.preventDefault()
+    evt.stopPropagation()
+  }
+  else {
+    evt.returnValue = false
+    evt.cancelBubble = true
+  }
+  return false;
+}
+
+function printIt() {
+  var result
+  try { result =  evalSelection() }
+  catch (e) { return }
+  var editor = result.source.editor;
+  var end = result.source.end;
+  var head = editor.value.substring(0, end);
+  var tail = editor.value.substring(end);
+  var oldScrollTop = editor.scrollTop
+  editor.value = head + result.result + tail;
+  editor.scrollTop = oldScrollTop
+  setCaretSelection(editor, end, head.length + result.result.length);
+}
+
+function doIt() {
+  var result
+  try { result = evalSelection() }
+  catch (e) { return }
+  result.source.editor.focus();
+}
+
+/* Get selection of textarea */
+function getCaretSelection(field) {
+    field.focus();
+    var result = {start: 0, end: 0};
+    // IE support based on http://groups.drupal.org/node/1210
+    if(typeof workspace.selectionEnd == "undefined") {
+        var range = document.selection.createRange();
+        var rangeCopy = range.duplicate();
+        rangeCopy.moveToElementText(field);
+        rangeCopy.setEndPoint( 'EndToEnd', range );
+        result.start = rangeCopy.text.length - range.text.length;
+        result.end = result.start + range.text.length;
+    } else {
+        result.start = field.selectionStart;
+        result.end = field.selectionEnd;
+    }
+    return result;
+}
+
+/* Set selection of textarea */
+function setCaretSelection(field, start, end) {
+    field.focus();
+    // IE
+    if(typeof workspace.selectionEnd == "undefined") {
+        var range = field.createTextRange()
+        range.expand("textedit");
+        var dStart = start - (field.value.substring(0, start).split("\n").length - 1);
+        var dEnd = end - field.value.length + field.value.substring(end + 1).split("\n").length - 1
+        range.moveStart("character", dStart)
+        range.moveEnd("character", dEnd)
+        range.select();
+    } else {
+        field.selectionStart = start;
+        field.selectionEnd = end;
+    }
+}
+
+/* Get expression from textarea */
+function getSource() {
+  var editor = workspace;
+  var selection = getCaretSelection(editor);
+  var start = selection.start;
+  var end = selection.end;
+  var text = editor.value.substring(start, end);
+  if (start == end) {
+    var alltext = editor.value;
+    var index = 0;
+    if (start > 0 && alltext.charAt(start) == "\n")
+      start--
+    while (start > 0 && alltext.charAt(start) != "\n")
+      start--
+    while (end < alltext.length && alltext.charAt(end) != "\r" && alltext.charAt(end) != "\n")
+      end++
+    if (end == alltext.length)
+      end--
+    text = alltext.substring(start, end);
+    setCaretSelection(editor, start, end);
+  }
+
+  var source = {
+    editor: editor,
+    start: start,
+    end: end,
+    text: text
+  };
+  return source;
+}
+
+function ParseError() { }
+
+function evalSelection() {
+  var source = getSource();
+  var result;
+  try {
+    try { form.translation.value = OMetaSqueakParser.translate(source.text) }
+    catch (e) {
+      if (e instanceof Fail) {
+        var failPos      = source.start + e.matcher.input.realPos() - 1,
+            errorMsg     = " Parse error ->",
+            oldScrollTop = form.source.scrollTop
+        form.source.value = form.source.value.substring(0, failPos) + errorMsg +
+                            form.source.value.substring(failPos, form.source.value.length)
+        form.source.scrollTop = oldScrollTop
+        setCaretSelection(form.source, failPos, failPos + errorMsg.length)
+        e = new ParseError()
+      }
+      throw e
+    }
+    result = eval(form.translation.value)
+  }
+  catch (e) {
+    if (!(e instanceof ParseError)) {
+      if (e instanceof Fail)
+        alert(e)
+      else
+        alert("uncaught exception: " + e)
+    }
+    throw e
+  }
+  result = [" ", printString(result)].squish().join('')
+  
+  resultObject = {
+    source: source,
+    result: result
+  };
+  return resultObject;
+}
+
+// *** End of JavaScript Workspace code.
+// *****************************************************************************
+
+
+/*
+JS SUCKS: can't make an object that pretends to be a function - they are not 1st class objects (implementations)
+ 
+  x = new Object()
+  x.apply = function($elf, args) { return args[0] + 1 }
+  x.call = function($elf, arg1) { return arg1 + 10 }
+  alert(x(5))
+
+  x = (function(arg1) { return arg1 + 1 }).delegated()
+  alert(x)
+  alert(x(100))
+*/
+
+Transcript = {
+  show:  function(x) {
+           form.transcript.value     = [form.transcript.value, x.asString()].join('')
+           form.transcript.scrollTop = form.transcript.scrollHeight
+           return null
+          },
+  cr:    function()  {
+           form.transcript.value     = [form.transcript.value, "\n"].join('')
+           form.transcript.scrollTop = form.transcript.scrollHeight
+           return null
+         },
+  clear: function()  {
+           form.transcript.value = ""
+           return null
+         }
+}
+
+Object.msleep = function(ms) {
+  var now      = new Date()
+      stopTime = new Date(now.getTime() + ms)
+  while (new Date() < stopTime)
+    ;
+  return null
+}
+
+eval(OMetaParser.matchAllwith(
+  "ometa OMetaSqueakParser : Parser {                                                                              \
+     topLevelExpr  ::= <foreign OMetaParser  #grammar>                                                             \
+                     | <foreign SqueakParser #expr>.                                                               \
+     topLevelExprs ::= <listOf #topLevelExpr '.'>:r (<token '.'> | <empty>) <spaces> <end> => [r delimWith: '; ']. \
+     iTranslate    ::= <topLevelExprs>:r                                                   => [r squish join: '']. \
+   }                                                                                                               ",
+  "grammar").squish().join(''))
+OMetaSqueakParser.translate = function(s) { return this.matchAllwith(s, "iTranslate") }
+OMetaSqueakParser.eval      = function(s) { return eval(this.translate(s)) }
+
+function autoexec() {
+  OMetaSqueakParser.eval(
+    "ometa MDefSqueakParser : SqueakParser {                                                       \
+       unaryMsgPat       ::= <identifier>:m                        => [{{$'. m. $'}. {}}].         \
+       binaryMsgPat      ::= <binary>:m  <identifier>:a            => [{m squish join: ''. {a}}].  \
+       keywordMsgPatPart ::= <keyword>:k <identifier>:a            => [{k. a}].                    \
+       keywordMsgPat     ::= <keywordMsgPatPart>+:parts                                            \
+                               ![parts collect: [:p | p at: 0]]:ks                                 \
+                               ![parts collect: [:p | p at: 1]]:as                                 \
+                               ![ks squish join: '']:ks            => [{{$'. ks escape. $'}. as}]. \
+       msgPat            ::= <keywordMsgPat>                                                       \
+                           | <binaryMsgPat>                                                        \
+                           | <unaryMsgPat>.                                                        \
+       methodDef         ::= <identifier>:cls <msgPat>:nameAndArgs <block false>:body              \
+                               => [cls,, '.prototype[',, (nameAndArgs at: 0),, '] = ',,            \
+                                   'function(',, ((nameAndArgs at: 1) delimWith: ', '),, ') { ',,  \
+                                     'var $elf = this; ',,                                         \
+                                     'try { (',, body,, ')() } ',,                                 \
+                                     'catch (_r) { ',,                                             \
+                                       'if (_r instanceof Return) return _r.value;',,              \
+                                       'else throw _r } return this }'].                           \
+     }.                                                                                            \
+     ometa NewSqueakParser {                                                                       \
+        expr     ::= <foreign MDefSqueakParser #methodDef>                                         \
+                   | <foreign MDefSqueakParser #expr>.                                             \
+        unit     ::= <foreign MDefSqueakParser #unit>.                                             \
+        tsString ::= <foreign MDefSqueakParser #unit>.                                             \
+     }.                                                                                            \
+     SqueakParser := NewSqueakParser.                                                              ")
+}
+
+function toggleVisible(id) {
+  var style = document.getElementById(id).style
+  if (style.display == "none") {
+    style.display = "block"
+    return "hide"
+  }
+  else {
+    style.display = "none"
+    return "show"
+  }
+}
+
+/*
+   JS SUCKS: Unfortunately, functions are not quite 1st class objects in "real" JS implementations.
+   This makes function proxies, like f below, not work:
+
+    f = (function(x) { return x + 1 }).delegated()
+    f.printString = function() { return "[:x | x + 1]" }
+*/
+
+    </script>
+  </head>
+  <body onLoad="form = document.getElementById('myForm'); workspace = form.source; workspace.onkeydown = onShortCutKey; autoexec()">
+    <table border=0><tr><td><h2><a href=index.html style="text-decoration: none; color: black">Source-to-Source JavaScript Compiler</a> in OMeta/JS</h2></td></tr></table>
+<!--
+    <b><u>Instructions</u>:</b> the text area below (<b>source</b>) works just like a Smalltalk workspace.
+    To evaluate some code, just select it and press the "do it" button.
+    "Print it" is like "do it", but it also prints the result by sending it the <tt>printString</tt> message.
+    <br><br>
+-->
+    This page "autoexecs" the example from the <a href=index.html>OMeta/JS demo page</a> that adds support for method declarations
+    to the <tt>SqueakParser</tt>, then defines a multi-stage OMeta/JS compiler.
+    To make it go, select all of the code below and press the "do it" button, then try the examples at the end of the page.
+    <br><br>
+    <form id=myForm>
+<!--
+      <b>Source</b><br>
+-->
+      <textarea cols=132 rows=40 name=source>
+Object isString [^false].
+String isString [^true].
+
+ometa JSParser : Parser {
+  fromTo :x :y ::= <seq x> (~<seq y> <char>)* <seq y>. 
+  space        ::= <super #space> | <fromTo '//' '\n'> | <fromTo '/*' '*/'>.
+  nameFirst    ::= <letter>        | '$' | '_'.
+  nameRest     ::= <letterOrDigit> | '$' | '_'.
+  iName        ::= <firstAndRest #nameFirst #nameRest>:r                                           => [r join: ''].
+  name         ::= <iName>:n ?[(self isKeyword: n) not]                                            => [{#name. n}].
+  keyword      ::= <iName>:k ?[self isKeyword: k]                                                  => [{k. k}].
+  number       ::= <digit>+:ds                                                                     => [{#number. parseInt value: (ds join: '')}].
+  escapeChar   ::= '\\' <char>:c                                                                   => ['\\', c].
+  str          ::= "'" (<escapeChar> | ~"'" <char>)*:cs "'"                                        => [{#string. cs join: ''}]
+                 | '"' (<escapeChar> | ~'"' <char>)*:cs '"'                                        => [{#string. cs join: ''}].
+  special      ::= ( "("   | ")"   | "{"   | "}"   | "["  | "]"  | "," | ";"  | "?" | ":"
+                   | "!==" | "!="  | "===" | "=="  | "="  | ">=" | ">" | "<=" | "<" | "++"
+                   | "+="  | "+"   | "--"  | "-="  | "-"  | "*=" | "*" | "/=" | "/" | "%="
+                   | "%"   | "&&=" | "&&"  | "||=" | "||" | "."  | "!"                    ):s      => [{s. s}].
+  tok          ::= <spaces> (<name> | <keyword> | <number> | <str> | <special>).
+  toks         ::= <token>*:ts <spaces> <end>                                                      => [ts].
+  token :tt    ::= <tok>:t ?[(t at: 0) = tt]                                                       => [t at: 1].
+  spacesNoNl   ::= (~'\n' <space>)*.
+
+  expr         ::= <orExpr>:e ( <token '?'>   <expr>:t <token ':'> <expr>:f                        => [{#condExpr. e. t. f}]
+                              | <token '='>   <expr>:rhs                                           => [{#set.  e. rhs}]
+                              | <token '+='>  <expr>:rhs                                           => [{#mset. e. #+.    rhs}]
+                              | <token '-='>  <expr>:rhs                                           => [{#mset. e. #-.    rhs}]
+                              | <token '*='>  <expr>:rhs                                           => [{#mset. e. #*.    rhs}]
+                              | <token '/='>  <expr>:rhs                                           => [{#mset. e. #/.    rhs}]
+                              | <token '%='>  <expr>:rhs                                           => [{#mset. e. #%.    rhs}]
+                              | <token '&&='> <expr>:rhs                                           => [{#mset. e. #&&.   rhs}]
+                              | <token '||='> <expr>:rhs                                           => [{#mset. e. #'||'. rhs}]
+                              | <empty>                                                            => [e]
+                              ).
+  orExpr       ::= <orExpr>:x <token '||'> <andExpr>:y                                             => [{#binop. #'||'. x. y}]
+                 | <andExpr>.
+  andExpr      ::= <andExpr>:x <token '&&'> <eqExpr>:y                                             => [{#binop. #&&. x. y}]
+                 | <eqExpr>.
+  eqExpr       ::= <eqExpr>:x ( <token '=='>  <relExpr>:y                                          => [{#binop. #==.  x. y}]
+                              | <token '!='>  <relExpr>:y                                          => [{#binop. #!=.  x. y}]
+                              | <token '==='> <relExpr>:y                                          => [{#binop. #===. x. y}]
+                              | <token '!=='> <relExpr>:y                                          => [{#binop. #!==. x. y}]
+                              )
+                 | <relExpr>.
+  relExpr      ::= <relExpr>:x ( <token '>'>          <addExpr>:y                                  => [{#binop. #>.  x. y}]
+                               | <token '>='>         <addExpr>:y                                  => [{#binop. #>=. x. y}]
+                               | <token '<'>          <addExpr>:y                                  => [{#binop. #<.  x. y}]
+                               | <token '<='>         <addExpr>:y                                  => [{#binop. #>=. x. y}]
+                               | <token 'instanceof'> <addExpr>:y                                  => [{#binop. #instanceof. x. y}]
+                               )
+                 | <addExpr>.
+  addExpr      ::= <addExpr>:x <token '+'> <mulExpr>:y                                             => [{#binop. #+. x. y}]
+                 | <addExpr>:x <token '-'> <mulExpr>:y                                             => [{#binop. #-. x. y}]
+                 | <mulExpr>.
+  mulExpr      ::= <mulExpr>:x <token '*'> <mulExpr>:y                                             => [{#binop. #*. x. y}]
+                 | <mulExpr>:x <token '/'> <mulExpr>:y                                             => [{#binop. #/. x. y}]
+                 | <mulExpr>:x <token '%'> <mulExpr>:y                                             => [{#binop. #%. x. y}]
+                 | <unary>.
+  unary        ::= <token '-'>  <postfix>:p                                                        => [{#unop.  #-.   p}]
+                 | <token '+'>  <postfix>:p                                                        => [p]
+                 | <token '++'> <postfix>:p                                                        => [{#preop. #++.  p}]
+                 | <token '--'> <postfix>:p                                                        => [{#preop. #--.  p}]
+                 | <token '!'>  <postfix>:p                                                        => [{#unop.  #!.   p}]
+                 | <postfix>.
+  postfix      ::= <primExpr>:p ( <spacesNoNl> <token '++'>                                        => [{#postop. #++. p}]
+                                | <spacesNoNl> <token '--'>                                        => [{#postop. #--. p}]
+                                | <empty>                                                          => [p]
+                                ).
+  primExpr     ::= <primExpr>:p
+                     ( <token '['> <expr>:i <token ']'>                                            => [{#get.  i. p}]
+                     | <token '.'> <token #name>:m <token '('> <listOf #expr ','>:as <token ')'>   => [{#send. m. p} concat: as]
+                     | <token '.'> <token #name>:f                                                 => [{#get.  {#string. f}. p}]
+                     | <token '('> <listOf #expr ','>:as <token ')'>                               => [{#call. p} concat: as]
+                     )
+                 | <primExprHd>.
+  primExprHd   ::= <token '('> <expr>:e <token ')'>                                                => [e]
+                 | <token 'this'>                                                                  => [{#this}]
+                 | <token #name>:n                                                                 => [{#get. n}]
+                 | <token #number>:n                                                               => [{#number. n}]
+                 | <token #string>:s                                                               => [{#string. s}]
+                 | <token 'function'> <funcRest>
+                 | <token 'new'> <token #name>:n <token '('> <listOf #expr ','>:as <token ')'>     => [{#new. n} concat: as]
+                 | <token '['> <listOf #expr ','>:es <token ']'>                                   => [{#arr} concat: es]
+                 | <json>.
+  json         ::= <token '{'> <listOf #jsonBinding ','>:bs <token '}'>                            => [{#json} concat: bs].
+  jsonBinding  ::= <jsonPropName>:n <token ':'> <expr>:v                                           => [{#binding. n. v}].
+  jsonPropName ::= <token #name> | <token #number> | <token #string>.
+  formal       ::= <spaces> <token #name>.
+  funcRest     ::= <token '('> <listOf #formal ','>:fs <token ')'>
+                     <token '{'> <srcElems>:body <token '}'>                                       => [{#func. fs. body}].
+  sc           ::= <spacesNoNl> ('\n' | &'}' | <end>)
+                 | <token ';'>.
+  binding      ::= <token #name>:n ( <token '='> <expr>
+                                    | <empty> => [{#get. 'undefined'}] ):v                         => [{#var. n. v}].
+  block        ::= <token '{'> <srcElems>:ss <token '}'>                                           => [ss].
+  stmt         ::= <block>
+                 | <token 'var'> <listOf #binding ','>:bs <sc>                                     => [{#begin} concat: bs]
+                 | <token 'if'> <token '('> <expr>:c <token ')'> <stmt>:t
+                     ( <token 'else'> <stmt>
+                     | <empty> => [{#get. 'undefined'}] ):f                                        => [{#if. c. t. f}]
+                 | <token 'while'> <token '('> <expr>:c <token ')'> <stmt>:s                       => [{#while.   c. s}]
+                 | <token 'do'> <stmt>:s <token 'while'> <token '('> <expr>:c <token ')'> <sc>     => [{#doWhile. s. c}]
+                 | <token 'for'> <token '('> ( <token 'var'> <binding>
+                                             | <expr>
+                                             | <empty> => [{#get. 'undefined'}] ):i
+                                 <token ';'> ( <expr>
+                                             | <empty> => [{#get. 'true'}]      ):c
+                                 <token ';'> ( <expr>
+                                             | <empty> => [{#get. 'undefined'}] ):u
+                                 <token ')'>
+                       <stmt>:s                                                                    => [{#for. i. c. u. s}]
+                 | <token 'for'> <token '('> ( <token 'var'> <token #name>:n
+                                                            => [{#var. n. {#get. 'undefined'}}]
+                                            | <expr>                                            ):v
+                                <token 'in'> <expr>:e
+                                <token ')'>
+                       <stmt>:s                                                                    => [{#forIn. v. e. s}]
+                 | <token 'switch'> <token '('> <expr>:e <token ')'> <token '{'>
+                     ( <token 'case'> <expr>:c <token ':'> <srcElems>:cs => [{#case. c. cs}]
+                     | <token 'default'> <token ':'> <srcElems>:cs       => [{#default. cs}] )*:cs
+                     <token '}'>                                                                   => [{#switch. e} concat: cs]
+                 | <token 'break'> <sc>                                                            => [{#break}]
+                 | <token 'continue'> <sc>                                                         => [{#continue}]
+                 | <token 'throw'> <spacesNoNl> <expr>:e <sc>                                      => [{#throw. e}]
+                 | <token 'try'> <block>:t
+                     <token 'catch'> <token '('> <token #name>:e <token ')'> <block>:c
+                     ( <token 'finally'> <block>
+                     | <empty> => [{#get. 'undefined'}] ):f                                        => [{#try. t. e. c. f}]
+                 | <token 'return'> ( <expr>
+                                    | <empty> => [{#get. 'undefined'}] ):e <sc>                    => [{#return. e}]
+                 | <expr>:e <sc>                                                                   => [e].
+  srcElem      ::= <token 'function'> <token 'name'>:n <funcRest>:f                                => [{#var. n. f}]
+                 | <stmt>.
+  srcElems     ::= <srcElem>*:ss                                                                   => [{#begin} concat: ss].
+  iParse       ::= <srcElems>:r <spaces> <end>                                                     => [r].
+}.
+JSParser at: #keywords put: Object new.
+keywords := #(break case catch continue default delete do else finally for function if in
+              instanceof new return switch this throw try typeof var void while with).
+keywords do: [:k |
+  (JSParser at: #keywords) at: k put: true
+].
+JSParser isKeyword: k [^ (self at: #keywords) hasProperty: k].
+JSParser parse: aString [
+  ^ [self matchAll: aString with: #iParse] on: Fail do: [:f | f realPos]
+].
+
+ometa Translator {
+  trans    {:t ?[self hasProperty: t] <apply t>:ans} => [ans].
+}.
+
+ometa JSTranslator : Translator {
+  curlyTrans ::= {#begin <curlyTrans>:r} => [r]
+               | {#begin <trans>*:rs}    => ['{', (rs join: ';'), '}']
+               | <trans>:r               => ['{', r, '}'].
+
+  this                                                        => ['this'].
+  break                                                       => ['break'].
+  continue                                                    => ['continue'].
+  number   :n                                                 => ['', n].
+  string   :s                                                 => [s printString].
+  arr      <trans>*:xs                                        => ['[', (xs join: ','), ']'].
+  unop     :op <trans>:x                                      => ['(', op, x, ')'].
+  get      <trans>:fd <trans>:x                               => [x, '[', fd, ']'];
+  get      :x                                                 => [x].
+  set      <trans>:lhs <trans>:rhs                            => [lhs, '=', rhs].
+  mset     <trans>:lhs :op <trans>:rhs                        => [lhs, op, '=', rhs].
+  binop    :op <trans>:x <trans>:y                            => ['(', x, op, y, ')'].
+  preop    :op <trans>:x                                      => [op, x].
+  postop   :op <trans>:x                                      => [x, op].
+  return   <trans>:x                                          => ['return ', x].
+  if       <trans>:cond <curlyTrans>:t <curlyTrans>:e         => ['if (', cond, ') ', t, ' else ', e].
+  condExpr <trans>:cond <trans>:t <trans>:e                   => [cond, '?', t, ':', e].
+  while    <trans>:cond <curlyTrans>:body                     => ['while (', cond, ') ', body].
+  doWhile  <curlyTrans>:body <trans>:cond                     => ['do ', body, ' while (', cond, ')'].
+  for      <trans>:init <trans>:cond <trans>:upd
+           <curlyTrans>:body                                  => ['for (', init, ';', cond, ';', upd, ') ', body].
+  forIn    <trans>:x <trans>:arr <curlyTrans>:body            => ['for (', x, ' in ', arr, ') ', body].
+  begin    <trans>:x <end>                                    => [x];
+  begin    <trans>*:xs                                        => ['{', (xs join: ';'), '}'].
+  func     :args <curlyTrans>:body                            => ['(function (', (args join: ','), ') ', body, ')'].
+  call     <trans>:fn <trans>*:args                           => [fn, '(', (args join: ','), ')'].
+  send     :msg <trans>:recv <trans>*:args                    => [recv, '.', msg, '(', (args join: ','), ')'].
+  new      :cls <trans>*:args                                 => ['new ', cls, '(', (args join: ','), ')'].
+  var      :name <trans>:val                                  => ['var ', name, '=', val].
+  throw    <trans>:x                                          => ['throw ', x].
+  try      <curlyTrans>:x :name <curlyTrans>:c <curlyTrans>:f => ['try ', x, ' catch (', name, ') ', c, ' finally ', f].
+  json     <trans>*:props                                     => ['({', (props join: ','), '})'].
+  binding  :name <trans>:val                                  => [name printString, ': ', val].
+  switch   <trans>:x <trans>*:cases                           => ['switch (', x, ') {', (cases join: '; '), '}'].
+  case     <trans>:x <trans>:y                                => ['case ', x, ': ', y].
+}.
+
+input := '1 + 2 3'.
+[JSParser parse: input with: #iParse] on: Fail do: [:f |
+  (input substring: 0 : f.failPos), ' Parse error ->', (input substring: f.failPos)
+].
+
+ometa SpecialTranslator : Translator {
+  trans ::= :x ?[x isArray not]                             => [x]
+          | <super #trans>
+          | {:x <trans>*:xs}                                => [xs addFirst: x; yourself].
+}.
+
+Object isArray [^false].
+Array  isArray [^true].
+Array  includes: x [
+  self do: [:y | x = y ifTrue: [^true]].
+  ^false
+].
+ometa LocalFinder : SpecialTranslator {
+  go    ::= ![self at: #locals put: {}] <start> => [self.locals].
+  start ::= {#func :fs <trans>}
+          | <trans>.
+
+  var  :name :val                                           => [(self.locals includes: name) ifFalse: [self.locals add: name]].
+  func :fs :b.
+}.
+
+ast := JSParser matchAll: 'function() { if (foo > bar) { var x, y; } else { var w } return function() { var z } }' with: #iParse.
+ast := ast at: 1.
+LocalFinder match: ast with: #go.
+
+gensym := [
+  | n |
+  n := 0.
+  ['$$gensym$$', (n := n + 1) asString]
+] value.
+
+
+ometa LocalRenamer : SpecialTranslator {
+  init :m        ::= &<foreign LocalFinder #go>:locals
+                       ![self at: #locals put: locals;
+                              at: #map    put: m]
+                       ![locals do: [:l |
+                           self.map at: l
+                                    put: gensym value]].
+  go :m <init m> ::= {#func :fs <trans>:body}            => [{#func. fs. body}]
+                   | <trans>.
+  transName :n   ::= ?[self.map hasOwnProperty: n]       => [self.map at: n]
+                   |                                     => [n].
+
+  var  <transName>:n <trans>:v                           => [{#var. n. v}].
+  get  <trans>:fd <trans>:obj                            => [{#get. fd. obj}];
+  get  <transName>:n                                     => [n isString
+                                                               ifTrue:  [{#get. n}]
+                                                               ifFalse: [n]].
+  func :fs :b
+    <foreign LocalFinder #go b>:ls
+    ![self newStateWithLocals: ls fields: fs]:old
+    <trans b>:b
+    ![self at: #locals put: (old at: 0);
+           at: #map    put: (old at: 1)]                 => [{#func. fs. b}].
+}.
+LocalRenamer newStateWithLocals: ls fields: fs [
+  | old |
+  old := {self.locals. self.map}.
+  self at: #locals put: {};
+       at: #map    put: Object new.
+  (old at: 0) do: [:l |
+    ((ls includes: l) or: [fs includes: l])
+      ifFalse: [
+        self.map at: l put: ((old at: 1) at: l).
+        self.locals add: l.
+      ]
+  ].
+  ^old
+].
+
+ast := JSParser parse: 'function(x, y) { var z; return function(y) { y+z} }' with: #iParse.
+LocalRenamer match: (ast at: 1) with: #go : Object new.
+
+ometa MJSParser : JSParser {
+  name     ::= '@' <iName>:n                                                    => [{#mname. n}]
+             | <super #name>.
+  sc       ::= <spacesNoNl> &(')' | ',')
+             | <super #sc>.
+  primExpr ::= <token #mname>:n <token '('> <listOf #stmt ','>:args <token ')'> => [{#expand. n} concat: args]
+             | <super #primExpr>.
+  topLevel ::= <srcElem>
+             | <token 'macro'> <token #mname>:n
+                 <token '('> <listOf #formal ','>:fs <token ')'> <block>:body   => [macros at:  n
+                                                                                           put: (Object new
+                                                                                                   at: #formals put: fs;
+                                                                                                   at: #body    put: body;
+                                                                                                   yourself).
+                                                                                    {#macro. n. fs. body}].
+  iParse   ::= <topLevel>:t   <spaces> <end>                                    => [t]
+             | <topLevel>*:ts <spaces> <end>                                    => [{#begin} concat: ts].
+}.
+MJSParser at: #keywords put: JSParser.keywords delegated.
+MJSParser.keywords at: #macro put: true.
+macros := Object new.
+
+ometa MacroExpander : SpecialTranslator {
+  expand :n <trans>*:args
+    ![macros at: n]:m
+    <foreign LocalRenamer #go (Object new) m.body>:r
+    <foreign LocalRenamer #go (self mapForFormals: m.formals actuals: args) r>.
+}.
+MacroExpander mapForFormals: fs actuals: as [
+  | m |
+  m := Object new.
+  0 to: fs size - 1 do: [:idx | m at: (fs at: idx) put: (as at: idx)].
+  ^ m
+].
+
+ometa MJSTranslator : JSTranslator {
+  transWithoutMacros ::= ![self at:  #delMacros
+                                put: true]
+                         <trans>.
+
+  macro :n :fs ( ?[self.delMacros] :body => ['']
+               | <trans>:body            => ['macro @', n, '(', (fs join: ','), '){', body, '}']
+               ).
+  expand :n <trans>*:args   => ['@', n, '(', (args join: ','), ')'].
+}.
+MJSTranslator at: #delMacros put: false.
+
+mjsEval := [:code |
+  | tmp |
+  tmp := MJSParser parse: code with: #iParse.
+  tmp := MacroExpander match: tmp with: #trans.
+  tmp := MJSTranslator match: tmp with: #transWithoutMacros.
+  eval value: tmp
+].
+
+mjsEval value: '
+  macro @repeat(k, s) {
+    var n = k
+    while (n--)
+      s
+  }
+
+  var x = 0
+  @repeat(5, x++)
+  alert(x)
+'
+
+      </textarea><br>
+      <input type=button value="print it (ctrl+p)" onClick="printIt()">
+      <input type=button value="do it (ctrl+d)" onClick="doIt()">
+      <br><br>
+      <b>Translation</b>
+      <input type=button value="show/hide" onClick="this.value = toggleVisible('translation')">
+      <br>
+      <div id=translation style="{display: none}">
+        <textarea cols=132 rows=4 name=translation></textarea>
+      </div>
+      <b>Transcript</b>
+      <input type=button value="show/hide" onClick="this.value = toggleVisible('transcript')">
+      <br>
+      <div id=transcript style="{display: block}">
+        <textarea cols=132 rows=4 name=transcript></textarea>
+      </div>
+    </form>
+    <div id=playArea></div>
+<!--
+<b><u>Note</u>:</b> I have tested OMeta/JS on Firefox 2.0.0.9, Safari 3.0.4, and IE 7.0.5730.11.
+Please e-mail me if it doesn't work for you (don't forget to let me know what browser you are using).<br><br>
+<b><u>Known quirks</u>:</b><br>
+<bl>
+  <li>On Safari, ctrl+p and ctrl+d don't work.</li>
+  <li>On IE, ctrl+p works, but also makes a print dialog pop up.
+  <li>On IE, the canvas examples don't work.</li>
+</bl><br>
+-->
+<!--
+<bl>
+  <li>
+-->
+<!--
+  </li>
+</bl>
+To learn more about OMeta, click <a href=..>here</a>.<br>
+-->
+  </body>
+</html>
+
