@@ -20,15 +20,15 @@ todo done: 一番根元のタイルの操作でエラーが出る。
 todo done: 数値の文字にドラッグ時色が変わるように
 todo done: 数値と文字別々のエディタ
 todo done: watcher 文字と数字以外は編集不能に
+todo done: textarea blur 時に大きさチェック
 
 todo: scrable
 
-todo: textarea blur 時に大きさチェック
+todo: 出力に json を使う。
 todo: enter で watcher 入力
 todo: 関数名をドラッグできないようにする。
 todo: パーツビン
 todo: 加速度
-todo: 虚数
 todo: 乱数発生器プロットする。
 todo: 複素数の掛け算。
 
