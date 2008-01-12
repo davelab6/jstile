@@ -36,7 +36,7 @@ DocPosition.prototype = {
 
   initialize: function(newTitle, newDivition) {
     this.title = newTitle;
-    this.division = newDivition || 0;
+    this.division = parseInt(newDivition) || 0;
   },
   hash: function() {
     if (this.division) {

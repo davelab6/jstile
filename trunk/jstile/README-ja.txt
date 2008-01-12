@@ -1,8 +1,11 @@
 tilescript の実験
 
-goal: world の中を worm が動く
-goal: worm が タートルグラフィックの動きが出来る。
-goal: ビューワ
+(find-file "~/doc/presentation/c5-2008/")
+
+todo: begin に挿入できる
+todo: タートルグラフィックス
+todo: enter で watcher 入力
+todo: 加速度
 
 todo done: toggle を綺麗に。
 todo done: 削除
@@ -28,10 +31,6 @@ todo done: scrable
 todo done: ドラッグ後の watcher 広く
 todo pending: パーツビン
 todo done: 乱数発生器プロットする。
-
-todo: enter で watcher 入力
-
-todo: 加速度
 
 note: ローカルで日本語保存不可能。
 
