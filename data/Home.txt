@@ -1,6 +1,5 @@
 ["tilescript",
 ["html", "<p><b><a href=\"#TileScript\">TileScript</a></b> is an interactive playfield for playing with Javascript language.</p>"],
-["html", "<ul>\n<li><a href=\"#SandBox\">SandBox</a></li>\n<li><a href=\"#Object\">Object</a></li>\n<li><a href=\"#Script\">Script</a></li>\n<li><a href=\"#examples\">examples</a></li>\n<li><a href=\"#FCConverter\">FCConverter</a></li>\n<li><a href=\"#About-ja\">About-ja</a></li>\n<li><a href=\"#Random\">Random</a></li>\n<li><a href=\"#Canvas\">Canvas</a></li>\n<li><a href=\"#Scribble\">Scribble</a></li>\n<li><a href=\"#ComplexNumber\">ComplexNumber</a></li>\n<li><a href=\"#repeat\">repeat</a></li>\n<li><a href=\"#map\">map</a></li>\n<ul>"],
-["source", "(3+4)"],
-["source", "C = (F - 32) / 1.8; undefined"]
+["html", "<h2>Visit at first</h2>\n<ul>\n<li><a href=\"#Tutorial\">Tutorial</a></li>\n<li><a href=\"#SandBox\">SandBox</a></li>\n</ul>\n<h2>Examples</h2>\n<ul>\n<li><a href=\"#Object\">Object</a></li>\n<li><a href=\"#Script\">Script</a></li>\n<li><a href=\"#examples\">examples</a></li>\n<li><a href=\"#FCConverter\">FCConverter</a></li>\n<li><a href=\"#About-ja\">About-ja</a></li>\n<li><a href=\"#Random\">Random</a></li>\n<li><a href=\"#Canvas\">Canvas</a></li>\n<li><a href=\"#Scribble\">Scribble</a></li>\n<li><a href=\"#ComplexNumber\">ComplexNumber</a></li>\n<li><a href=\"#repeat\">repeat</a></li>\n<li><a href=\"#map\">map</a></li>\n<ul>"],
+["tile", "3 + 4 // comment"]
 ]

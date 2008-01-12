@@ -2,6 +2,7 @@ tilescript の実験
 
 (find-file "~/doc/presentation/c5-2008/")
 
+todo: 大まかな使い方のページ
 todo: begin に挿入できる
 todo: タートルグラフィックス
 todo: enter で watcher 入力
