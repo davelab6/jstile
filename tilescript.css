@@ -215,13 +215,13 @@ table.tile {
 #viewer {
     position: fixed;
     float: right;
-    border-left: 2px solid #888888;
+    border-left: 2px solid #808080;
     margin: 0px;
     width: 25%;
     top: 0px;
     right: 0px;
     height: 100%;
-    background: #f0f0f0;
+    background: #CDC9DC;
 }
 
 #viewer.viewerHide {
@@ -240,7 +240,8 @@ table.tile {
     font-size: large;
     cursor: move;
     margin: 2px;
-    border: 1px solid #888888;
+    border: 1px solid #666666;
+    background: white;
 }
 
 .watcher input {
