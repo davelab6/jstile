@@ -12,8 +12,10 @@
 ["tile", "(5*6)"],
 ["html", "<h3>Why tile is so good?</h3>\n<p align=\"center\">tile   --------------- text</p>\n<p align=\"center\">\n<img align=\"center\" src=\"data/tileAndText2.jpg\">\n</p>"],
 ["html", "<h2>Macro</h2>\n<h3>Predefined control structures</h3>\n<ul>\n<li>if {...} else {...}\n<li>for () {...}\n</ul>\n<h3>User defined control structures (prototype.js)</h3>\n<ul>\n<li>[1,2,3].each(function(v, i) { return ... })\n<li>[1,2,3].any(function(v, i) { return ... })\n</ul>\n<h3>Macro</h3>\n<ul>\n<li>@repeat(4,++x)\n<li>@map(x, x*2, [1,2,3])\n</li>\n"],
-["html", "<h2>Environment</h2>\n<h3>Our options</h3>\n<ul>\n<li>Squeak\n<li>Adobe Flash (ActionScript3)\n<li>Web Browser\n</ul>\n<h3>Why web browser?</h3>\n<ul>\n<li>Simple contents publishing\n<li>Active Essay / Literate programming\n</ul>\n"],
-["html", "<h2>Active Essay as a Curriculum</h2>"],
-["html", "<h2>How to use The Tilescript Environment</h2>"],
-["html", "<style>\nbody {\n background-image: url(data/vpri.png);\n background-position: bottom left;\n background-repeat: no-repeat;\n background-attachment: fixed;\n}\n</style>"]
+["html", "<h2>Environment</h2>\n<h3>Our options</h3>\n<ul>\n<li>Squeak\n<li>Adobe Flash (ActionScript3)\n<li>Web Browser\n</ul>\n<h3>Why web browser?</h3>\n<ul>\n<li>Simple contents publishing\n<li>Active Essay / Literate programming \n</ul>\n<p>(In etoys,\nsometimes difficult problem need\nmany complicated scriptors \nwhich almost covers verall screen).</p>"],
+["html", "<h2>Active Essay as a Curriculum</h2>\n<h3>eToys's goal</h3>\n<ul>\n<li>Concrete experiment of abstract idea like math & science\n</ul>\n<h3>TileScript's goal</h3>\n<ul>\n<li>Learning by Explaining\n<li>Active Essay = Essay + Program\n</ul>"],
+["html", "<h2>How to use The Tilescript Environment</h2>\n<p style=\"font-size: 2em; margin: 3em;\">\n<a href=\"http://tinlizzie.org/jstile/\">\nhttp://tinlizzie.org/jstile/</a>\n</p>\n(Firefox only now) <a href=\"#SandBox\">SandBox</a>"],
+["html", "<h2>Examples</h2>\n<ul>\n<li><a href=\"#Canvas\">Canvas</a>\n<li><a href=\"#Scribble\">Scribble</a>\n<li><a href=\"#FCConverter\">FCConverter</a>\n<li><a href=\"#ComplexNumber\">ComplexNumber</a>\n<li><a href=\"#Random\">Random</a>\n\n</ul>"],
+["html", "<h2>Conclusion</h2>\n<ul>\n<li>Extensible, Flexible, yet a Simple scripting language.\n<li>Bidirectional conversion between tile and text.\n<li>Simple macro to extend control structure.\n<li>Authoring environment for Active Essay.\n</ul>"],
+["html", "<img src=\"data/vpri.png\" style=\"\nposition: fixed;\nleft: 0px;\nbottom: 0px;\n\">"]
 ]
