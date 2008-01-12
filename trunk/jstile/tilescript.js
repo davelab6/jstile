@@ -194,7 +194,8 @@ Row = {
   sourceCode: function(delMacros) {
     var rowNode = this.rowNode();
     if (rowNode.viewMode == "source") {
-      return delMacros ?  rowNode.value.makeTree().makeCodeNoMacros() : rowNode.value;
+      return rowNode.value;
+      //      return delMacros ?  rowNode.value.makeTree().makeCodeNoMacros() : rowNode.value;
     } else if (rowNode.viewMode == "html") {
       return rowNode.value;
     } else {
