@@ -498,7 +498,12 @@ ometa JSTranslator : Translator {
            <curlyTrans>:body                                  => ['for (', init, ';', cond, ';', upd, ') ', body].
   forIn    <trans>:x <trans>:arr <curlyTrans>:body            => ['for (', x, ' in ', arr, ') ', body].
   begin    <trans>:x <end>                                    => [x];
-  begin    <trans>*:xs                                        => ['{', (xs join: ';'), '}'].
+  begin    (<trans>:x
+              ( ( ?[(x at: x size - 1) = '}']
+                | <end>)                      => [x]
+              |                               => [x, ';']
+              )
+           )*:xs                                              => ['{', (xs join: ''), '}'].
   func     :args <curlyTrans>:body                            => ['(function (', (args join: ','), ') ', body, ')'].
   call     <trans>:fn <trans>*:args                           => [fn, '(', (args join: ','), ')'].
   send     :msg <trans>:recv <trans>*:args                    => [recv, '.', msg, '(', (args join: ','), ')'].
