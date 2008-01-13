@@ -1,6 +1,13 @@
 ["tilescript",
 ["html", "<h2>Fahrenheit Centigrade converter</h2>"],
+["html", "<p>\nThe relationship of Fahrenheit (F) and Centigrade (C)\nis represented as this formula.\n</p>\n<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\nC = (F - 32) / 1.8\n</p>\n"],
+["html", "<h3>A simple converter with watchers</h3>"],
+["tile", "C=F=0"],
+["html", "<p>Drop here watchers of C,F to see these values.\nThen, try next formulas</p>"],
+["tile", "C=((F-32)/1.8)"],
+["tile", "F=((C*1.8)+32)"],
+["html", "<h3>A bidirectional constrain solver with events</h3>"],
 ["html", "<ul>\n<li>Fahrenheit:\n<input id=\"f\" value=\"86\" style=\"font-size: x-large\"></li>\n<li>Centigrade:\n<input id=\"c\" value=\"30\" style=\"font-size: x-large\"></li>\n</ul>"],
-["html", "<p>\nPlease push the <img src=\"exclamation.gif\"> button bellow.\nAnd edit above numbers.\n</p>"],
-["source", "$('f').onblur = function () {\n  $(\"c\").value = ($(\"f\").value - 32) / 1.8\n};\n$('c').onblur = function () {\n  $(\"f\").value = ($(\"c\").value * 1.8) + 32\n};\nundefined;"]
+["html", "<p>A HTML element can be referred a Javascript program\nwith id attribute and $() function.</p>\n<p>\nPlease push the <img src=\"exclamation.gif\"> button bellow.\nAnd edit above numbers.\n</p>"],
+["source", "$('f').onblur = function () {\n  $(\"c\").value = ($(\"f\").value - 32) / 1.8\n};\n$('c').onblur = function () {\n  $(\"f\").value = ($(\"c\").value * 1.8) + 32\n};\n"]
 ]

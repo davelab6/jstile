@@ -15,5 +15,6 @@
 ["tile", "go('NewPage')"],
 ["html", "<a href=\"#NewPage\">NewPage</a>"],
 ["html", "<p>The URL is constructed as </p>\n<p><span style=\"font-size: 1.2em; color: black\">\nhttp://somewhere/somepage#</span>\n<span style=\"font-size: 1.2em; color: red\">\nPageName</span>\n</p>\n<p>Press <img src=\"save.gif\">\nif you want to save the page (Please use <a href=\"#SandBox\">SandBox</a> at first.)</p>\n"],
-["html", "<h2>tips</h2>\n<ul>\n<li>Hit space bar / back space to go to the next / back paragraph.\n</ul>"]
+["html", "<h2>tips</h2>\n<ul>\n<li>Hit space bar / back space to go to the next / back paragraph.\n</ul>"],
+["html", "<div style=\"\nfont-weight: bold;\nposition: fixed;\nleft: 0px;\nbottom: 0px;\n\">http://tinlizzie.org/jstile/#Tutorial</div>\n"]
 ]
