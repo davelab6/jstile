@@ -1,6 +1,6 @@
 ["tilescript",
-["html", "<p>Here is a formula of multiplication of complex number.</p>\n<img src=\"data/ComplexMultiplication.png\">\n<p>- Complex number\nFrom Wikipedia, the free encyclopedia</p>"],
-["html", "<p>Assume that arrays p, q are complex numbers where</p>\n<ul>\n<li>p[0] is a real part and\n<li>p[1] is a imaginary part.\n</ul>\n<p>Let's define a multiplication operator as a program.\n</p>"],
+["html", "<p>Here is a formula of multiplication of complex number.</p>\n\n<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\n(a + bi)(c + di) = (ac - bd) + (bc + ad)i\n</p>\n"],
+["html", "<p>Assume that arrays p, q represent complex numbers where</p>\n<ul>\n<li>p[0] is a real part and\n<li>p[1] is a imaginary part.\n</ul>\n<p>Let's define the multiplication operator as a function.\n</p>"],
 ["source", "mul = function(p, q) {\n  return [p[0] * q[0] - p[1] * q[1],\n          p[1] * q[0] + p[0] * q[1]]\n}"],
 ["html", "<p>Make sure how it works.</p>"],
 ["source", "mul([1, 0], [1, 0]) // 1 * 1"],
