@@ -2,7 +2,7 @@ tilescript の実験
 
 (find-file "~/doc/presentation/c5-2008/")
 
-todo: 大まかな使い方のページ
+todo: ブラウザで埋まった画面の例。
 todo: begin に挿入できる
 todo: タートルグラフィックス
 todo: enter で watcher 入力
@@ -32,6 +32,7 @@ todo done: scrable
 todo done: ドラッグ後の watcher 広く
 todo pending: パーツビン
 todo done: 乱数発生器プロットする。
+todo done: 大まかな使い方のページ
 
 note: ローカルで日本語保存不可能。
 

@@ -84,6 +84,7 @@ DocPosition.go = function(newPosition) {
   if (this.current.title != newPosition.title) {
     if (IsDirty) {
       if (!confirm("The page was modified, do you want to discard it?")) {
+        document.location.hash = this.current.hash();
         return;
       }
     }
@@ -635,7 +636,7 @@ Array.prototype.makeTiles["macro"] = function(tile) {
   tile.addColumn(b);
   tile.addLabel("(" + this[2].join(", ") + ")");
   tile.addRow();
-  tile.addColumn(this.makeTile(3), 2);
+  tile.addColumn(this.makeTile(3), 3);
 }
 
 Array.prototype.makeTiles["var"] = function(tile) {
