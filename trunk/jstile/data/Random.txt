@@ -1,5 +1,5 @@
 ["tilescript",
-["html", "<h2>What is Pseudorandom number generator?</h2>"],
+["html", "<h2>What is Pseudo random number generator?</h2>"],
 ["html", "<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\nX <sub>n+1</sub> = (A  X<sub>n</sub> + B) mod M\n</p>\n"],
 ["html", "<p>Press <img src=\"exclamation.gif\"/>.</p>"],
 ["tile", "{X=0;A=13;B=5;M=24}"],

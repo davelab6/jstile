@@ -2,7 +2,12 @@ tilescript の実験
 
 (find-file "~/doc/presentation/c5-2008/")
 
-todo: ブラウザで埋まった画面の例。
+todo: Gabriel Fahrenheit と、Anders Celsius の写真
+todo: 複素平面を考えた人の写真
+todo: 擬似乱数を考えた人と説明
+todo: Numerical Recipes in C の作者
+
+
 todo: begin に挿入できる
 todo: タートルグラフィックス
 todo: enter で watcher 入力
@@ -33,6 +38,7 @@ todo done: ドラッグ後の watcher 広く
 todo pending: パーツビン
 todo done: 乱数発生器プロットする。
 todo done: 大まかな使い方のページ
+todo done: ブラウザで埋まった画面の例。
 
 note: ローカルで日本語保存不可能。
 
