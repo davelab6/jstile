@@ -2,11 +2,13 @@ tilescript の実験
 
 (find-file "~/doc/presentation/c5-2008/")
 
+http://centros5.pntic.mec.es/~virge133/emisora/pilares/cfk_cristina.htm
+http://en.wikipedia.org/wiki/Anders_Celsius
+
 todo: Gabriel Fahrenheit と、Anders Celsius の写真
 todo: 複素平面を考えた人の写真
 todo: 擬似乱数を考えた人と説明
 todo: Numerical Recipes in C の作者
-
 
 todo: begin に挿入できる
 todo: タートルグラフィックス
