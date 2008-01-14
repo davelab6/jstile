@@ -1,5 +1,5 @@
 ["tilescript",
-["html", "<h2>Fahrenheit Centigrade converter</h2>\n<ul>\n<li>Fahrenheit: The freezing point of water is 32 degrees, the boiling point is 212 degrees.\n<li>Centigrade: The freezing point of water is 0 degrees, the boiling point is 100 degrees.\n</ul>\n<p>\nThe relationship of Fahrenheit (F) and Centigrade (C)\nis represented as this formula.\n</p>\n<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\nC = (F - 32) / 1.8\n</p>\n"],
+["html", "<h2>Fahrenheit Centigrade converter</h2>\n<table style=\"margin: 1em;\">\n<tr>\n<td><img src=\"data/Fahrenheit.jpg\"></td>\n<td><img src=\"data/Celsius.jpg\"></td>\n</tr>\n<tr>\n<td>Gabriel Fahrenheit (1686-1736) </td>\n<td>Anders Celsius (1701-1744)</td>\n</tr>\n</table>\n<ul>\n<li> \nFahrenheit: The freezing point of water is 32 degrees, the boiling point is 212 degrees.\n<li>\nCentigrade: The freezing point of water is 0 degrees, the boiling point is 100 degrees.\n</ul>\n<p>\nThe relationship of Fahrenheit (F) and Centigrade (C)\nis represented as this formula.\n</p>\n<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\nC = (F - 32) / 1.8\n</p>\n"],
 ["html", "<h3>A simple converter with watchers</h3>"],
 ["tile", "C=F=0"],
 ["html", "<p>Drop here watchers of C,F to see these values.\nThen, try next formulas</p>"],
