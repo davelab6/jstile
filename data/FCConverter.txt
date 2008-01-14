@@ -2,11 +2,9 @@
 ["html", "<h2>Fahrenheit Centigrade converter</h2>\n<table style=\"margin: 1em;\">\n<tr>\n<td><img src=\"data/Fahrenheit.jpg\"></td>\n<td><img src=\"data/Celsius.jpg\"></td>\n</tr>\n<tr>\n<td>Gabriel Fahrenheit (1686-1736) </td>\n<td>Anders Celsius (1701-1744)</td>\n</tr>\n</table>\n<ul>\n<li> \nFahrenheit: The freezing point of water is 32 degrees, the boiling point is 212 degrees.\n<li>\nCentigrade: The freezing point of water is 0 degrees, the boiling point is 100 degrees.\n</ul>\n<p>\nThe relationship of Fahrenheit (F) and Centigrade (C)\nis represented as this formula.\n</p>\n<p style=\"\nfont-size: 2em;\nfont-family: 'Times New Roman';\nfont-style: italic;\n\">\nC = (F - 32) / 1.8\n</p>\n"],
 ["html", "<h3>A simple converter with watchers</h3>"],
 ["tile", "C=F=0"],
-["html", "<p>Drop here watchers of C,F to see these values.\nThen, try next formulas</p>"],
+["html", "<p>Drop here watchers by <img src=\"view.gif\">\nof C,F to edit these values.\nThen, try next formulas</p>"],
 ["tile", "C=((F-32)/1.8)"],
 ["tile", "F=((C*1.8)+32)"],
-["html", "<h3>A bidirectional constrain solver with events</h3>"],
-["html", "<ul>\n<li>Fahrenheit:\n<input id=\"f\" value=\"86\" style=\"font-size: x-large\"></li>\n<li>Centigrade:\n<input id=\"c\" value=\"30\" style=\"font-size: x-large\"></li>\n</ul>"],
-["html", "<p>A HTML element can be referred a Javascript program\nwith id attribute and $() function.</p>\n<p>\nPlease push the <img src=\"exclamation.gif\"> button bellow.\nAnd edit above numbers.\n</p>"],
+["html", "<h3>A bidirectional constrain solver with events</h3>\n<ul>\n<li>Fahrenheit:\n<input id=\"f\" value=\"86\"\nstyle=\"font-size: x-large\"></li>\n<li>Centigrade:\n<input id=\"c\" value=\"30\"\nstyle=\"font-size: x-large\"></li>\n</ul>\n<p>A HTML element can be referred a Javascript\nprogram with id attribute and $() function.</p>\n<p>\nPlease push the <img src=\"exclamation.gif\">\nbutton bellow.\nAnd edit above numbers.\n</p>\n"],
 ["source", "$('f').onblur = function () {\n  $(\"c\").value = ($(\"f\").value - 32) / 1.8\n};\n$('c').onblur = function () {\n  $(\"f\").value = ($(\"c\").value * 1.8) + 32\n};\n"]
 ]
