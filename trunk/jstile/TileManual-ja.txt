@@ -1,0 +1,197 @@
+*[jstile] タイルスクリプト取扱説明書(の下書き)
+
+** 概要
+
+Tilescript はグラフィカル言語とテキスト言語双方の利点を利点を生かした教育向けプログラミング環境です。この文書では、Tilescript のウェブ上での開発環境、特に C5 2008 で発表に使われた Tilescript revision 144 について述べます。
+
+** 利用方法
+
+- Firefox2 のみ動作確認しています。
+- ダウンロードしてローカルで利用する。
+-- http://tinlizzie.org/svn/trunk/jstile/ 以下の全てのファイルをダウンロードするか、subversion クライアントを利用してチェックアウトしてください。
+- 評価用の環境を利用する。
+-- http://tinlizzie.org/jstile/ にアクセスしてください。
+
+** 基本概念
+
+- 文書 : Tilescript では一つの画面に一つの文書が表示されます。文書には名前が付いています。
+- 段落 : 文書は段落から構成されています。段落には以下の種類があります。
+-- source : テキストエリアに表示された javascript または HTML ソースコードです。
+-- tile : タイル表示されたプログラムです。
+-- html : HTML 表示要素です。  
+-- result : テキストエリアに表示されたコードの実行結果です。
+- javascript 名前空間 : 全てのプログラムは同じ名前空間を共有します。つまり、ある文書で定義された変数は、他の文書から参照する事が出来ます。名前空間をクリアしたい場合はブラウザのリロードボタンで Tilescript を読み直して下さい。
+- Viewer と Watcher : Viewer とは、画面右方に表示される領域で、変数 Watcher が表示されます。Watcher は現在のグローバル変数の名前と値を全て表示します。
+-- グローバル変数とは、window オブジェクトの要素です。
+-- Tilescript 内部で使われる変数は Watcher に表示されません。また、ユーザが Tilescript 内部で使われる変数名を再定義した場合にも表示されません。
+
+** 操作方法
+
+*** ページ上部のボタン
+
+- Viewer ボタン(目玉アイコン) : Viewer の表示、非表示を切り替えます。
+- Home ボタン(家アイコン) : Home ページに移動します。
+- 保存ボタン(ディスクアイコン) : 文書を保存します。
+
+*** 段落の作成
+
+段落の間をクリックするか、タイルを段落の間にドロップすると新しい段落が作成されます。
+
+*** 段落の機能
+
+- 実行ボタン(びっくりアイコン) : 段落に記述されたプログラムを実行します。
+-- 実行結果が段落の下に新しい段落として表示されます。表示 には prototype.js の Object.inspect() を利用しています。
+- 削除ボタン(X アイコン) : 段落を削除します。
+- チェックボックス : ソースコード、タイル、HTML を切り替えます。
+-- チェックなし : ソースコードが表示されます。
+-- チェックあり + ソースコードの先頭が < : HTML として表示されます。
+-- チェックあり + ソースコードの先頭が < 以外 : タイルとして表示されます。
+
+** Transcript
+
+画面下方にあるタブで、Transcript の表示、非表示を切り替えます。Transcript にはプログラムの実行結果や、ソースコードを解析した際の構文木が表示されます。
+
+** Tilescript 文書
+
+Tilescript 文書には名前が付いています。名前にはアルファベットと数字を使う事が出来ます。名前は文書の先頭に表示され、そのまま URL にも使われます。URL の構成は以下のようになっています。
+
+ベース URL#文書名#段落番号
+
+例えば評価用環境にある Fibonacci という名前の文書は、http://tinlizzie.org/jstile/#Fibonacci となります。段落番号を使って http://tinlizzie.org/jstile/#Fibonacci#3 のように特定の位置を指定する事も出来ます。
+
+新規文書の作成には Wiki と同じ方法を使います。つまり、作りたい文書名の URL にアクセスするだけです。例えば http://tinlizzie.org/jstile/#NewPage という文書が存在しない時、このページにアクセスして保存すると新たに NewPage という文書が作成されます。
+
+ハッシュ要素 (URL の #以降) を用いて文書名を URL として表現する事は、特に Firefox で有効です。ブラウザは # を同一文書内の位置であると判断するため、大きな javascript の再読み込みをしなくてすみます。また、ブラウザのヒストリに正しく記録されるためにバックボタンを使うと期待通りの動作をします。Tilescript 環境は定期的にハッシュ要素を監視して、指定された文書を表示します。
+
+プレゼンテーション時に役に立つ機能として、スペースバーで段落を一つ進める事が出来ます。
+
+文書が変更された際にはブラウザのタイトルバーに * modified * と表示され、ページの移動時に警告が表示されます。
+
+** Tilescript 文書のファイルフォーマット
+
+以下に Tilescript 文書ファイルの例を示します。フォーマットは JSON 形式です。
+
+>||
+["tilescript",
+  ["source", "3 + 4"],
+  ["tile", "(3+4)"],
+  ["html", "<p>3 + 4</p>"]
+]
+||<
+
+第一要素は必ず文字列 "tilescript" です。第二要素以降 [タグ, ソースコード] が記録されます。タグには source, tile, html, result の種類があり、それぞれ段落の種類を示します。
+
+** マクロ
+
+Tilescript では、マクロを使ってユーザが制御構造を作る事が出来ます。マクロの定義は function に似ています。function の代わりにキーワード macro を使い、マクロ名には @ を先頭に付けます以下の例を記します。
+
+>||
+macro @repeat(k, s) {
+  var n = k;
+  while (n-- > 0) {s}
+}
+||<
+
+マクロを定義するには、定義を段落に入力し、タイルに変換します。その時点でマクロ定義が完了します。定義されたマクロはグローバル変数 macros に格納されます。
+
+マクロの利用例を以下に記します。
+
+>||
+@repeat(4, ++x)
+||<
+
+** 構成
+
+Tilescript 環境は以下のファイルより構成されます。
+
+- index.html : エントリポイントです。
+- tilescript.css : 表示を制御します。
+- 各 js ファイル
+- data ディレクトリ : 文書が保存されています。
+
+動作に最低限必要なソフトウェアは Firefox2 です。インターネット上もしくはローカル環境で動作します。インターネット上では文書の保存領域として WebDAV を利用します。ローカル環境では Mozilla API を利用してローカルディスクに直接記録します。
+
+Tilescript は直接 WebDAV プロトコルを扱う為、インターネット上で利用する際でも CGI 等の特別なサーバは不要です。ローカル環境で利用する際は ファイルシステムにアクセスする Mozilla の特殊な機能を利用するため、権限の設定が必要になります。
+
+** 利用ライブラリ
+
+以下のライブラリを利用しています。ライブラリの選定に当たっては、将来 LivelyKernel と共に利用する事を考慮しました(現在はまだ LivelyKernel との共用は出来ません)。
+
+- OMeta
+- prototype.js 1.5.2_pre0
+- scriptaculous v1.7.1_beta3
+
+** 動機
+
+*** 言語の開発動機
+
+Tilescript の目的は、初心者にも簡単で、幅広く応用出来るプログラミング環境です。Squeak etoys をアイデアの出発点としました。
+
+etoys は、タイル言語を使った子供用の優れたプログラム環境です。また、Smalltalk 言語を用いて機能を拡張する事が出来ます。タイル言語と Smalltalk 言語の間には大きなギャップがあります。
+
+- ギャップ1 : etoys (タイル) は Smalltalk に変換出来るが、Smalltak はetoys に変換出来ない。
+- ギャップ2 : etoys はインスタンス指向の言語だが、Smalltalk はクラス指向である。
+
+このギャップを埋める為に以下の手法を選びました。
+
+- タイル言語とテキスト言語を相互変換する仕組み。
+- インスタンス指向の言語(javascript) を基礎として選ぶ。
+
+また、ユーザが言語自体を拡張できるようマクロ機能を実装しました。
+
+*** 開発環境の開発動機
+
+Tilescript 開発環境は、特にユーザによる Active Essays の執筆を支援する目的で開発されました。同様のコンセプトの開発環境として、SophieScript があります。
+
+Active Essays とは、文章の中にプログラムを織り交ぜて、読み進めながらプログラムの実行を楽しむ文書の事で、特に物理や数学の概念を自分でシミュレートしながら学ぶのに適しています。例えば自然選択や乱数のシミュレーションを通して進化論を学ぶ事の出来る The Evolution Essay - Ted Kaehler があります。
+
+Tilescript では、Active Essays を実現するだけでなく、ユーザが自分で Active Essays を執筆するための支援を重視しました。コンピュータを使った科学教育のカリキュラムの一つとして、説明による学習 (Learning by Explaining) が最適だと判断したからです。
+
+良い Active Essay を書くためには、他人の書いたソースコードをよく読む必要があります。しかし現在の etoys では、レイアウトが画面サイズに依存するため、ソースコードと文章を同時に表示して読み進める事が難しくなっています。これを解決するためには、画面サイズに応じてレイアウトがダイナミックに変化するフローレイアウトが最適であると判断しました。
+
+フローレイアウトを簡単に実装するため、Tilescript では HTML DOM をそのまま利用しました。
+
+** 作品例
+
+*** 摂氏華氏変換器 http://tinlizzie.org/jstile/#FCConverter
+
+変数を使った例です。始めに二つの変数 C, F を定義して、Viewer からそれぞれの Watcher を取り出します。Watcher と単位変換プログラムを使って華氏と摂氏の値を相互変換する事が出来ます。例えば摂氏 10 度を求めるには、C を 10 にセットしてから F = C * 1.8 + 32 の式を実行すると華氏の値が求まります。
+
+また、DOM イベントを用いた双方向制約の実装例もあります。
+
+*** 擬似乱数 http://tinlizzie.org/jstile/#Random
+
+擬似乱数のアルゴリズムとして linear congruential generator を紹介しています。A, B, M, それぞれの定数を設定して、X の初期値 0 を設定した後で、X = ( (A * X) + B) % M を何度も実行すると、次々と X に擬似配列の値が現れます。また、結果を配列に格納する事により、M の値に応じて擬似乱数に周期がある事が分かります。
+
+続いて、Canvas に擬似乱数をプロットする事で、擬似乱数の振る舞いと質について直感的に評価する事が出来ます。この例では、Numerical Recipes in C によって示された値を使い結果を検証しています。
+
+*** 複素数の積 http://tinlizzie.org/jstile/#ComplexNumber
+
+複素数の積を計算する例です。
+
+まず javascript の配列を使って一つの複素数を表現します。例えば 1 + 2i を [1, 2] のように表現します。この記法を使って複素数の積を関数 mul として実装し、まず 1 * 1 や i * i など単純なケースで検証します。
+
+もっと複雑な例については、複素平面を Canvas にプロットする事により振る舞いを知る事が出来ます。また、イベントによりダイナミックに複素数をプロットする事で、複素数の積が二次元図形の拡大と回転を表現するのに適している事が分かります。
+
+** 歴史
+
+Tilescript の基本的なアイデアは 2007 年の Apple Hill Learning Camp にて Alessandro Warth, Yoshiki Ohshima, Scott Wallece, Takashi Yamamiya によって話し合われました。その後しばらく Tilescript は Squeak 上の javascript 実装をベースにして Morphic 環境で開発されていました。2007年12月に、単純なブラウザの DOM を利用してもタイルが表現出来る見込みが付いた事と、OMeta の javascript 版が完成した為にブラウザでの開発に移行しました。しばらくは IE, Firefox, Opera, Safari と言ったブラウザを全てサポートしていましたが、現在一時的に Firefox のみ完全対応となっています。
+
+** 問題点
+
+現在の Tilescript は、新しいアイデアのデモに使うという点が優先課題であったため、実際に利用するには数多くの問題点が残されています。
+
+- パーツビンが無い為、何も無い場所からスクリプトを作成する事が出来ません。タイルスクリプトの利点としては、javascript で記述したコードを簡単に編集出来るという点のみとなっています。
+- ドラッグアンドドロップに関して、型や文法要素に対するチェックが無い為、容易に構文エラーが発生します。
+- セキュリティは全く考慮されていません。
+
+** References
+
+- A. Warth, T. Yamamiya, Y. Ohshima, S. Wallace: Toward A More Scalable End-User Scripting Language.  Proceedings of the Sixth Intenational Conference on Creating, Connecting and Collaborating through Computing.
+- prototype.js http://prototypejs.org/
+- scriptaculous http://script.aculo.us/
+- Lively Kernel http://research.sun.com/projects/lively/
+- OMeta http://www.cs.ucla.edu/~awarth/ometa/
+- A. Kay: Active Essays. http://www.squeakland.org/whatis/a_essays.html
+- T. Kaehler: The Evolution Essay. http://www.squeakland.org/projects/Weasel%20Essay1.023.pr
+- J. Licke, R. Hirscfeld, M. Ruger, M. Masuch: SophieScript - Active Content in Multimedia Documents. Proceedings of the Sixth Intenational Conference on Creating, Connecting and Collaborating through Computing.
