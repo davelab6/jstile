@@ -2,6 +2,7 @@
 
 Model = {}
 Model.dependents = [];
+Model.x = 0;
 
 // Main loop
 Model.handleEvent = function(event) {
@@ -12,15 +13,15 @@ Model.handleEvent = function(event) {
 }
 
 Model.changed = function() {
-  var generator, i;
+  var generator, j;
   for (var i = 0; i < Model.dependents.length; i++) {
     try {
       generator = Model.dependents[i];
       generator.send(Model.x);
     } catch (err if err instanceof StopIteration) {
       // When the generator is finished, remove dependency.
-      i = Model.dependents.indexOf(generator);
-      this.dependents.splice(i, 1); 
+      j = Model.dependents.indexOf(generator);
+      this.dependents.splice(j, 1); 
     }
   }
 }
@@ -32,7 +33,7 @@ Model.addDependent = function(f) {
 
 // ---------- Listners ----------
 
-// Basic example of an infinit loop as an observer (like eToys).
+// Basic example of an infinite loop as an observer (like eToys).
 function everything() {
   yield; // Just an idiom because the first yield can not receive a value.
   while (true) {
@@ -69,3 +70,10 @@ window.onload = function() {
     Model.handleEvent(event);
   }
 }
+
+// Ideal solution
+// function ideal() {
+//  while (true) {
+//    $("ideal").innerHTML = Model.getX_Updated()
+//  }
+// }
