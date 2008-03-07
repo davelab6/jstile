@@ -4,14 +4,20 @@
 <head>
 <title>Polling + Observer Pattern</title>
 <script type="text/javascript" src="../scriptaculous/prototype.js"></script>
-<script type="application/javascript;version=1.7"/ src="yield.js"></script>
-</script>
+<script type="application/javascript;version=1.7" src="yield.js"></script>
 <style type="text/css">
 <!--
-p {
+p.inspector {
   font-size: 3em;
   margin: 0 0 0 0;
   background-color: #ddeedd;
+}
+#ModelDependents {
+  font-size: 0.8em;
+}
+pre {
+  background-color: #eeeeff;
+  border: 1px solid #ddddee;
 }
 -->
 
@@ -19,11 +25,89 @@ p {
 </head>
 <body>
 <h1>Polling + Observer Pattern ( Morphic * MVC )</h1>
-<p>Model.x = <span id="ModelX">0</span></p>
-<p>Model.dependents = <span id="ModelDependents">()</span></p>
-<hr>
-<p>everything = <span id="everything">0</span></p>
-<p>first100 = <span id="first100">0</span></p>
-<p>each100 = <span id="each100">0</span></p>
+<p class="inspector">Model.x = <span id="ModelX">0</span></p>
+<p class="inspector">Model.dependents = <br/><span id="ModelDependents">()</span></p>
+<hr/>
+<p class="inspector">everything = <span id="everything">0</span></p>
+<p class="inspector">first100 = <span id="first100">0</span></p>
+<p class="inspector">each100 = <span id="each100">0</span></p>
+<hr/>
+<h2>About the demo (Firefox only)</h2>
+
+This demo gives you another idea of <b>Observer Pattern</b>. Traditionally
+Observer Pattern is used in various places in GUI framework like
+MVC. The idea here is to use a <b>Generator</b> to represent a dependency
+instead of keeping dependents list manually. For example:
+
+<pre>
+// Basic example of an infinite loop as an observer (like eToys).
+function everything() {
+  yield; // Just an idiom because the first yield can not receive a value.
+  while (true) {
+    $("everything").innerHTML = yield; // Get updated X value (now it's hard-coded)
+  };
+}
+Model.addDependent(everything());
+</pre>
+
+In this demo. The Model keeps track current mouse X position. And
+"everything" handler just follow the value. In this case, the handler
+is just a infinite loop. But the process reaches the point of "yield",
+it is blocked and wait next changed value. Basically this behavior is
+same as UNIX's pipe. Or, you can see this is same as eToys process.
+
+<pre>
+// It lives only 100 cycle, after that, the dependency is released automatically.
+function first100() {
+  yield;
+  for(var i = 0; i < 100; i++) {
+    $("first100").innerHTML = yield;
+  }; 
+}
+Model.addDependent(first100());
+</pre>
+
+This is more interesting one. "first100" handler only handles first
+100 updates in the model. It is represented by FOR loop naturally. But
+if you write this behavior with Observer Pattern, you have to keep a
+counter somewhere, and after it finish, you need to remove it from
+dependents list by yourself.
+
+<pre>
+// Only one of 100 is interesting. (because sleep() is difficult in JS)
+function each100() {
+  yield;
+  while (true) {
+    for (var i = 0; i < 99; i++) yield; // Throw away 99 times!
+    $("each100").innerHTML = yield;
+  }
+}
+Model.addDependent(each100());
+</pre>
+Last example is useful if you don't want every updates.
+
+<h2>Motivation and Goal</h2>
+
+<p>
+Both <b>Observer Pattern</b> (MVC) and <b>Polling</b> (Morphic) have
+each advantage and drawback. If frequency of model's update is slow
+(like keyboard input), or the timing is critical, Observer Pattern is
+efficient choice. But if it is very high (like system clock) or there
+are numbers of observer (like eToys' viewer), Polling is better. And
+Polling is easier to understand. One motivation is to unify those
+ideas. The behavior of this demo is same as Observer Pattern, but it
+can be described like Polling (NOTE: This demo doesn't do anything
+like a pooling, but I think there is a way to mix those behavior).
+</p>
+
+<p>
+Another motivation is to provide a universal event model
+everywhere. If a program should be a set of independent processes
+talking each other like Internet. Object dependency should be described
+same manner. In this demo, you can see each observer as an event
+handler.
+</p>
+
+<p>Takashi Yamamiya</p>
 </body>
 </html>
