@@ -1,0 +1,14 @@
+["tilescript",
+["html", "<h2>This is a play for me to learn TileScript and JavaScript</h2>\n\n<style type=\"text/css\">\n\ndiv.rowTool { \n visibility: visible;\n}\n\ndiv.rowTool:hover {\n background-color:red; \n visibility: visible;\n filter:alpha(opacity=80);\n}\n\n\n</style>"],
+["html", "<p>The Canvas is created by using HTML code. It has a fixed position, so it can be seen\neven when scrolling down. But this is no perfect solution... :-/</p>"],
+["html", "<canvas style=\"background-color:white; position:fixed; right:20px; top:120px\" id=\"canvas\" width=\"300\" height=\"300\"></canvas>\n\n"],
+["html", "<p>the folling make the canvas available for scripting</p>"],
+["source", "cl= function(){\n  canvas=$('canvas');\n  ctx=canvas.getContext('2d');\n  ctx.clearRect(0,0,canvas['width'],canvas['height'])\n}\n\ncl()"],
+["html", "<p>Now it is time to draw a rectangle, I use variable to make the customization of the rectangle easy</p>"],
+["source", "\ndrawRectangle= function (x,y,w,h) {\n  ctx.moveTo(x,  y)\n  ctx.lineTo(x+w,y)\n  ctx.lineTo(x+w,y+h)\n  ctx.lineTo(x,  y+h)\n  ctx.lineTo(x,  y)\n  ctx.stroke()}\n\ndrawRectangle(10,20,30,40)\ndrawRectangle(50,50,30,40)\n\n"],
+["tile", "{drawRectangle(10,20,30,40);drawRectangle2(100,100,30,40)}"],
+["html", "<p>but we don't need to write this for ourself, we can use function of the JavaScript Canvas API</p>"],
+["source", "ctx.fillRect(15,15,120,120);"],
+["html", "<p>or we can try out complete examples from the web</p>"],
+["source", "cl()\nfunction draw() {\n\n  ctx.save();\n  ctx.translate(75,75);\n\n  for (i=1;i<6;i++){ // Loop through rings (from inside to out)\n    ctx.save()\n    ctx.fillStyle = 'rgb('+(51*i)+','+(255-51*i)+',255)'\n\n    for (j=0;j<i*6;j++){ // draw individual dots\n      ctx.rotate(Math.PI*2/(i*6))\n      ctx.beginPath()\n      ctx.arc(0,i*12.5,5,0,Math.PI*2,true)\n      ctx.fill()\n    }\n\n    ctx.restore()\n  }\n  ctx.restore()\n}\ndraw()"]
+]
