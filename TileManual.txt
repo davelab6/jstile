@@ -1,5 +1,7 @@
 Tilescript Manual
 
+This document is described for http://tinlizzie.org/svn/trunk/jstile/ revision 154.
+
 * Summary
 
 Tilescript is a programming environment for educational purpose which
