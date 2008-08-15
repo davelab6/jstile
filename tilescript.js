@@ -187,10 +187,10 @@ Row = {
   className: "row",
 
   rowNode: function() {
-    return document.getElementsByClassName("tile", this.valueParent)[0];
+    return this.valueParent.getElementsByClassName("tile")[0];
   },
   printItButton: function() {
-    return document.getElementsByClassName("printIt", this.rowTool)[0];
+    return this.rowTool.getElementsByClassName("printIt")[0];
   },
   sourceCode: function(delMacros) {
     var rowNode = this.rowNode();
@@ -396,7 +396,7 @@ TileElement = {
     this.parentNode.replaceChild(elementCopy, this);
   },
   include: function(element) {
-    return this.getElementsByClassName("tile").include(element);
+    return $A(this.getElementsByClassName("tile")).include(element);
   },
   addColumn: function(element, colSpan, rowSpan) {
     if (element.parentTile !== undefined) {
