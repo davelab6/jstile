@@ -1,17 +1,15 @@
 Tilescript Manual
 
-This document is described for http://tinlizzie.org/svn/trunk/jstile/ revision 154.
+This document is described for http://tinlizzie.org/svn/trunk/jstile/ revision 309.
 
 * Summary
 
 Tilescript is a programming environment for educational purpose which
-has good features in both graphical and textual languages. In this
-document, the development environment of Tilescript, especially
-Tilescript revision 144 for C5 2008 presentation, is described.
+has good features in both graphical and textual languages.
 
 * How to use
 
-- Only Firefox2 is supported.
+- Only Firefox3 and Safari are supported.
 - To use on a local machine.
 -- Download or check out with subversion client at
    http://tinlizzie.org/svn/trunk/jstile/.
@@ -159,11 +157,8 @@ dialog to confirm local file access.
 * Libraries used by the system
 
 - OMeta
-- prototype.js 1.5.2_pre0
-- scriptaculous v1.7.1_beta3
-
-This configuration is to adapt Lively Kernel, although Lively Kernel
-will be only supported by the future version.
+- prototype.js 1.6.0.1
+- scriptaculous 1.8.1
 
 * Motivation
 
